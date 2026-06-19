@@ -22,6 +22,7 @@ export type BranchProfile = {
       timeNote: keyof EditableSiteContent;
       location: keyof EditableSiteContent;
       bring: keyof EditableSiteContent;
+      bringNote: keyof EditableSiteContent;
       contact: keyof EditableSiteContent;
       countText: keyof EditableSiteContent;
       emptyText: keyof EditableSiteContent;
@@ -49,6 +50,7 @@ export type BranchProfile = {
     timeNote: string;
     location: string;
     bring: string;
+    bringNote: string;
     contact: string;
     countText: string;
     emptyText: string;
@@ -61,6 +63,8 @@ const defaultPlanningInfo = {
   timeNote: "Meestal 14u-17u, afwijkingen staan bij de vergadering.",
   location: "Diest, Belgie",
   bring: "Kleren die vuil mogen worden",
+  bringNote:
+    "Als er andere kledij of extra materiaal nodig is, staat dat bij de vergadering in het programma.",
   contact: "Via de takleiding of groepsleiding",
   countText: "Er staan {aantal} vergaderingen in het programma.",
   emptyText: "Programma wordt binnenkort aangevuld",
@@ -88,6 +92,7 @@ export const branchProfiles: BranchProfile[] = [
         timeNote: "branchKapoenenPlanningTimeNote",
         location: "branchKapoenenPlanningLocation",
         bring: "branchKapoenenPlanningBring",
+        bringNote: "branchKapoenenPlanningBringNote",
         contact: "branchKapoenenPlanningContact",
         countText: "branchKapoenenPlanningCountText",
         emptyText: "branchKapoenenPlanningEmptyText",
@@ -172,6 +177,7 @@ export const branchProfiles: BranchProfile[] = [
         timeNote: "branchWelpenPlanningTimeNote",
         location: "branchWelpenPlanningLocation",
         bring: "branchWelpenPlanningBring",
+        bringNote: "branchWelpenPlanningBringNote",
         contact: "branchWelpenPlanningContact",
         countText: "branchWelpenPlanningCountText",
         emptyText: "branchWelpenPlanningEmptyText",
@@ -230,6 +236,7 @@ export const branchProfiles: BranchProfile[] = [
         timeNote: "branchJongverkennersPlanningTimeNote",
         location: "branchJongverkennersPlanningLocation",
         bring: "branchJongverkennersPlanningBring",
+        bringNote: "branchJongverkennersPlanningBringNote",
         contact: "branchJongverkennersPlanningContact",
         countText: "branchJongverkennersPlanningCountText",
         emptyText: "branchJongverkennersPlanningEmptyText",
@@ -304,6 +311,7 @@ export const branchProfiles: BranchProfile[] = [
         timeNote: "branchVerkennersPlanningTimeNote",
         location: "branchVerkennersPlanningLocation",
         bring: "branchVerkennersPlanningBring",
+        bringNote: "branchVerkennersPlanningBringNote",
         contact: "branchVerkennersPlanningContact",
         countText: "branchVerkennersPlanningCountText",
         emptyText: "branchVerkennersPlanningEmptyText",
@@ -368,6 +376,7 @@ export const branchProfiles: BranchProfile[] = [
         timeNote: "branchJinsPlanningTimeNote",
         location: "branchJinsPlanningLocation",
         bring: "branchJinsPlanningBring",
+        bringNote: "branchJinsPlanningBringNote",
         contact: "branchJinsPlanningContact",
         countText: "branchJinsPlanningCountText",
         emptyText: "branchJinsPlanningEmptyText",
@@ -459,6 +468,9 @@ export function getEditableBranchProfile(
         branch.planningInfo.location,
       bring:
         content[branch.contentKeys.planning.bring] || branch.planningInfo.bring,
+      bringNote:
+        content[branch.contentKeys.planning.bringNote] ||
+        branch.planningInfo.bringNote,
       contact:
         content[branch.contentKeys.planning.contact] ||
         branch.planningInfo.contact,

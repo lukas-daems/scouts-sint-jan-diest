@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Footer from "../components/Footer";
 import IconBadge from "../components/IconBadge";
 import Navbar from "../components/Navbar";
-import PageDemoForm from "../components/PageDemoForm";
 import SiteEditor from "../components/SiteEditor";
 import {
   getEditableSitePage,
@@ -30,26 +29,40 @@ function CardsGrid({ page }: { page: EditableSitePage }) {
   }
 
   return (
-    <div className="grid gap-5 md:grid-cols-2">
-      {page.cards.map((card, index) => (
-        <article
-          className={`lift-card rounded-[2rem] border border-slate-200 bg-white p-6 shadow-lg shadow-green-950/6 ${
-            index === 0 && page.cards.length > 3 ? "md:col-span-2" : ""
-          }`}
-          key={`${card.title}-${index}`}
-        >
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001] ring-1 ring-[#d7e8cf]">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <h2 className="mt-5 text-2xl font-black text-slate-950">
-            {card.title}
-          </h2>
-          <p className="mt-3 whitespace-pre-line leading-7 text-slate-600">
-            {card.text}
-          </p>
-        </article>
-      ))}
-    </div>
+    <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
+      <div className="max-w-3xl">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+          Overzicht
+        </p>
+        <h2 className="mt-2 text-3xl font-black text-slate-950">
+          Belangrijk op deze pagina
+        </h2>
+      </div>
+      <div className="mt-7 grid gap-4 md:grid-cols-2">
+        {page.cards.map((card, index) => (
+          <article
+            className={`rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-lg hover:shadow-green-950/8 ${
+              index === 0 && page.cards.length > 3 ? "md:col-span-2" : ""
+            }`}
+            key={`${card.title}-${index}`}
+          >
+            <div className="flex items-start gap-4">
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001] ring-1 ring-[#d7e8cf]">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h3 className="text-xl font-black text-slate-950">
+                  {card.title}
+                </h3>
+                <p className="mt-2 whitespace-pre-line leading-7 text-slate-600">
+                  {card.text}
+                </p>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -75,6 +88,58 @@ function FactsList({ page }: { page: EditableSitePage }) {
         </div>
       ))}
     </div>
+  );
+}
+
+function PageOverview({
+  page,
+  siteName,
+}: {
+  page: EditableSitePage;
+  siteName: string;
+}) {
+  const hasSupport = Boolean(page.highlight) || page.facts.length > 0;
+
+  return (
+    <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:p-10">
+      <div
+        className={`grid gap-8 ${
+          hasSupport ? "lg:grid-cols-[0.92fr_1.08fr] lg:items-start" : ""
+        }`}
+      >
+        <div>
+          <IconBadge icon={page.kind === "camp" ? "tent" : "check"} tone="green" />
+          <p className="mt-6 text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+            {siteName}
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+            {page.sidebarTitle}
+          </h2>
+          <p className="mt-4 max-w-2xl whitespace-pre-line leading-8 text-slate-600">
+            {page.sidebarText}
+          </p>
+        </div>
+
+        {hasSupport ? (
+          <div className="grid gap-4">
+            {page.highlight ? (
+              <div className="rounded-3xl bg-[#edf6e8] p-5 ring-1 ring-[#d7e8cf] sm:p-6">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                  {page.highlight.label}
+                </p>
+                <h3 className="mt-2 text-xl font-black text-slate-950">
+                  {page.highlight.title}
+                </h3>
+                <p className="mt-3 whitespace-pre-line leading-7 text-slate-700">
+                  {page.highlight.text}
+                </p>
+              </div>
+            ) : null}
+            <FactsList page={page} />
+          </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
@@ -131,6 +196,8 @@ function ProductCatalog({ page }: { page: EditableSitePage }) {
     return null;
   }
 
+  const requestHref = page.externalCta?.href;
+
   return (
     <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
       <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
@@ -154,14 +221,71 @@ function ProductCatalog({ page }: { page: EditableSitePage }) {
             <p className="mt-2 text-sm leading-6 text-slate-600">
               Maten: {product.sizes}
             </p>
-            <a
-              className="mt-5 inline-flex rounded-full bg-[#103001] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
-              href="#formulier"
-            >
-              {product.action}
-            </a>
+            {requestHref ? (
+              <Link
+                className="mt-5 inline-flex rounded-full bg-[#103001] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+                href={requestHref}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {product.action}
+              </Link>
+            ) : (
+              <span className="mt-5 inline-flex rounded-full bg-[#edf6e8] px-5 py-2.5 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
+                Link volgt binnenkort
+              </span>
+            )}
           </article>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function ExternalCtaBlock({ page }: { page: EditableSitePage }) {
+  if (!page.externalCta) {
+    return null;
+  }
+
+  const hasLink = Boolean(page.externalCta.href);
+
+  return (
+    <section
+      className="rounded-[2rem] border border-[#d7e8cf] bg-[#edf6e8] p-6 shadow-xl shadow-green-950/8 sm:p-8"
+      id="aanvragen"
+    >
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex gap-4">
+          <div className="shrink-0">
+            <IconBadge icon="check" tone="green" />
+          </div>
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+              Externe link
+            </p>
+            <h2 className="mt-2 text-3xl font-black text-slate-950">
+              {page.externalCta.title}
+            </h2>
+            <p className="mt-3 max-w-2xl whitespace-pre-line leading-7 text-slate-700">
+              {page.externalCta.text}
+            </p>
+          </div>
+        </div>
+
+        {hasLink ? (
+          <Link
+            className="inline-flex shrink-0 justify-center rounded-full bg-[#103001] px-7 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/15 transition hover:-translate-y-0.5 hover:bg-[#1e4b0d]"
+            href={page.externalCta.href}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {page.externalCta.button}
+          </Link>
+        ) : (
+          <span className="inline-flex shrink-0 justify-center rounded-full bg-white px-7 py-4 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
+            Link volgt binnenkort
+          </span>
+        )}
       </div>
     </section>
   );
@@ -223,15 +347,7 @@ function FeatureBlocks({ page }: { page: EditableSitePage }) {
       <DocumentsBlock page={page} />
       <ProductCatalog page={page} />
       <LinksBlock page={page} />
-      {page.form ? (
-        <PageDemoForm
-          fields={page.form.fields}
-          intro={page.form.intro}
-          submitLabel={page.form.submitLabel}
-          successMessage={page.form.successMessage}
-          title={page.form.title}
-        />
-      ) : null}
+      <ExternalCtaBlock page={page} />
     </div>
   );
 }
@@ -298,52 +414,26 @@ export default async function InfoPage({ params }: InfoPageProps) {
       </section>
 
       <section className="px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.42fr_0.58fr]">
-          <aside className="h-fit rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
-            <IconBadge icon={page.kind === "camp" ? "tent" : "check"} tone="green" />
-            <p className="mt-6 text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
-              {siteContent.siteName}
-            </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              {page.sidebarTitle}
-            </h2>
-            <p className="mt-4 whitespace-pre-line leading-8 text-slate-600">
-              {page.sidebarText}
-            </p>
-            {page.highlight ? (
-              <div className="mt-7 rounded-3xl bg-[#edf6e8] p-5 ring-1 ring-[#d7e8cf]">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-                  {page.highlight.label}
-                </p>
-                <h3 className="mt-2 text-xl font-black text-slate-950">
-                  {page.highlight.title}
-                </h3>
-                <p className="mt-3 whitespace-pre-line leading-7 text-slate-700">
-                  {page.highlight.text}
-                </p>
-              </div>
-            ) : null}
-            <div className="mt-7">
-              <FactsList page={page} />
-            </div>
-          </aside>
+        <div className="mx-auto grid max-w-7xl gap-8">
+          <PageOverview page={page} siteName={siteContent.siteName} />
 
           {page.kind === "single" ? (
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-xl shadow-green-950/8 sm:p-10">
-              <h2 className="text-3xl font-black text-slate-950">
-                {page.title}
-              </h2>
-              <p className="mt-5 whitespace-pre-line text-lg leading-9 text-slate-600">
-                {page.intro}
-              </p>
+            <div className="grid gap-8">
               {page.body ? (
-                <div className="mt-8 whitespace-pre-line rounded-3xl bg-[#fbfdf9] p-6 text-base leading-8 text-slate-700 ring-1 ring-slate-200 sm:p-8">
-                  {page.body}
-                </div>
+                <section className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-xl shadow-green-950/8 sm:p-10">
+                  <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+                    Informatie
+                  </p>
+                  <h2 className="mt-2 text-3xl font-black text-slate-950">
+                    {page.title}
+                  </h2>
+                  <div className="mt-6 whitespace-pre-line rounded-3xl bg-[#fbfdf9] p-6 text-base leading-8 text-slate-700 ring-1 ring-slate-200 sm:p-8">
+                    {page.body}
+                  </div>
+                </section>
               ) : null}
-              <div className="mt-8">
-                <CardsGrid page={page} />
-              </div>
+              <CardsGrid page={page} />
+              <ExternalCtaBlock page={page} />
             </div>
           ) : (
             <FeatureBlocks page={page} />

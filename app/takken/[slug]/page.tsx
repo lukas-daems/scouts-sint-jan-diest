@@ -291,6 +291,7 @@ export default async function BranchDetailPage({
                   {
                     label: "Meenemen",
                     value: branch.planningInfo.bring,
+                    note: branch.planningInfo.bringNote,
                   },
                   {
                     label: "Contact",

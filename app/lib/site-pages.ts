@@ -55,10 +55,11 @@ export type SitePageLinkItem = {
   description: string;
 };
 
-export type SitePageFormField = {
-  label: string;
-  type: string;
-  options: string[];
+export type SitePageExternalCta = {
+  title: string;
+  text: string;
+  button: string;
+  href: string;
 };
 
 export type EditableSitePage = SiteInfoPage & {
@@ -76,13 +77,7 @@ export type EditableSitePage = SiteInfoPage & {
   updates: string;
   products: SitePageProduct[];
   links: SitePageLinkItem[];
-  form?: {
-    title: string;
-    intro: string;
-    fields: SitePageFormField[];
-    submitLabel: string;
-    successMessage: string;
-  };
+  externalCta?: SitePageExternalCta;
   primaryCta?: {
     label: string;
     href: string;
@@ -282,30 +277,10 @@ function parseLinks(value: string): SitePageLinkItem[] {
     .filter((item) => item.label);
 }
 
-function parseFormFields(value: string): SitePageFormField[] {
-  return value
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [label = "", type = "text", rawOptions = ""] = line.split("|");
-      return {
-        label: label.trim(),
-        type: type.trim() || "text",
-        options: rawOptions
-          .split(",")
-          .map((option) => option.trim())
-          .filter(Boolean),
-      };
-    })
-    .filter((item) => item.label);
-}
-
 export function getEditableSitePage(
   page: SiteInfoPage,
   content: EditableSiteContent
 ): EditableSitePage {
-  const formFields = parseFormFields(valueFor(content, page, "FormFields"));
   const highlightLabel = valueFor(content, page, "HighlightLabel");
   const highlightTitle = valueFor(content, page, "HighlightTitle");
   const highlightText = valueFor(content, page, "HighlightText");
@@ -313,6 +288,10 @@ export function getEditableSitePage(
   const primaryHref = valueFor(content, page, "PrimaryCtaHref");
   const secondaryLabel = valueFor(content, page, "SecondaryCtaLabel");
   const secondaryHref = valueFor(content, page, "SecondaryCtaHref");
+  const externalTitle = valueFor(content, page, "ExternalCtaTitle");
+  const externalText = valueFor(content, page, "ExternalCtaText");
+  const externalButton = valueFor(content, page, "ExternalCtaButton");
+  const externalHref = valueFor(content, page, "ExternalCtaUrl");
 
   return {
     ...page,
@@ -339,14 +318,13 @@ export function getEditableSitePage(
     updates: valueFor(content, page, "Updates"),
     products: parseProducts(valueFor(content, page, "Products")),
     links: parseLinks(valueFor(content, page, "Items")),
-    form:
-      formFields.length > 0
+    externalCta:
+      externalTitle || externalText || externalButton || externalHref
         ? {
-            title: valueFor(content, page, "FormTitle"),
-            intro: valueFor(content, page, "FormIntro"),
-            fields: formFields,
-            submitLabel: valueFor(content, page, "FormSubmit"),
-            successMessage: valueFor(content, page, "FormSuccess"),
+            title: externalTitle,
+            text: externalText,
+            button: externalButton || "Open formulier",
+            href: externalHref,
           }
         : undefined,
     primaryCta:
@@ -444,21 +422,16 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
     });
   }
 
-  if (
-    ["event", "order", "reservation", "shop", "committee", "rental"].includes(
-      page.kind
-    )
-  ) {
+  if (["event", "order", "reservation", "shop", "committee", "rental"].includes(page.kind)) {
     groups.push({
-      title: "Formulier",
+      title: "Externe formulierlink",
       description:
-        "Gebruik bij formulierregels: label|type|opties. Select-opties scheid je met komma's.",
+        "Geen ingebouwd formulier op de site. Plaats hier de link naar bijvoorbeeld Google Forms, Microsoft Forms of een ander extern formulier.",
       fields: [
-        { key: keyFor(page, "FormTitle"), label: "Formuliertitel" },
-        { key: keyFor(page, "FormIntro"), label: "Formulierintro", kind: "textarea" },
-        { key: keyFor(page, "FormFields"), label: "Formuliervelden", kind: "textarea" },
-        { key: keyFor(page, "FormSubmit"), label: "Knoptekst formulier" },
-        { key: keyFor(page, "FormSuccess"), label: "Succesmelding", kind: "textarea" },
+        { key: keyFor(page, "ExternalCtaTitle"), label: "Titel van de CTA-balk" },
+        { key: keyFor(page, "ExternalCtaText"), label: "Korte uitlegtekst", kind: "textarea" },
+        { key: keyFor(page, "ExternalCtaButton"), label: "Knoptekst" },
+        { key: keyFor(page, "ExternalCtaUrl"), label: "Externe formulierlink" },
       ],
     });
   }

@@ -2,30 +2,15 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { FormEvent, useState } from "react";
 import IconBadge from "./IconBadge";
 import type { EditableSiteContent } from "../lib/site-content-defaults";
-
-const fields = [
-  { label: "Naam ouder", name: "parentName", type: "text" },
-  { label: "Naam kind", name: "childName", type: "text" },
-  { label: "Leeftijd kind", name: "childAge", type: "text" },
-  { label: "E-mailadres", name: "email", type: "email" },
-  { label: "Telefoonnummer", name: "phone", type: "tel" },
-];
 
 type ContactSectionProps = {
   content: EditableSiteContent;
 };
 
 export default function ContactSection({ content }: ContactSectionProps) {
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitted(true);
-    event.currentTarget.reset();
-  }
+  const hasExternalLink = Boolean(content.contactExternalUrl);
 
   return (
     <section className="bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="contact">
@@ -43,50 +28,45 @@ export default function ContactSection({ content }: ContactSectionProps) {
         </div>
 
         <div className="mt-14 grid gap-8 lg:grid-cols-[1.12fr_0.88fr]">
-          <form
-            className="rounded-[2rem] border border-slate-200 bg-[#fbfdf9] p-6 shadow-xl shadow-green-950/8 sm:p-8"
-            onSubmit={handleSubmit}
-          >
-            {/* TODO: koppel dit formulier later aan een echte verzendfunctie. */}
-            <div className="grid gap-5 sm:grid-cols-2">
-              {fields.map((field) => (
-                <label
-                  className="grid gap-2 text-sm font-semibold text-slate-700"
-                  key={field.name}
+          <article className="rounded-[2rem] border border-[#d7e8cf] bg-[#fbfdf9] p-6 shadow-xl shadow-green-950/8 sm:p-8">
+            <div className="rounded-[1.7rem] bg-[#edf6e8] p-6 ring-1 ring-[#d7e8cf] sm:p-8">
+              <IconBadge icon="mail" tone="green" />
+              <h3 className="mt-6 text-3xl font-black text-slate-950">
+                {content.contactExternalTitle}
+              </h3>
+              <p className="mt-4 whitespace-pre-line text-base leading-8 text-slate-700">
+                {content.contactExternalText}
+              </p>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                {hasExternalLink ? (
+                  <a
+                    className="inline-flex justify-center rounded-full bg-[#103001] px-8 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/20 transition hover:-translate-y-1 hover:bg-[#1e4b0d]"
+                    href={content.contactExternalUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {content.contactExternalButton}
+                  </a>
+                ) : (
+                  <span className="inline-flex justify-center rounded-full bg-white px-8 py-4 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
+                    Link volgt binnenkort
+                  </span>
+                )}
+                <a
+                  className="inline-flex justify-center rounded-full bg-white px-8 py-4 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf] transition hover:bg-green-50"
+                  href={`mailto:${content.contactEmail}`}
                 >
-                  {field.label}
-                  <input
-                    className="min-h-14 rounded-2xl border border-slate-200 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
-                    name={field.name}
-                    required
-                    type={field.type}
-                  />
-                </label>
-              ))}
-              <label className="grid gap-2 text-sm font-semibold text-slate-700 sm:col-span-2">
-                Bericht
-                <textarea
-                  className="min-h-40 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-950 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
-                  name="message"
-                  required
-                />
-              </label>
+                  {content.contactMailCta}
+                </a>
+              </div>
             </div>
 
-            <div className="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <button
-                className="inline-flex items-center justify-center rounded-full bg-[#103001] px-9 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/20 transition hover:-translate-y-1 hover:bg-[#1e4b0d]"
-                type="submit"
-              >
-                {content.contactFormButton}
-              </button>
-              {submitted ? (
-                <p className="rounded-full bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-700">
-                  Bedankt! Dit formulier is voorlopig een demo.
-                </p>
-              ) : null}
-            </div>
-          </form>
+            <p className="mt-6 rounded-3xl bg-white p-5 text-sm font-semibold leading-7 text-slate-600 ring-1 ring-slate-200">
+              Aanvragen en inschrijvingen verlopen via een externe link die de
+              leiding zelf beheert. Zo tonen we geen formulier dat lokaal toch
+              niet verzonden wordt.
+            </p>
+          </article>
 
           <aside className="blue-pattern relative overflow-hidden rounded-[2rem] p-8 text-white shadow-2xl shadow-green-950/20">
             <div className="relative">

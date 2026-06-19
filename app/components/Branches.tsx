@@ -11,7 +11,7 @@ type BranchesProps = {
 export default function Branches({ content }: BranchesProps) {
   return (
     <section
-      className="bg-[#f2f8ee] px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+      className="bg-[#f2f8ee] px-5 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-36 lg:px-10 lg:pt-44"
       id="takken"
     >
       <div className="mx-auto max-w-7xl">

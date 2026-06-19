@@ -48,17 +48,14 @@ const pageContentDefaults = {
   pageDroppingCards:
     "Datum|De datum van de volgende dropping wordt tijdig gedeeld.\nStartuur|Het startuur wordt bij inschrijving meegedeeld.\nStartlocatie|De startlocatie wordt duidelijk gecommuniceerd.\nEinduur|Het verwachte einduur volgt bij de praktische info.\nPrijs|De deelnameprijs wordt bij de inschrijving vermeld.\nMeenemen|Stevige schoenen, fluohesje en zin voor avontuur.",
   pageDroppingFacts:
-    "Voor wie?|Ouders, oud-leiding en sympathisanten|Concrete leeftijdsinfo kan worden aangevuld\nInschrijven|Via interesseformulier|Echte verzending later koppelen\nVeiligheid|Duidelijke afspraken|Praktische afspraken worden bij deelname gedeeld",
-  pageDroppingFormTitle: "Interesse in Dropping",
-  pageDroppingFormIntro:
-    "Laat je gegevens achter. Dit formulier is voorlopig een demo en kan later aan echte inschrijving gekoppeld worden.",
-  pageDroppingFormFields:
-    "Naam|text|\nE-mail|email|\nAantal deelnemers|number|\nVragen of opmerkingen|textarea|",
-  pageDroppingFormSubmit: "Interesse doorgeven",
-  pageDroppingFormSuccess:
-    "Bedankt! Dit demoformulier is nog niet gekoppeld aan echte verzending.",
+    "Voor wie?|Ouders, oud-leiding en sympathisanten|Concrete leeftijdsinfo kan worden aangevuld\nInschrijven|Via externe link|Google Form of andere link via admin\nVeiligheid|Duidelijke afspraken|Praktische afspraken worden bij deelname gedeeld",
+  pageDroppingExternalCtaTitle: "Schrijf je in voor de dropping",
+  pageDroppingExternalCtaText:
+    "Zodra de inschrijvingen openen, plaatsen we hier de externe inschrijflink. Zo verloopt alle registratie via een duidelijk beheerd formulier.",
+  pageDroppingExternalCtaButton: "Naar inschrijfformulier",
+  pageDroppingExternalCtaUrl: "",
   pageDroppingPrimaryCtaLabel: "Ik heb interesse",
-  pageDroppingPrimaryCtaHref: "#formulier",
+  pageDroppingPrimaryCtaHref: "#aanvragen",
 
   pageOntbijtmandenEyebrow: "Verkoopactie",
   pageOntbijtmandenTitle: "Ontbijtmanden bestellen",
@@ -70,16 +67,13 @@ const pageContentDefaults = {
     "Aantal manden|Kies hoeveel ontbijtmanden je wil bestellen.\nAfhalen of leveren|Afhaallocatie, leverzone en timing worden bij de actie gedeeld.\nBetaling|Prijs en betaalinstructies worden duidelijk vermeld.",
   pageOntbijtmandenFacts:
     "Bestelperiode|Wordt tijdig aangekondigd|Wanneer bestellen kan\nPrijs|Prijs per mand wordt gedeeld|Duidelijke betaalinfo volgt\nLevering|Afhalen of leveren|Volgens gekozen optie",
-  pageOntbijtmandenFormTitle: "Bestel ontbijtmanden",
-  pageOntbijtmandenFormIntro:
-    "Gebruik dit demoformulier als voorbeeld voor de latere bestelstroom.",
-  pageOntbijtmandenFormFields:
-    "Naam|text|\nAdres|text|\nTelefoon|tel|\nAantal manden|number|\nAfhalen of leveren|select|Afhalen,Leveren\nOpmerkingen|textarea|",
-  pageOntbijtmandenFormSubmit: "Bestelling doorgeven",
-  pageOntbijtmandenFormSuccess:
-    "Bedankt! Dit demoformulier is nog niet gekoppeld aan echte bestelling.",
+  pageOntbijtmandenExternalCtaTitle: "Bestel een ontbijtmand",
+  pageOntbijtmandenExternalCtaText:
+    "Wanneer de verkoopactie loopt, plaatsen we hier de externe bestellink. Daar kunnen aantallen, afhalen of leveren en contactgegevens veilig verzameld worden.",
+  pageOntbijtmandenExternalCtaButton: "Naar bestelformulier",
+  pageOntbijtmandenExternalCtaUrl: "",
   pageOntbijtmandenPrimaryCtaLabel: "Bestelmand invullen",
-  pageOntbijtmandenPrimaryCtaHref: "#formulier",
+  pageOntbijtmandenPrimaryCtaHref: "#aanvragen",
 
   pageSteakBurgerdayEyebrow: "Eetmoment en steunactie",
   pageSteakBurgerdayTitle: "Steak- en Burgerday",
@@ -90,18 +84,15 @@ const pageContentDefaults = {
   pageSteakBurgerdayCards:
     "Datum|Datum en uren worden tijdig aangekondigd.\nLocatie|De locatie wordt bij de reservatie gedeeld.\nMenu|Steak, burger of vegetarische optie.\nReservatie|Reserveer vooraf zodat we goed kunnen plannen.",
   pageSteakBurgerdayFacts:
-    "Voor wie?|Iedereen welkom|Leden, ouders en sympathisanten\nPrijs|Prijzen per menu-optie worden gedeeld|Per menu-optie\nReservatie|Demoformulier|Echte verzending later koppelen",
+    "Voor wie?|Iedereen welkom|Leden, ouders en sympathisanten\nPrijs|Prijzen per menu-optie worden gedeeld|Per menu-optie\nReservatie|Via externe link|Google Form of andere link via admin",
   pageSteakBurgerdayMenuOptions: "Steak,Burger,Vegetarisch,Kinderportie",
-  pageSteakBurgerdayFormTitle: "Reserveer je plaats",
-  pageSteakBurgerdayFormIntro:
-    "Geef je naam, aantal personen en menukeuze door. Dit is voorlopig een demoformulier.",
-  pageSteakBurgerdayFormFields:
-    "Naam|text|\nE-mail|email|\nAantal personen|number|\nMenu-keuze|select|Steak,Burger,Vegetarisch,Kinderportie\nOpmerkingen|textarea|",
-  pageSteakBurgerdayFormSubmit: "Reservatie doorgeven",
-  pageSteakBurgerdayFormSuccess:
-    "Bedankt! Dit demoformulier is nog niet gekoppeld aan echte reservatie.",
+  pageSteakBurgerdayExternalCtaTitle: "Reserveer je plaats",
+  pageSteakBurgerdayExternalCtaText:
+    "Wanneer de reservaties openen, plaatsen we hier de externe reservatielink voor naam, aantal personen, menu-keuze en opmerkingen.",
+  pageSteakBurgerdayExternalCtaButton: "Naar reservatieformulier",
+  pageSteakBurgerdayExternalCtaUrl: "",
   pageSteakBurgerdayPrimaryCtaLabel: "Reserveer",
-  pageSteakBurgerdayPrimaryCtaHref: "#formulier",
+  pageSteakBurgerdayPrimaryCtaHref: "#aanvragen",
 
   pageShopEyebrow: "Materiaal en kledij",
   pageShopTitle: "Shop en scoutsbenodigdheden",
@@ -110,19 +101,16 @@ const pageContentDefaults = {
   pageShopSidebarText:
     "Deze shop is bedoeld voor groepskledij, badges of nuttig materiaal. De echte voorraad en betaling kunnen later gekoppeld worden.",
   pageShopCards:
-    "Uniform|Nieuwe leden krijgen uitleg over hemd, das en afspraken.\nGroepsmateriaal|Hier kan info komen over eigen groepskledij of materiaalacties.\nAanvragen|Gebruik het formulier om iets na te vragen.",
+    "Uniform|Nieuwe leden krijgen uitleg over hemd, das en afspraken.\nGroepsmateriaal|Hier kan info komen over eigen groepskledij of materiaalacties.\nAanvragen|Gebruik de externe aanvraaglink wanneer die beschikbaar is.",
   pageShopProducts:
     "Scoutsdas|€12|Eenheidsmaat|Aanvragen\nGroeps-T-shirt|€18|S,M,L,XL|Aanvragen\nBadge Scouts Sint-Jan|€3|Eenheidsmaat|Aanvragen",
-  pageShopFormTitle: "Product aanvragen",
-  pageShopFormIntro:
-    "Laat weten welk product en welke maat je zoekt. Dit is voorlopig een demoformulier.",
-  pageShopFormFields:
-    "Naam|text|\nE-mail|email|\nProduct|select|Scoutsdas,Groeps-T-shirt,Badge Scouts Sint-Jan\nMaat|text|\nOpmerkingen|textarea|",
-  pageShopFormSubmit: "Aanvraag doorgeven",
-  pageShopFormSuccess:
-    "Bedankt! Dit demoformulier is nog niet gekoppeld aan echte verwerking.",
+  pageShopExternalCtaTitle: "Vraag shopmateriaal aan",
+  pageShopExternalCtaText:
+    "Gebruik hier later een externe aanvraaglink voor producten, maten en opmerkingen. Zonder link tonen we duidelijk dat de aanvraaglink nog volgt.",
+  pageShopExternalCtaButton: "Naar aanvraagformulier",
+  pageShopExternalCtaUrl: "",
   pageShopPrimaryCtaLabel: "Product aanvragen",
-  pageShopPrimaryCtaHref: "#formulier",
+  pageShopPrimaryCtaHref: "#aanvragen",
 
   pageOudercomiteEyebrow: "Ouders rond de groep",
   pageOudercomiteTitle: "Oudercomite",
@@ -133,17 +121,14 @@ const pageContentDefaults = {
   pageOudercomiteCards:
     "Helpen bij acties|Ondersteuning bij eetdagen, verkoopacties of praktische taken.\nBrug tussen ouders en leiding|Vragen of signalen helder mee opvolgen.\nLogistieke steun|Extra handen bij materiaal, vervoer of voorbereiding.",
   pageOudercomiteFacts:
-    "Tijdsinvestering|Klein of groter engagement|Iedere hulp telt\nVoor wie?|Ouders en sympathisanten|Na contact\nContact|Via formulier|Echte verzending later koppelen",
-  pageOudercomiteFormTitle: "Ik wil helpen",
-  pageOudercomiteFormIntro:
-    "Laat weten waarbij je eventueel wil helpen. Dit is voorlopig een demoformulier.",
-  pageOudercomiteFormFields:
-    "Naam|text|\nE-mail|email|\nTelefoon|tel|\nWaarbij wil je helpen?|textarea|",
-  pageOudercomiteFormSubmit: "Hulp aanbieden",
-  pageOudercomiteFormSuccess:
-    "Bedankt! Dit demoformulier is nog niet gekoppeld aan echte verzending.",
+    "Tijdsinvestering|Klein of groter engagement|Iedere hulp telt\nVoor wie?|Ouders en sympathisanten|Na contact\nContact|Via externe link|Google Form of andere link via admin",
+  pageOudercomiteExternalCtaTitle: "Ik wil helpen",
+  pageOudercomiteExternalCtaText:
+    "Ouders die willen helpen kunnen later via deze externe link hun gegevens en interesses doorgeven.",
+  pageOudercomiteExternalCtaButton: "Naar helpformulier",
+  pageOudercomiteExternalCtaUrl: "",
   pageOudercomitePrimaryCtaLabel: "Ik wil helpen",
-  pageOudercomitePrimaryCtaHref: "#formulier",
+  pageOudercomitePrimaryCtaHref: "#aanvragen",
 
   pageVerhuurEyebrow: "Praktische aanvraag",
   pageVerhuurTitle: "Verhuur",
@@ -154,17 +139,14 @@ const pageContentDefaults = {
   pageVerhuurCards:
     "Beschikbaarheid|Vraag eerst na of de datum mogelijk is.\nMateriaal of lokaal|Omschrijf duidelijk wat je nodig hebt.\nVoorwaarden|Afspraken, waarborg en prijzen kunnen hier worden aangevuld.",
   pageVerhuurFacts:
-    "Aanvraag|Via formulier|Echte verzending later koppelen\nPlanning|Datum nodig|Controle door groepsleiding\nContact|Duidelijke gegevens|Zodat we snel kunnen antwoorden",
-  pageVerhuurFormTitle: "Verhuuraanvraag",
-  pageVerhuurFormIntro:
-    "Vul datum, organisatie en gewenste materialen in. Dit is voorlopig een demoformulier.",
-  pageVerhuurFormFields:
-    "Datum|date|\nOrganisatie|text|\nMateriaal of lokaal|textarea|\nAantal personen|number|\nNaam contactpersoon|text|\nE-mail|email|\nTelefoon|tel|",
-  pageVerhuurFormSubmit: "Aanvraag versturen",
-  pageVerhuurFormSuccess:
-    "Bedankt! Dit demoformulier is nog niet gekoppeld aan echte verzending.",
+    "Aanvraag|Via externe link|Google Form of andere link via admin\nPlanning|Datum nodig|Controle door groepsleiding\nContact|Duidelijke gegevens|Zodat we snel kunnen antwoorden",
+  pageVerhuurExternalCtaTitle: "Doe een verhuuraanvraag",
+  pageVerhuurExternalCtaText:
+    "Gebruik hier later een externe link voor datum, organisatie, materiaal of lokaal, aantal personen en contactgegevens.",
+  pageVerhuurExternalCtaButton: "Naar verhuuraanvraag",
+  pageVerhuurExternalCtaUrl: "",
   pageVerhuurPrimaryCtaLabel: "Verhuur aanvragen",
-  pageVerhuurPrimaryCtaHref: "#formulier",
+  pageVerhuurPrimaryCtaHref: "#aanvragen",
 
   pageLinksEyebrow: "Nuttige links",
   pageLinksTitle: "Links en nuttige informatie",
@@ -351,7 +333,11 @@ export const defaultSiteContent: EditableSiteContent = {
   contactTitle: "Klaar om kennis te maken?",
   contactSubtitle:
     "Heb je vragen, wil je je zoon inschrijven of graag eens vrijblijvend langskomen? Neem contact op met de leiding van Scouts Sint-Jan Berchmans.",
-  contactFormButton: "Verstuur aanvraag",
+  contactExternalTitle: "Stel je vraag of vraag info aan",
+  contactExternalText:
+    "Gebruik hier later een externe link naar een contact- of inschrijvingsformulier. Zonder link blijft de mailknop beschikbaar.",
+  contactExternalButton: "Stel je vraag",
+  contactExternalUrl: "",
   contactMailCta: "Stuur ons een mail",
   contactTrustText:
     "Nieuwe leden zijn welkom om eerst vrijblijvend kennis te maken.",
@@ -438,6 +424,8 @@ export const defaultSiteContent: EditableSiteContent = {
     "Meestal 14u-17u, afwijkingen staan bij de vergadering.",
   branchKapoenenPlanningLocation: "Diest, Belgie",
   branchKapoenenPlanningBring: "Kleren die vuil mogen worden",
+  branchKapoenenPlanningBringNote:
+    "Als er andere kledij of extra materiaal nodig is, staat dat bij de vergadering in het programma.",
   branchKapoenenPlanningContact: "Via de takleiding of groepsleiding",
   branchKapoenenPlanningCountText:
     "Er staan {aantal} vergaderingen in het programma.",
@@ -490,6 +478,8 @@ export const defaultSiteContent: EditableSiteContent = {
     "Meestal 14u-17u, afwijkingen staan bij de vergadering.",
   branchWelpenPlanningLocation: "Diest, Belgie",
   branchWelpenPlanningBring: "Kleren die vuil mogen worden",
+  branchWelpenPlanningBringNote:
+    "Als er andere kledij of extra materiaal nodig is, staat dat bij de vergadering in het programma.",
   branchWelpenPlanningContact: "Via de takleiding of groepsleiding",
   branchWelpenPlanningCountText:
     "Er staan {aantal} vergaderingen in het programma.",
@@ -521,6 +511,8 @@ export const defaultSiteContent: EditableSiteContent = {
     "Meestal 14u-17u, afwijkingen staan bij de vergadering.",
   branchJongverkennersPlanningLocation: "Diest, Belgie",
   branchJongverkennersPlanningBring: "Kleren die vuil mogen worden",
+  branchJongverkennersPlanningBringNote:
+    "Als er andere kledij of extra materiaal nodig is, staat dat bij de vergadering in het programma.",
   branchJongverkennersPlanningContact: "Via de takleiding of groepsleiding",
   branchJongverkennersPlanningCountText:
     "Er staan {aantal} vergaderingen in het programma.",
@@ -551,6 +543,8 @@ export const defaultSiteContent: EditableSiteContent = {
     "Meestal 14u-17u, afwijkingen staan bij de vergadering.",
   branchVerkennersPlanningLocation: "Diest, Belgie",
   branchVerkennersPlanningBring: "Kleren die vuil mogen worden",
+  branchVerkennersPlanningBringNote:
+    "Als er andere kledij of extra materiaal nodig is, staat dat bij de vergadering in het programma.",
   branchVerkennersPlanningContact: "Via de takleiding of groepsleiding",
   branchVerkennersPlanningCountText:
     "Er staan {aantal} vergaderingen in het programma.",
@@ -581,6 +575,8 @@ export const defaultSiteContent: EditableSiteContent = {
     "Meestal 14u-17u, afwijkingen staan bij de vergadering.",
   branchJinsPlanningLocation: "Diest, Belgie",
   branchJinsPlanningBring: "Kleren die vuil mogen worden",
+  branchJinsPlanningBringNote:
+    "Als er andere kledij of extra materiaal nodig is, staat dat bij de vergadering in het programma.",
   branchJinsPlanningContact: "Via de takleiding of groepsleiding",
   branchJinsPlanningCountText:
     "Er staan {aantal} vergaderingen in het programma.",
@@ -664,6 +660,24 @@ const legacyValueReplacements: Partial<
   pageActivitiesIntro: {
     "Elke zaterdag van 14u tot 17u maken we ruimte voor spel, natuur, creativiteit en groepsgevoel. Daarnaast organiseren we doorheen het jaar speciale evenementen en steunacties.":
       defaultSiteContent.pageActivitiesIntro,
+  },
+  pageDroppingPrimaryCtaHref: {
+    "#formulier": defaultSiteContent.pageDroppingPrimaryCtaHref,
+  },
+  pageOntbijtmandenPrimaryCtaHref: {
+    "#formulier": defaultSiteContent.pageOntbijtmandenPrimaryCtaHref,
+  },
+  pageSteakBurgerdayPrimaryCtaHref: {
+    "#formulier": defaultSiteContent.pageSteakBurgerdayPrimaryCtaHref,
+  },
+  pageShopPrimaryCtaHref: {
+    "#formulier": defaultSiteContent.pageShopPrimaryCtaHref,
+  },
+  pageOudercomitePrimaryCtaHref: {
+    "#formulier": defaultSiteContent.pageOudercomitePrimaryCtaHref,
+  },
+  pageVerhuurPrimaryCtaHref: {
+    "#formulier": defaultSiteContent.pageVerhuurPrimaryCtaHref,
   },
   pageZomerkampTitle: {
     "Zomerkamp met Scouts Sint-Jan Diest":

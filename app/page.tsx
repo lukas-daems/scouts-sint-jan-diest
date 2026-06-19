@@ -1,4 +1,3 @@
-import AboutScouts from "./components/AboutScouts";
 import Activities from "./components/Activities";
 import Branches from "./components/Branches";
 import CampInfo from "./components/CampInfo";
@@ -25,7 +24,6 @@ export default async function Home() {
         <Navbar logoUrl={siteContent.siteLogoUrl} siteName={siteContent.siteName} />
         <Hero content={siteContent} />
       </div>
-      <AboutScouts content={siteContent} />
       <Branches content={siteContent} />
       <Activities content={siteContent} />
       <WhyJoin content={siteContent} />

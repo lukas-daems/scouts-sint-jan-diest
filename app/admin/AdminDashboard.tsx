@@ -129,20 +129,6 @@ const homepageGroups: Array<{
     ],
   },
   {
-    title: "Intro onder hero",
-    description: "Teksten voor de eerste witte sectie.",
-    fields: [
-      { key: "aboutTitle", label: "Titel" },
-      { key: "aboutSubtitle", label: "Intro tekst", kind: "textarea" },
-      { key: "aboutCardOneTitle", label: "Kaart 1 titel" },
-      { key: "aboutCardOneText", label: "Kaart 1 tekst", kind: "textarea" },
-      { key: "aboutCardTwoTitle", label: "Kaart 2 titel" },
-      { key: "aboutCardTwoText", label: "Kaart 2 tekst", kind: "textarea" },
-      { key: "aboutCardThreeTitle", label: "Kaart 3 titel" },
-      { key: "aboutCardThreeText", label: "Kaart 3 tekst", kind: "textarea" },
-    ],
-  },
-  {
     title: "Takken-preview",
     description: "Korte takkenblok op de homepage.",
     fields: [
@@ -239,7 +225,10 @@ const contactFields: FieldConfig[] = [
   { key: "contactPhone", label: "Telefoon" },
   { key: "instagram", label: "Instagram" },
   { key: "facebook", label: "Facebook" },
-  { key: "contactFormButton", label: "Formulierknop" },
+  { key: "contactExternalTitle", label: "Externe link titel" },
+  { key: "contactExternalText", label: "Externe link uitleg", kind: "textarea" },
+  { key: "contactExternalButton", label: "Externe link knoptekst" },
+  { key: "contactExternalUrl", label: "Externe formulierlink" },
   { key: "contactMailCta", label: "Mailknop" },
   { key: "contactTrustText", label: "Vertrouwenszin", kind: "textarea" },
 ];
@@ -977,6 +966,11 @@ export default function AdminDashboard() {
               {renderField({
                 key: activeBranch.contentKeys.planning.bring,
                 label: "Meenemen",
+                kind: "textarea",
+              })}
+              {renderField({
+                key: activeBranch.contentKeys.planning.bringNote,
+                label: "Nuance bij meenemen/kledij",
                 kind: "textarea",
               })}
               {renderField({
