@@ -115,37 +115,51 @@ const pageContentDefaults = {
   pageOudercomiteEyebrow: "Ouders rond de groep",
   pageOudercomiteTitle: "Oudercomite",
   pageOudercomiteImageUrl: "",
-  pageOudercomiteSidebarTitle: "Extra handen maken veel mogelijk",
+  pageOudercomiteSidebarTitle: "Enthousiaste ouders die mee rond de groep staan",
   pageOudercomiteSidebarText:
-    "Het oudercomite ondersteunt waar nodig en vormt een brug tussen ouders en leiding. Ouders kunnen helpen op kleine of grotere momenten.",
+    "Het oudercomite bestaat uit enthousiaste en gemotiveerde ouders die ongeveer vijf keer per werkjaar samenkomen met de groepsleiding. Ze vertegenwoordigen ouders naar de leiding toe, brengen bekommernissen constructief aan en ondersteunen de groep waar dat nodig is.",
   pageOudercomiteCards:
-    "Helpen bij acties|Ondersteuning bij eetdagen, verkoopacties of praktische taken.\nBrug tussen ouders en leiding|Vragen of signalen helder mee opvolgen.\nLogistieke steun|Extra handen bij materiaal, vervoer of voorbereiding.",
+    "Spreekbuis voor ouders|Ouders kunnen met vragen, bedenkingen of problemen die de leden aanbelangen terecht bij het oudercomite. Het oudercomite brengt signalen op een constructieve manier tot bij de leiding.\nSteak & Burger Day en dropping|Het oudercomite organiseert jaarlijks Steak & Burger Day en een dropping. Die activiteiten brengen mensen samen en ondersteunen financieel de werking van Sint-Jan.\nHulp op Scoutsbal|Tijdens Scoutsbal steken ouders mee de handen uit de mouwen, bijvoorbeeld door te helpen tappen of praktische taken op te nemen.\nFinanciele steun voor Sint-Jan|Door acties en hulp achter de schermen draagt het oudercomite bij aan de werking van de groep Scouts Sint-Jan Berchmans.",
   pageOudercomiteFacts:
-    "Tijdsinvestering|Klein of groter engagement|Iedere hulp telt\nVoor wie?|Ouders en sympathisanten|Na contact\nContact|Via externe link|Google Form of andere link via admin",
-  pageOudercomiteExternalCtaTitle: "Ik wil helpen",
+    "Vergaderingen|Ongeveer 5 keer per werkjaar|Samen met de groepsleiding\nActief lid|Je wordt uitgenodigd op de vergaderingen|Mee nadenken en opvolgen\nHelpend lid|Je helpt mee bij activiteiten|Bijvoorbeeld Steakday, dropping of Scoutsbal\nAanspreekbaar|Tijdens activiteiten|Ouders mogen leden van het oudercomite gerust aanspreken",
+  pageOudercomiteHighlightLabel: "Even voorstellen",
+  pageOudercomiteHighlightTitle: "Een constructieve brug tussen ouders en leiding",
+  pageOudercomiteHighlightText:
+    "Ouders kunnen leden van het oudercomite aanspreken tijdens activiteiten. Zo blijven vragen, ideeen en bekommernissen dicht bij de groep en bij de groepsleiding.",
+  pageOudercomiteWorkTitle: "Wat doet het oudercomite?",
+  pageOudercomiteJoinTitle: "Hoe kan je aansluiten?",
+  pageOudercomiteMembersTitle: "Ledenlijst",
+  pageOudercomiteMembers: "Ledenlijst volgt.",
+  pageOudercomiteExternalCtaTitle: "Interesse in het oudercomite?",
   pageOudercomiteExternalCtaText:
-    "Ouders die willen helpen kunnen later via deze externe link hun gegevens en interesses doorgeven.",
-  pageOudercomiteExternalCtaButton: "Naar helpformulier",
-  pageOudercomiteExternalCtaUrl: "",
-  pageOudercomitePrimaryCtaLabel: "Ik wil helpen",
+    "Interesse om je bij het oudercomite te voegen of heb je vragen? Contacteer ons via oudercomite@sintjanman.be.",
+  pageOudercomiteExternalCtaButton: "Mail het oudercomite",
+  pageOudercomiteExternalCtaUrl: "mailto:oudercomite@sintjanman.be",
+  pageOudercomitePrimaryCtaLabel: "Contacteer het oudercomite",
   pageOudercomitePrimaryCtaHref: "#aanvragen",
 
-  pageVerhuurEyebrow: "Praktische aanvraag",
+  pageVerhuurEyebrow: "Materiaalverhuur",
   pageVerhuurTitle: "Verhuur",
   pageVerhuurImageUrl: "",
-  pageVerhuurSidebarTitle: "Vraag beschikbaarheid duidelijk aan",
+  pageVerhuurSidebarTitle: "Lokalen niet te huur, materiaal wel",
   pageVerhuurSidebarText:
-    "Als er materiaal of lokalen verhuurd worden, kan deze pagina voorwaarden, beschikbaarheid en aanvraaginfo bundelen.",
+    "Veel groepen vragen om lokalen te huren voor weekends of kampen. Door de zonering van onze lokalen is dat niet toegestaan. We verhuren wel materiaal, zoals eetmateriaal en biertafelsets.",
   pageVerhuurCards:
-    "Beschikbaarheid|Vraag eerst na of de datum mogelijk is.\nMateriaal of lokaal|Omschrijf duidelijk wat je nodig hebt.\nVoorwaarden|Afspraken, waarborg en prijzen kunnen hier worden aangevuld.",
+    "Bestek en borden|We beschikken over bestek en borden voor ongeveer 100 personen. Handig voor eetdagen, verenigingsmomenten of grotere maaltijden.\nBiertafelsets|Er zijn 14 biertafelsets beschikbaar. Een set bestaat uit een tafel van 220 x 70 cm en twee banken van 220 x 35 cm.\nPraktische afspraken|Neem vooraf contact op voor beschikbaarheid, afhaling, terugbrengen en eventuele bijkomende afspraken rond zorg voor het materiaal.",
   pageVerhuurFacts:
-    "Aanvraag|Via externe link|Google Form of andere link via admin\nPlanning|Datum nodig|Controle door groepsleiding\nContact|Duidelijke gegevens|Zodat we snel kunnen antwoorden",
-  pageVerhuurExternalCtaTitle: "Doe een verhuuraanvraag",
+    "Lokalen|Niet te huur|Door de zonering van de lokalen is verhuur niet toegestaan\nBiertafelsets|14 sets beschikbaar|1 tafel van 220 x 70 cm en 2 banken van 220 x 35 cm\nPrijs|10 euro per set|Voor 2 dagen of een weekend\nEetmateriaal|Ongeveer 100 personen|Bestek en borden beschikbaar",
+  pageVerhuurHighlightLabel: "Belangrijk",
+  pageVerhuurHighlightTitle: "Lokalen niet te huur",
+  pageVerhuurHighlightText:
+    "Onze lokalen kunnen niet verhuurd worden voor weekends, kampen of andere overnachtingen. Door de zonering van de lokalen is verhuur niet toegestaan.",
+  pageVerhuurMaterialsTitle: "Materiaal dat wel verhuurd wordt",
+  pageVerhuurPricesTitle: "Prijzen en details",
+  pageVerhuurExternalCtaTitle: "Materiaal huren of vragen over verhuur?",
   pageVerhuurExternalCtaText:
-    "Gebruik hier later een externe link voor datum, organisatie, materiaal of lokaal, aantal personen en contactgegevens.",
-  pageVerhuurExternalCtaButton: "Naar verhuuraanvraag",
-  pageVerhuurExternalCtaUrl: "",
-  pageVerhuurPrimaryCtaLabel: "Verhuur aanvragen",
+    "Wil je materiaal huren of heb je vragen over verhuur? Contacteer ons via verhuur@sintanman.be.",
+  pageVerhuurExternalCtaButton: "Mail verhuur",
+  pageVerhuurExternalCtaUrl: "mailto:verhuur@sintanman.be",
+  pageVerhuurPrimaryCtaLabel: "Mail voor verhuur",
   pageVerhuurPrimaryCtaHref: "#aanvragen",
 
   pageLinksEyebrow: "Nuttige links",
@@ -380,9 +394,9 @@ export const defaultSiteContent: EditableSiteContent = {
   pageShopIntro:
     "Op deze pagina kan later informatie komen over groepskledij, badges, nuttig kampmateriaal of links naar officiele scoutswinkels.",
   pageOudercomiteIntro:
-    "Het oudercomite ondersteunt de groep waar nodig en vormt een brug tussen ouders en leiding. Deze pagina kan later worden aangevuld met namen, werking en contact.",
+    "Het oudercomite brengt ouders en groepsleiding dichter bij elkaar. Enthousiaste ouders denken mee, helpen bij activiteiten en zorgen mee voor een sterke werking van Scouts Sint-Jan Berchmans.",
   pageVerhuurIntro:
-    "Heeft Scouts Sint-Jan Berchmans materiaal of lokalen die verhuurd worden? Dan kan deze pagina later alle voorwaarden, beschikbaarheid en contactinformatie bundelen.",
+    "Onze lokalen kunnen niet verhuurd worden, maar bepaald materiaal wel. Op deze pagina vind je wat mogelijk is, welke prijzen gelden en hoe je ons contacteert.",
   pageLinksIntro:
     "Een overzichtspagina voor nuttige verwijzingen, formulieren, scoutsinformatie en externe pagina's die ouders of leden vaak nodig hebben.",
   pageOudLeidingTitle: "Oud-leiding van Scouts Sint-Jan Berchmans",
@@ -690,6 +704,74 @@ const legacyValueReplacements: Partial<
   pageVerhuurIntro: {
     "Heeft Scouts Sint-Jan Diest materiaal of lokalen die verhuurd worden? Dan kan deze pagina later alle voorwaarden, beschikbaarheid en contactinformatie bundelen.":
       defaultSiteContent.pageVerhuurIntro,
+    "Heeft Scouts Sint-Jan Berchmans materiaal of lokalen die verhuurd worden? Dan kan deze pagina later alle voorwaarden, beschikbaarheid en contactinformatie bundelen.":
+      defaultSiteContent.pageVerhuurIntro,
+  },
+  pageOudercomiteIntro: {
+    "Het oudercomite ondersteunt de groep waar nodig en vormt een brug tussen ouders en leiding. Deze pagina kan later worden aangevuld met namen, werking en contact.":
+      defaultSiteContent.pageOudercomiteIntro,
+  },
+  pageOudercomiteSidebarTitle: {
+    "Extra handen maken veel mogelijk":
+      defaultSiteContent.pageOudercomiteSidebarTitle,
+  },
+  pageOudercomiteSidebarText: {
+    "Het oudercomite ondersteunt waar nodig en vormt een brug tussen ouders en leiding. Ouders kunnen helpen op kleine of grotere momenten.":
+      defaultSiteContent.pageOudercomiteSidebarText,
+  },
+  pageOudercomiteCards: {
+    "Helpen bij acties|Ondersteuning bij eetdagen, verkoopacties of praktische taken.\nBrug tussen ouders en leiding|Vragen of signalen helder mee opvolgen.\nLogistieke steun|Extra handen bij materiaal, vervoer of voorbereiding.":
+      defaultSiteContent.pageOudercomiteCards,
+  },
+  pageOudercomiteFacts: {
+    "Tijdsinvestering|Klein of groter engagement|Iedere hulp telt\nVoor wie?|Ouders en sympathisanten|Na contact\nContact|Via externe link|Google Form of andere link via admin":
+      defaultSiteContent.pageOudercomiteFacts,
+  },
+  pageOudercomiteExternalCtaTitle: {
+    "Ik wil helpen": defaultSiteContent.pageOudercomiteExternalCtaTitle,
+  },
+  pageOudercomiteExternalCtaText: {
+    "Ouders die willen helpen kunnen later via deze externe link hun gegevens en interesses doorgeven.":
+      defaultSiteContent.pageOudercomiteExternalCtaText,
+  },
+  pageOudercomiteExternalCtaButton: {
+    "Naar helpformulier": defaultSiteContent.pageOudercomiteExternalCtaButton,
+  },
+  pageOudercomiteExternalCtaUrl: {
+    "": defaultSiteContent.pageOudercomiteExternalCtaUrl,
+  },
+  pageVerhuurEyebrow: {
+    "Praktische aanvraag": defaultSiteContent.pageVerhuurEyebrow,
+  },
+  pageVerhuurSidebarTitle: {
+    "Vraag beschikbaarheid duidelijk aan":
+      defaultSiteContent.pageVerhuurSidebarTitle,
+  },
+  pageVerhuurSidebarText: {
+    "Als er materiaal of lokalen verhuurd worden, kan deze pagina voorwaarden, beschikbaarheid en aanvraaginfo bundelen.":
+      defaultSiteContent.pageVerhuurSidebarText,
+  },
+  pageVerhuurCards: {
+    "Beschikbaarheid|Vraag eerst na of de datum mogelijk is.\nMateriaal of lokaal|Omschrijf duidelijk wat je nodig hebt.\nVoorwaarden|Afspraken, waarborg en prijzen kunnen hier worden aangevuld.":
+      defaultSiteContent.pageVerhuurCards,
+  },
+  pageVerhuurFacts: {
+    "Aanvraag|Via externe link|Google Form of andere link via admin\nPlanning|Datum nodig|Controle door groepsleiding\nContact|Duidelijke gegevens|Zodat we snel kunnen antwoorden":
+      defaultSiteContent.pageVerhuurFacts,
+  },
+  pageVerhuurExternalCtaTitle: {
+    "Doe een verhuuraanvraag":
+      defaultSiteContent.pageVerhuurExternalCtaTitle,
+  },
+  pageVerhuurExternalCtaText: {
+    "Gebruik hier later een externe link voor datum, organisatie, materiaal of lokaal, aantal personen en contactgegevens.":
+      defaultSiteContent.pageVerhuurExternalCtaText,
+  },
+  pageVerhuurExternalCtaButton: {
+    "Naar verhuuraanvraag": defaultSiteContent.pageVerhuurExternalCtaButton,
+  },
+  pageVerhuurExternalCtaUrl: {
+    "": defaultSiteContent.pageVerhuurExternalCtaUrl,
   },
   pageLinksItems: {
     "Scouts algemeen|Scouts en Gidsen Vlaanderen|https://www.scoutsengidsenvlaanderen.be|Algemene info over scouts.\nFormulieren|Medische fiche|/#contact|Vervang later door het juiste document.\nSociale media|Instagram|/#contact|Officieel profiel toevoegen.":

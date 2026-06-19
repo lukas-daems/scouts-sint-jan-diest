@@ -77,6 +77,7 @@ export type EditableSitePage = SiteInfoPage & {
   updates: string;
   products: SitePageProduct[];
   links: SitePageLinkItem[];
+  committeeMembers: string[];
   externalCta?: SitePageExternalCta;
   primaryCta?: {
     label: string;
@@ -277,6 +278,13 @@ function parseLinks(value: string): SitePageLinkItem[] {
     .filter((item) => item.label);
 }
 
+function parseLines(value: string) {
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 export function getEditableSitePage(
   page: SiteInfoPage,
   content: EditableSiteContent
@@ -318,6 +326,8 @@ export function getEditableSitePage(
     updates: valueFor(content, page, "Updates"),
     products: parseProducts(valueFor(content, page, "Products")),
     links: parseLinks(valueFor(content, page, "Items")),
+    committeeMembers:
+      page.kind === "committee" ? parseLines(valueFor(content, page, "Members")) : [],
     externalCta:
       externalTitle || externalText || externalButton || externalHref
         ? {
@@ -410,6 +420,32 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
       description: "Gebruik: categorie|label|url|uitleg.",
       fields: [
         { key: keyFor(page, "Items"), label: "Links", kind: "textarea" },
+      ],
+    });
+  }
+
+  if (page.kind === "rental") {
+    groups.push({
+      title: "Verhuurstructuur",
+      description:
+        "Titels voor de specifieke blokken op de verhuurpagina.",
+      fields: [
+        { key: keyFor(page, "MaterialsTitle"), label: "Titel materiaalblok" },
+        { key: keyFor(page, "PricesTitle"), label: "Titel prijzenblok" },
+      ],
+    });
+  }
+
+  if (page.kind === "committee") {
+    groups.push({
+      title: "Oudercomite structuur",
+      description:
+        "Titels en ledenlijst voor de oudercomitepagina. Gebruik bij ledenlijst: 1 naam of regel per lijn.",
+      fields: [
+        { key: keyFor(page, "WorkTitle"), label: "Titel werkingblok" },
+        { key: keyFor(page, "JoinTitle"), label: "Titel aansluitblok" },
+        { key: keyFor(page, "MembersTitle"), label: "Titel ledenlijst" },
+        { key: keyFor(page, "Members"), label: "Ledenlijst", kind: "textarea" },
       ],
     });
   }

@@ -11,6 +11,7 @@ import {
   type EditableSitePage,
   type SitePageLinkItem,
 } from "../lib/site-pages";
+import type { EditableSiteContent } from "../lib/site-content-defaults";
 import { getSiteContent } from "@/db/site-content";
 
 export const dynamic = "force-dynamic";
@@ -340,6 +341,227 @@ function LinksBlock({ page }: { page: EditableSitePage }) {
   );
 }
 
+function RentalPageContent({
+  page,
+  content,
+}: {
+  page: EditableSitePage;
+  content: EditableSiteContent;
+}) {
+  return (
+    <div className="grid gap-8">
+      <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-green-950/8">
+        <div className="grid gap-0 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="p-6 sm:p-8 lg:p-10">
+            <IconBadge icon="check" tone="green" />
+            <p className="mt-6 text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+              {content.siteName}
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              {page.sidebarTitle}
+            </h2>
+            <p className="mt-4 max-w-2xl whitespace-pre-line leading-8 text-slate-600">
+              {page.sidebarText}
+            </p>
+          </div>
+
+          {page.highlight ? (
+            <div className="bg-[#103001] p-6 text-white sm:p-8 lg:p-10">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-green-100">
+                {page.highlight.label}
+              </p>
+              <h3 className="mt-3 text-3xl font-black tracking-tight">
+                {page.highlight.title}
+              </h3>
+              <p className="mt-4 whitespace-pre-line leading-8 text-green-50">
+                {page.highlight.text}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+              {page.eyebrow}
+            </p>
+            <h2 className="mt-2 text-3xl font-black text-slate-950">
+              {content.pageVerhuurMaterialsTitle}
+            </h2>
+          </div>
+        </div>
+
+        <div className="mt-7 grid gap-4 lg:grid-cols-3">
+          {page.cards.map((card) => (
+            <article
+              className="rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5"
+              key={card.title}
+            >
+              <h3 className="text-xl font-black text-slate-950">
+                {card.title}
+              </h3>
+              <p className="mt-3 whitespace-pre-line leading-7 text-slate-600">
+                {card.text}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {page.facts.length > 0 ? (
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+            {page.eyebrow}
+          </p>
+          <h2 className="mt-2 text-3xl font-black text-slate-950">
+            {content.pageVerhuurPricesTitle}
+          </h2>
+          <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {page.facts.map((fact) => (
+              <article
+                className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+                key={`${fact.label}-${fact.value}`}
+              >
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                  {fact.label}
+                </p>
+                <p className="mt-2 text-xl font-black text-slate-950">
+                  {fact.value}
+                </p>
+                {fact.note ? (
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {fact.note}
+                  </p>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <ExternalCtaBlock page={page} />
+    </div>
+  );
+}
+
+function CommitteePageContent({
+  page,
+  content,
+}: {
+  page: EditableSitePage;
+  content: EditableSiteContent;
+}) {
+  return (
+    <div className="grid gap-8">
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:p-10">
+        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div>
+            <IconBadge icon="check" tone="green" />
+            <p className="mt-6 text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+              {page.highlight?.label || page.eyebrow}
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              {page.sidebarTitle}
+            </h2>
+            <p className="mt-4 max-w-2xl whitespace-pre-line leading-8 text-slate-600">
+              {page.sidebarText}
+            </p>
+          </div>
+
+          {page.highlight ? (
+            <div className="rounded-[2rem] bg-[#edf6e8] p-6 ring-1 ring-[#d7e8cf] sm:p-7">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                {page.highlight.title}
+              </p>
+              <p className="mt-3 whitespace-pre-line text-lg leading-8 text-[#103001]">
+                {page.highlight.text}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+          {page.eyebrow}
+        </p>
+        <h2 className="mt-2 text-3xl font-black text-slate-950">
+          {content.pageOudercomiteWorkTitle}
+        </h2>
+        <div className="mt-7 grid gap-4 md:grid-cols-2">
+          {page.cards.map((card) => (
+            <article
+              className="rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5"
+              key={card.title}
+            >
+              <h3 className="text-xl font-black text-slate-950">
+                {card.title}
+              </h3>
+              <p className="mt-3 whitespace-pre-line leading-7 text-slate-600">
+                {card.text}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {page.facts.length > 0 ? (
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+            {page.eyebrow}
+          </p>
+          <h2 className="mt-2 text-3xl font-black text-slate-950">
+            {content.pageOudercomiteJoinTitle}
+          </h2>
+          <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {page.facts.map((fact) => (
+              <article
+                className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+                key={`${fact.label}-${fact.value}`}
+              >
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                  {fact.label}
+                </p>
+                <p className="mt-2 text-lg font-black text-slate-950">
+                  {fact.value}
+                </p>
+                {fact.note ? (
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {fact.note}
+                  </p>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+          {page.eyebrow}
+        </p>
+        <h2 className="mt-2 text-3xl font-black text-slate-950">
+          {content.pageOudercomiteMembersTitle}
+        </h2>
+        <div className="mt-6 flex flex-wrap gap-3">
+          {page.committeeMembers.map((member) => (
+            <span
+              className="rounded-full bg-[#edf6e8] px-4 py-2 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf]"
+              key={member}
+            >
+              {member}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <ExternalCtaBlock page={page} />
+    </div>
+  );
+}
+
 function FeatureBlocks({ page }: { page: EditableSitePage }) {
   return (
     <div className="grid gap-8">
@@ -415,28 +637,36 @@ export default async function InfoPage({ params }: InfoPageProps) {
 
       <section className="px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
         <div className="mx-auto grid max-w-7xl gap-8">
-          <PageOverview page={page} siteName={siteContent.siteName} />
-
-          {page.kind === "single" ? (
-            <div className="grid gap-8">
-              {page.body ? (
-                <section className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-xl shadow-green-950/8 sm:p-10">
-                  <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
-                    Informatie
-                  </p>
-                  <h2 className="mt-2 text-3xl font-black text-slate-950">
-                    {page.title}
-                  </h2>
-                  <div className="mt-6 whitespace-pre-line rounded-3xl bg-[#fbfdf9] p-6 text-base leading-8 text-slate-700 ring-1 ring-slate-200 sm:p-8">
-                    {page.body}
-                  </div>
-                </section>
-              ) : null}
-              <CardsGrid page={page} />
-              <ExternalCtaBlock page={page} />
-            </div>
+          {page.kind === "rental" ? (
+            <RentalPageContent page={page} content={siteContent} />
+          ) : page.kind === "committee" ? (
+            <CommitteePageContent page={page} content={siteContent} />
           ) : (
-            <FeatureBlocks page={page} />
+            <>
+              <PageOverview page={page} siteName={siteContent.siteName} />
+
+              {page.kind === "single" ? (
+                <div className="grid gap-8">
+                  {page.body ? (
+                    <section className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-xl shadow-green-950/8 sm:p-10">
+                      <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+                        Informatie
+                      </p>
+                      <h2 className="mt-2 text-3xl font-black text-slate-950">
+                        {page.title}
+                      </h2>
+                      <div className="mt-6 whitespace-pre-line rounded-3xl bg-[#fbfdf9] p-6 text-base leading-8 text-slate-700 ring-1 ring-slate-200 sm:p-8">
+                        {page.body}
+                      </div>
+                    </section>
+                  ) : null}
+                  <CardsGrid page={page} />
+                  <ExternalCtaBlock page={page} />
+                </div>
+              ) : (
+                <FeatureBlocks page={page} />
+              )}
+            </>
           )}
         </div>
       </section>
