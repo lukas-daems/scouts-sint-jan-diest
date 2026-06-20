@@ -242,10 +242,15 @@ export type EditableSiteContent = {
   branchVerkennersLogoUrl: string;
   branchJinsLogoUrl: string;
   branchKapoenenProgram: string;
+  branchKapoenenImportantDates: string;
   branchWelpenProgram: string;
+  branchWelpenImportantDates: string;
   branchJongverkennersProgram: string;
+  branchJongverkennersImportantDates: string;
   branchVerkennersProgram: string;
+  branchVerkennersImportantDates: string;
   branchJinsProgram: string;
+  branchJinsImportantDates: string;
 } & Record<string, string>;
 
 export const defaultSiteContent: EditableSiteContent = {
@@ -471,6 +476,7 @@ export const defaultSiteContent: EditableSiteContent = {
           "De liefde hangt in de lucht! Kom zaterdag naar de scouts om te ontdekken of cupido jou ook heeft geraakt.",
       },
     ]),
+  branchKapoenenImportantDates: "",
   branchWelpenAge: "8-11 jaar",
   branchWelpenShortDescription:
     "Welpen ontdekken samen de wereld, trekken eropuit en beleven elke week nieuwe avonturen in een warme groep.",
@@ -503,6 +509,7 @@ export const defaultSiteContent: EditableSiteContent = {
   branchWelpenPlanningEmptyText: "Programma wordt binnenkort aangevuld",
   branchWelpenProgram:
     stringifyProgramItems([]),
+  branchWelpenImportantDates: "",
   branchJongverkennersAge: "11-13 jaar",
   branchJongverkennersShortDescription:
     "Jongverkenners houden van actie, uitdaging en avontuur. Ze leren scouting kennen door zelf te doen.",
@@ -536,6 +543,7 @@ export const defaultSiteContent: EditableSiteContent = {
   branchJongverkennersPlanningEmptyText: "Programma wordt binnenkort aangevuld",
   branchJongverkennersProgram:
     stringifyProgramItems([]),
+  branchJongverkennersImportantDates: "",
   branchVerkennersAge: "13-16 jaar",
   branchVerkennersShortDescription:
     "Verkenners beleven avontuur met meer vrijheid en verantwoordelijkheid, in een hechte groep waar vriendschap centraal staat.",
@@ -568,6 +576,7 @@ export const defaultSiteContent: EditableSiteContent = {
   branchVerkennersPlanningEmptyText: "Programma wordt binnenkort aangevuld",
   branchVerkennersProgram:
     stringifyProgramItems([]),
+  branchVerkennersImportantDates: "",
   branchJinsAge: "17-18 jaar",
   branchJinsShortDescription:
     "Jins staan op de grens tussen lid en leiding. Ze werken aan eigen projecten, nemen verantwoordelijkheid op en groeien richting engagement.",
@@ -600,6 +609,7 @@ export const defaultSiteContent: EditableSiteContent = {
   branchJinsPlanningEmptyText: "Programma wordt binnenkort aangevuld",
   branchJinsProgram:
     stringifyProgramItems([]),
+  branchJinsImportantDates: "",
 };
 
 export const editableSiteContentKeys = Object.keys(

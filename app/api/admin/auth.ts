@@ -262,6 +262,7 @@ export function canEditContentKey(
     branch.contentKeys.intro,
     branch.contentKeys.highlights,
     branch.contentKeys.program,
+    branch.contentKeys.importantDates,
     branch.contentKeys.imageUrl,
     branch.contentKeys.leaderNames,
     branch.contentKeys.leaderPhotoUrl,

@@ -696,6 +696,7 @@ export default function AdminDashboard() {
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     event.stopPropagation();
+    event.nativeEvent.stopImmediatePropagation?.();
   }
 
   function renderField(field: FieldConfig) {
@@ -729,14 +730,13 @@ export default function AdminDashboard() {
   function parseContactPhoneEntries(value: string) {
     return value
       .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
+      .filter((line) => line.length > 0)
       .map((line) => {
         const [name = "", phone = ""] = line.split("|");
 
         return {
-          name: name.trim(),
-          phone: phone.trim(),
+          name,
+          phone,
         };
       });
   }
@@ -745,8 +745,7 @@ export default function AdminDashboard() {
     entries: Array<{ name: string; phone: string }>
   ) {
     return entries
-      .filter((entry) => entry.name.trim() || entry.phone.trim())
-      .map((entry) => `${entry.name.trim()}|${entry.phone.trim()}`)
+      .map((entry) => `${entry.name}|${entry.phone}`)
       .join("\n");
   }
 
@@ -768,7 +767,7 @@ export default function AdminDashboard() {
       "contactPhones",
       stringifyContactPhoneEntries([
         ...entries,
-        { name: "", phone: "" },
+        { name: "Nieuw contact", phone: "" },
       ])
     );
     setMessage("Telefoonnummer toegevoegd. Klik op opslaan.");
@@ -814,7 +813,7 @@ export default function AdminDashboard() {
             phoneEntries.map((entry, index) => (
               <div
                 className="grid gap-3 rounded-3xl bg-white p-4 ring-1 ring-slate-200 md:grid-cols-[1fr_1fr_auto]"
-                key={`${entry.name}-${index}`}
+                key={`contact-phone-${index}`}
               >
                 <label className="grid gap-2 text-sm font-semibold text-slate-700">
                   Naam
@@ -988,6 +987,71 @@ export default function AdminDashboard() {
     );
   }
 
+  function renderImportantDatesManager(key: keyof EditableSiteContent) {
+    const value = content[key] ?? "";
+    const hasImportantDates = value.trim().length > 0;
+
+    return (
+      <div className="md:col-span-2 rounded-3xl border border-slate-200 bg-white p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="text-xl font-black text-slate-950">
+              Belangrijke data
+            </h3>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Voeg hier een extra kader toe dat altijd onderaan het programma
+              verschijnt. Handig voor weekends, kampdata, inschrijvingsmomenten
+              of deadlines.
+            </p>
+          </div>
+          {hasImportantDates ? (
+            <button
+              className="inline-flex rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-700 transition hover:bg-red-100"
+              onClick={() => {
+                updateField(key, "");
+                setMessage("Belangrijke data verwijderd. Klik op opslaan.");
+              }}
+              type="button"
+            >
+              Verwijder kader
+            </button>
+          ) : (
+            <button
+              className="inline-flex rounded-full bg-[#103001] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+              onClick={() => {
+                updateField(
+                  key,
+                  "Zaterdag ...: ...\nWeekend ...: ...\nKamp ...: ..."
+                );
+                setMessage("Belangrijke data toegevoegd. Vul aan en klik op opslaan.");
+              }}
+              type="button"
+            >
+              Voeg belangrijke data toe
+            </button>
+          )}
+        </div>
+
+        {hasImportantDates ? (
+          <label className="mt-5 grid gap-2 text-sm font-semibold text-slate-700">
+            Tekst in dit kader
+            <textarea
+              className="min-h-40 rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal leading-7 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+              onKeyDown={stopTextKeyPropagation}
+              onChange={(event) => updateField(key, event.target.value)}
+              value={value}
+            />
+          </label>
+        ) : (
+          <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-[#fbfdf9] p-6 text-sm leading-6 text-slate-500">
+            Er verschijnt geen belangrijke-data-kader op de takpagina zolang dit
+            leeg is.
+          </div>
+        )}
+      </div>
+    );
+  }
+
   function renderBranchesManager() {
     const branchChoices = allowedBranches.length > 0 ? allowedBranches : branchProfiles;
 
@@ -1067,6 +1131,9 @@ export default function AdminDashboard() {
                 kind: "textarea",
               })}
               {renderProgramManager(activeBranch.contentKeys.program)}
+              {renderImportantDatesManager(
+                activeBranch.contentKeys.importantDates
+              )}
             </div>
           </div>
 
@@ -1656,6 +1723,13 @@ export default function AdminDashboard() {
                           </div>
                         ))}
                       </div>
+                    </article>
+
+                    <article className="grid gap-5 rounded-3xl border border-slate-200 p-5 md:grid-cols-2">
+                      {renderProgramManager(activeBranch.contentKeys.program)}
+                      {renderImportantDatesManager(
+                        activeBranch.contentKeys.importantDates
+                      )}
                     </article>
 
                     <article className="grid gap-5 rounded-3xl border border-slate-200 p-5 md:grid-cols-2">

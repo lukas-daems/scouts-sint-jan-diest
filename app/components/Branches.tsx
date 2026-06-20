@@ -11,18 +11,10 @@ type BranchesProps = {
 export default function Branches({ content }: BranchesProps) {
   return (
     <section
-      className="relative isolate overflow-hidden bg-[#eef7e9] px-5 pb-16 pt-24 sm:px-8 sm:pb-24 sm:pt-32 lg:px-10 lg:pt-36"
+      className="relative z-0 isolate bg-[#eef7e9] px-5 pb-16 pt-20 sm:px-8 sm:pb-24 sm:pt-24 lg:px-10 lg:pt-28"
       id="takken"
     >
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#103001] via-[#2c5c1b] to-[#eef7e9]"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute left-1/2 top-12 h-24 w-[min(1120px,calc(100%-2.5rem))] -translate-x-1/2 rounded-[2rem] border border-white/45 bg-white/28 shadow-2xl shadow-green-950/18 backdrop-blur-2xl"
-      />
-      <div className="relative mx-auto max-w-7xl rounded-[2.25rem] border border-white/70 bg-white/72 p-5 shadow-2xl shadow-green-950/10 backdrop-blur-xl sm:p-8 lg:p-10">
+      <div className="relative mx-auto max-w-7xl rounded-[2.25rem] border border-slate-200/80 bg-white p-5 shadow-2xl shadow-green-950/10 sm:p-8 lg:p-10">
         <SectionHeader
           subtitle={content.branchesHomeSubtitle}
           title={content.branchesHomeTitle}

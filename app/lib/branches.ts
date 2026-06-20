@@ -13,6 +13,7 @@ export type BranchProfile = {
     intro: keyof EditableSiteContent;
     highlights: keyof EditableSiteContent;
     program: keyof EditableSiteContent;
+    importantDates: keyof EditableSiteContent;
     imageUrl: keyof EditableSiteContent;
     leaderNames: keyof EditableSiteContent;
     leaderPhotoUrl: keyof EditableSiteContent;
@@ -44,6 +45,7 @@ export type BranchProfile = {
   leaderNames: string;
   leaderPhotoUrl: string;
   program: string;
+  importantDates: string;
   planningInfo: {
     day: string;
     time: string;
@@ -83,6 +85,7 @@ export const branchProfiles: BranchProfile[] = [
       intro: "branchKapoenenIntro",
       highlights: "branchKapoenenHighlights",
       program: "branchKapoenenProgram",
+      importantDates: "branchKapoenenImportantDates",
       imageUrl: "branchKapoenenImageUrl",
       leaderNames: "branchKapoenenLeaderNames",
       leaderPhotoUrl: "branchKapoenenLeaderPhotoUrl",
@@ -132,6 +135,7 @@ export const branchProfiles: BranchProfile[] = [
     ],
     leaderNames: "Leiding wordt binnenkort aangevuld",
     leaderPhotoUrl: "",
+    importantDates: "",
     planningInfo: defaultPlanningInfo,
     program: stringifyProgramItems([
       {
@@ -168,6 +172,7 @@ export const branchProfiles: BranchProfile[] = [
       intro: "branchWelpenIntro",
       highlights: "branchWelpenHighlights",
       program: "branchWelpenProgram",
+      importantDates: "branchWelpenImportantDates",
       imageUrl: "branchWelpenImageUrl",
       leaderNames: "branchWelpenLeaderNames",
       leaderPhotoUrl: "branchWelpenLeaderPhotoUrl",
@@ -212,6 +217,7 @@ export const branchProfiles: BranchProfile[] = [
     ],
     leaderNames: "Leiding wordt binnenkort aangevuld",
     leaderPhotoUrl: "",
+    importantDates: "",
     planningInfo: defaultPlanningInfo,
     program: stringifyProgramItems([]),
   },
@@ -227,6 +233,7 @@ export const branchProfiles: BranchProfile[] = [
       intro: "branchJongverkennersIntro",
       highlights: "branchJongverkennersHighlights",
       program: "branchJongverkennersProgram",
+      importantDates: "branchJongverkennersImportantDates",
       imageUrl: "branchJongverkennersImageUrl",
       leaderNames: "branchJongverkennersLeaderNames",
       leaderPhotoUrl: "branchJongverkennersLeaderPhotoUrl",
@@ -287,6 +294,7 @@ export const branchProfiles: BranchProfile[] = [
     ],
     leaderNames: "Leiding wordt binnenkort aangevuld",
     leaderPhotoUrl: "",
+    importantDates: "",
     planningInfo: defaultPlanningInfo,
     program: stringifyProgramItems([]),
   },
@@ -302,6 +310,7 @@ export const branchProfiles: BranchProfile[] = [
       intro: "branchVerkennersIntro",
       highlights: "branchVerkennersHighlights",
       program: "branchVerkennersProgram",
+      importantDates: "branchVerkennersImportantDates",
       imageUrl: "branchVerkennersImageUrl",
       leaderNames: "branchVerkennersLeaderNames",
       leaderPhotoUrl: "branchVerkennersLeaderPhotoUrl",
@@ -352,6 +361,7 @@ export const branchProfiles: BranchProfile[] = [
     ],
     leaderNames: "Leiding wordt binnenkort aangevuld",
     leaderPhotoUrl: "",
+    importantDates: "",
     planningInfo: defaultPlanningInfo,
     program: stringifyProgramItems([]),
   },
@@ -367,6 +377,7 @@ export const branchProfiles: BranchProfile[] = [
       intro: "branchJinsIntro",
       highlights: "branchJinsHighlights",
       program: "branchJinsProgram",
+      importantDates: "branchJinsImportantDates",
       imageUrl: "branchJinsImageUrl",
       leaderNames: "branchJinsLeaderNames",
       leaderPhotoUrl: "branchJinsLeaderPhotoUrl",
@@ -416,6 +427,7 @@ export const branchProfiles: BranchProfile[] = [
     ],
     leaderNames: "Leiding wordt binnenkort aangevuld",
     leaderPhotoUrl: "",
+    importantDates: "",
     planningInfo: defaultPlanningInfo,
     program: stringifyProgramItems([]),
   },
@@ -454,6 +466,8 @@ export function getEditableBranchProfile(
       text: content[block.text] || branch.detailBlocks[index]?.text || "",
     })),
     program: content[branch.contentKeys.program] || branch.program,
+    importantDates:
+      content[branch.contentKeys.importantDates] || branch.importantDates,
     leaderNames: content[branch.contentKeys.leaderNames] || branch.leaderNames,
     leaderPhotoUrl:
       content[branch.contentKeys.leaderPhotoUrl] || branch.leaderPhotoUrl,

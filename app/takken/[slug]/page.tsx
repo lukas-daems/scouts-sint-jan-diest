@@ -99,7 +99,7 @@ export default async function BranchDetailPage({
               className="camp-scene has-photo min-h-[320px] lg:min-h-[360px]"
               role="img"
               style={{
-                backgroundImage: `linear-gradient(180deg, rgba(16, 48, 1, 0.04), rgba(7, 26, 2, 0.64)), url("${branch.imageUrl}")`,
+                backgroundImage: `url("${branch.imageUrl}")`,
               }}
             />
           </div>
@@ -264,6 +264,16 @@ export default async function BranchDetailPage({
                   {branch.planningInfo.emptyText}
                 </div>
               )}
+              {branch.importantDates.trim() ? (
+                <article className="rounded-3xl border border-[#d7e8cf] bg-[#edf6e8] p-5 ring-1 ring-[#d7e8cf] sm:p-6">
+                  <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                    Belangrijke data
+                  </p>
+                  <div className="mt-3 whitespace-pre-line text-base font-semibold leading-8 text-[#103001]">
+                    {branch.importantDates}
+                  </div>
+                </article>
+              ) : null}
             </div>
           </div>
 

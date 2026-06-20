@@ -13,16 +13,19 @@ export default function Hero({ content }: HeroProps) {
 
   return (
     <section
-      className="hero-sky relative isolate overflow-visible px-5 pb-14 pt-32 text-white sm:px-8 sm:pb-20 lg:min-h-[850px] lg:px-10 lg:pb-36 lg:pt-36"
+      className="hero-sky relative z-20 isolate overflow-visible px-5 pb-0 pt-32 text-white sm:px-8 lg:min-h-[820px] lg:px-10 lg:pt-36"
       id="home"
     >
       <div aria-hidden="true" className="hero-lines absolute inset-0" />
       <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-55" />
       <div className="relative mx-auto flex max-w-7xl flex-col items-center">
         <div className="section-fade max-w-5xl text-center">
-          <div className="mb-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-green-50 backdrop-blur">
+          <div className="hero-eyebrow-badge mb-5 inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase leading-none tracking-[0.16em] text-green-50">
             <span>{content.heroEyebrow}</span>
-            <span className="hidden h-1 w-1 rounded-full bg-white/55 sm:inline-flex" />
+            <span
+              aria-hidden="true"
+              className="hidden h-1.5 w-1.5 shrink-0 rounded-full bg-white/55 sm:inline-flex"
+            />
             <span>{content.heroOrgLabel}</span>
           </div>
           <h1 className="text-5xl font-black leading-[1.02] tracking-tight sm:text-7xl lg:text-8xl">
@@ -48,7 +51,7 @@ export default function Hero({ content }: HeroProps) {
           </div>
         </div>
 
-        <div className="hero-visual-card relative z-10 mt-16 w-full max-w-6xl overflow-visible p-2 sm:p-3 lg:-mb-24">
+        <div className="hero-visual-card relative z-[60] mt-8 w-full max-w-6xl translate-y-6 overflow-visible p-2 sm:mt-10 sm:p-3 lg:mt-10 lg:translate-y-8">
           {/* TODO: vervang deze CSS-placeholder door een echte hero-foto van Scouts Sint-Jan Diest. */}
           <div
             aria-label="Tenten op een scoutskamp in de natuur"
