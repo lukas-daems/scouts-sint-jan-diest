@@ -24,18 +24,29 @@ type FooterProps = {
   content: EditableSiteContent;
 };
 
-function getContactEmails(content: EditableSiteContent) {
-  const emails = (content.contactEmails || content.contactEmail)
-    .split(/\r?\n|,/)
-    .map((email) => email.trim())
+function getContactPhones(content: EditableSiteContent) {
+  const phoneLines = (content.contactPhones || content.contactPhone)
+    .split(/\r?\n/)
+    .map((line) => line.trim())
     .filter(Boolean);
 
-  return Array.from(new Set(emails.length ? emails : [content.contactEmail]));
+  const parsedPhones = phoneLines.map((line) => {
+    const [name = "", phone = ""] = line.split("|");
+
+    return {
+      name: name.trim() || "Groepsleiding",
+      phone: phone.trim() || name.trim(),
+    };
+  });
+
+  return parsedPhones.length
+    ? parsedPhones
+    : [{ name: "Groepsleiding", phone: content.contactPhone }];
 }
 
 export default function Footer({ content }: FooterProps) {
   const logoSrc = content.siteLogoUrl || "/assets/logo.png";
-  const contactEmails = getContactEmails(content);
+  const contactPhones = getContactPhones(content);
 
   return (
     <footer className="bg-[#071a02] px-5 py-16 text-white sm:px-8 lg:px-10">
@@ -117,10 +128,21 @@ export default function Footer({ content }: FooterProps) {
             </h3>
             <ul className="mt-5 space-y-3 text-sm text-green-100">
               <li>{content.contactLocation}</li>
-              {contactEmails.map((email) => (
-                <li key={email}>
-                  <a className="break-all transition hover:text-white" href={`mailto:${email}`}>
-                    {email}
+              <li>
+                <a
+                  className="break-all transition hover:text-white"
+                  href={`mailto:${content.contactEmail}`}
+                >
+                  {content.contactEmail}
+                </a>
+              </li>
+              {contactPhones.map((item) => (
+                <li key={`${item.name}-${item.phone}`}>
+                  <a
+                    className="transition hover:text-white"
+                    href={`tel:${item.phone.replace(/\s/g, "")}`}
+                  >
+                    {item.name}: {item.phone}
                   </a>
                 </li>
               ))}

@@ -222,12 +222,7 @@ const contactFields: FieldConfig[] = [
   { key: "contactSubtitle", label: "Intro tekst", kind: "textarea" },
   { key: "contactLocation", label: "Locatie" },
   { key: "contactEmail", label: "Hoofd e-mail" },
-  {
-    key: "contactEmails",
-    label: "E-mailadressen groepsleiding, 1 per lijn",
-    kind: "textarea",
-  },
-  { key: "contactPhone", label: "Telefoon" },
+  { key: "contactPhone", label: "Hoofdtelefoon" },
   { key: "instagram", label: "Instagram" },
   { key: "facebook", label: "Facebook" },
   { key: "contactExternalTitle", label: "Externe link titel" },
@@ -728,6 +723,137 @@ export default function AdminDashboard() {
           />
         )}
       </label>
+    );
+  }
+
+  function parseContactPhoneEntries(value: string) {
+    return value
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [name = "", phone = ""] = line.split("|");
+
+        return {
+          name: name.trim(),
+          phone: phone.trim(),
+        };
+      });
+  }
+
+  function stringifyContactPhoneEntries(
+    entries: Array<{ name: string; phone: string }>
+  ) {
+    return entries
+      .filter((entry) => entry.name.trim() || entry.phone.trim())
+      .map((entry) => `${entry.name.trim()}|${entry.phone.trim()}`)
+      .join("\n");
+  }
+
+  function updateContactPhoneEntry(
+    index: number,
+    field: "name" | "phone",
+    value: string
+  ) {
+    const entries = parseContactPhoneEntries(content.contactPhones);
+    const nextEntries = entries.map((entry, entryIndex) =>
+      entryIndex === index ? { ...entry, [field]: value } : entry
+    );
+    updateField("contactPhones", stringifyContactPhoneEntries(nextEntries));
+  }
+
+  function addContactPhoneEntry() {
+    const entries = parseContactPhoneEntries(content.contactPhones);
+    updateField(
+      "contactPhones",
+      stringifyContactPhoneEntries([
+        ...entries,
+        { name: "", phone: "" },
+      ])
+    );
+    setMessage("Telefoonnummer toegevoegd. Klik op opslaan.");
+  }
+
+  function removeContactPhoneEntry(index: number) {
+    const entries = parseContactPhoneEntries(content.contactPhones);
+    updateField(
+      "contactPhones",
+      stringifyContactPhoneEntries(
+        entries.filter((_, entryIndex) => entryIndex !== index)
+      )
+    );
+    setMessage("Telefoonnummer verwijderd. Klik op opslaan.");
+  }
+
+  function renderContactPhoneManager() {
+    const phoneEntries = parseContactPhoneEntries(content.contactPhones);
+
+    return (
+      <section className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200 md:col-span-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="text-xl font-black text-slate-950">
+              Telefoonnummers groepsleiding
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Voeg hier meerdere contactpunten toe. Ze verschijnen als naam +
+              telefoonnummer in het groene contactblok.
+            </p>
+          </div>
+          <button
+            className="inline-flex rounded-full bg-[#103001] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={addContactPhoneEntry}
+            type="button"
+          >
+            Nummer toevoegen
+          </button>
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          {phoneEntries.length > 0 ? (
+            phoneEntries.map((entry, index) => (
+              <div
+                className="grid gap-3 rounded-3xl bg-white p-4 ring-1 ring-slate-200 md:grid-cols-[1fr_1fr_auto]"
+                key={`${entry.name}-${index}`}
+              >
+                <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                  Naam
+                  <input
+                    className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateContactPhoneEntry(index, "name", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={entry.name}
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                  Telefoonnummer
+                  <input
+                    className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateContactPhoneEntry(index, "phone", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={entry.phone}
+                  />
+                </label>
+                <button
+                  className="self-end rounded-full border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  onClick={() => removeContactPhoneEntry(index)}
+                  type="button"
+                >
+                  Verwijder
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-5 text-sm font-semibold text-slate-600">
+              Nog geen telefoonnummers toegevoegd.
+            </div>
+          )}
+        </div>
+      </section>
     );
   }
 
@@ -1764,6 +1890,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="grid gap-5 md:grid-cols-2">
                     {contactFields.map(renderField)}
+                    {renderContactPhoneManager()}
                   </div>
                 </div>
               ) : null}

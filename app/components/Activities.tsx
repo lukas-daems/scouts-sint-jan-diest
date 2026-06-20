@@ -81,7 +81,7 @@ export default function Activities({ content }: ActivitiesProps) {
                 </p>
               </div>
               <div className="absolute inset-x-5 bottom-5 rounded-[1.5rem] border border-white/18 bg-white/14 p-5 text-white shadow-2xl shadow-green-950/25 backdrop-blur sm:inset-x-7 sm:bottom-7 sm:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-black uppercase tracking-[0.14em] text-green-100">
                       {content.activitiesFeaturedMiniTitle}

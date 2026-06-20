@@ -107,44 +107,49 @@ export default async function BranchDetailPage({
       </section>
 
       <section className="px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
-        <div className="mx-auto grid max-w-7xl gap-7 lg:grid-cols-[0.82fr_1.18fr]">
-          <aside className="premium-card h-fit p-6 sm:p-7">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
-              Deze tak
-            </p>
-            <h2 className="mt-3 text-2xl font-black text-slate-950 sm:text-3xl">
-              Praktisch voor {branch.name}
-            </h2>
-            <div className="mt-6 grid gap-3">
-              <div className="rounded-3xl bg-[#edf6e8] p-4 ring-1 ring-[#d7e8cf]">
-                <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#103001]">
-                  Leeftijd
-                </p>
-                <p className="mt-2 text-2xl font-black text-slate-950">
-                  {branch.age}
-                </p>
-              </div>
-              <div className="rounded-3xl bg-emerald-50 p-4 ring-1 ring-emerald-100">
-                <p className="text-sm font-bold uppercase tracking-[0.14em] text-emerald-700">
-                  Werking
-                </p>
-                <p className="mt-2 text-[15px] leading-7 text-slate-700">
-                  Activiteiten op maat van hun leeftijd, begeleid door
-                  geengageerde leiding.
-                </p>
+        <div className="mx-auto grid max-w-7xl items-stretch gap-7 lg:grid-cols-[0.82fr_1.18fr]">
+          <aside className="premium-card flex h-full flex-col p-6 sm:p-7">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+                Deze tak
+              </p>
+              <h2 className="mt-3 text-2xl font-black text-slate-950 sm:text-3xl">
+                Praktisch voor {branch.name}
+              </h2>
+              <div className="mt-6 grid gap-3">
+                <div className="rounded-3xl bg-[#edf6e8] p-4 ring-1 ring-[#d7e8cf]">
+                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#103001]">
+                    Leeftijd
+                  </p>
+                  <p className="mt-2 text-2xl font-black text-slate-950">
+                    {branch.age}
+                  </p>
+                </div>
+                <div className="rounded-3xl bg-emerald-50 p-4 ring-1 ring-emerald-100">
+                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-emerald-700">
+                    Werking
+                  </p>
+                  <p className="mt-2 text-[15px] leading-7 text-slate-700">
+                    Activiteiten op maat van hun leeftijd, begeleid door
+                    geengageerde leiding.
+                  </p>
+                </div>
               </div>
             </div>
             <Link
-              className="mt-7 inline-flex w-full justify-center rounded-full bg-[#103001] px-7 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/15 transition hover:-translate-y-0.5 hover:bg-[#1e4b0d]"
+              className="mt-7 inline-flex w-full justify-center rounded-full bg-[#103001] px-7 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/15 transition hover:-translate-y-0.5 hover:bg-[#1e4b0d] lg:mt-auto"
               href="/#contact"
             >
               Vraag info over {branch.name}
             </Link>
           </aside>
 
-          <div className="grid gap-4">
+          <div className="grid auto-rows-fr gap-4">
             {branch.detailBlocks.map((block) => (
-              <article className="premium-card p-6 sm:p-7" key={block.title}>
+              <article
+                className="premium-card flex h-full flex-col justify-center p-6 sm:p-7"
+                key={block.title}
+              >
                 <h2 className="text-xl font-black text-slate-950 sm:text-2xl">
                   {block.title}
                 </h2>
