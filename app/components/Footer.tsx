@@ -7,7 +7,6 @@ import type { EditableSiteContent } from "../lib/site-content-defaults";
 
 const navLinks = [
   ["Home", "/#home"],
-  ["Over ons", "/#over-ons"],
   ["Takken", "/takken"],
   ["Activiteiten", "/activiteiten"],
   ["Zomerkamp", "/zomerkamp"],
@@ -25,8 +24,18 @@ type FooterProps = {
   content: EditableSiteContent;
 };
 
+function getContactEmails(content: EditableSiteContent) {
+  const emails = (content.contactEmails || content.contactEmail)
+    .split(/\r?\n|,/)
+    .map((email) => email.trim())
+    .filter(Boolean);
+
+  return Array.from(new Set(emails.length ? emails : [content.contactEmail]));
+}
+
 export default function Footer({ content }: FooterProps) {
   const logoSrc = content.siteLogoUrl || "/assets/logo.png";
+  const contactEmails = getContactEmails(content);
 
   return (
     <footer className="bg-[#071a02] px-5 py-16 text-white sm:px-8 lg:px-10">
@@ -108,7 +117,13 @@ export default function Footer({ content }: FooterProps) {
             </h3>
             <ul className="mt-5 space-y-3 text-sm text-green-100">
               <li>{content.contactLocation}</li>
-              <li>{content.contactEmail}</li>
+              {contactEmails.map((email) => (
+                <li key={email}>
+                  <a className="break-all transition hover:text-white" href={`mailto:${email}`}>
+                    {email}
+                  </a>
+                </li>
+              ))}
               <li>
                 <Link
                   className="transition hover:text-white"

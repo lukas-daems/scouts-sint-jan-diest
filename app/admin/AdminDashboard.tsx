@@ -221,7 +221,12 @@ const contactFields: FieldConfig[] = [
   { key: "contactTitle", label: "Titel" },
   { key: "contactSubtitle", label: "Intro tekst", kind: "textarea" },
   { key: "contactLocation", label: "Locatie" },
-  { key: "contactEmail", label: "E-mail" },
+  { key: "contactEmail", label: "Hoofd e-mail" },
+  {
+    key: "contactEmails",
+    label: "E-mailadressen groepsleiding, 1 per lijn",
+    kind: "textarea",
+  },
   { key: "contactPhone", label: "Telefoon" },
   { key: "instagram", label: "Instagram" },
   { key: "facebook", label: "Facebook" },
@@ -1700,9 +1705,8 @@ export default function AdminDashboard() {
                         </h3>
                         <div className="mt-4 grid gap-2 md:grid-cols-2">
                           {[
-                            ["Over ons", "/#over-ons"],
-                            ["Activiteiten", "/#activiteiten"],
                             ["Takken", "/#takken"],
+                            ["Activiteiten", "/#activiteiten"],
                             ["Kamp", "/#kamp"],
                             ["Foto's", "/#fotos"],
                             ["Contact", "/#contact"],

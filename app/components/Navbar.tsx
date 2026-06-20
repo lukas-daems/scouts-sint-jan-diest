@@ -9,9 +9,8 @@ import { branchProfiles } from "../lib/branches";
 import { sitePageGroups } from "../lib/site-pages";
 
 const homeSectionLinks = [
-  { label: "Over ons", href: "/#over-ons" },
-  { label: "Activiteiten", href: "/#activiteiten" },
   { label: "Takken", href: "/#takken" },
+  { label: "Activiteiten", href: "/#activiteiten" },
   { label: "Kamp", href: "/#kamp" },
   { label: "Foto's", href: "/#fotos" },
   { label: "Contact", href: "/#contact" },

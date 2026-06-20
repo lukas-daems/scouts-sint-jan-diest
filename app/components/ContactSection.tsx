@@ -9,8 +9,19 @@ type ContactSectionProps = {
   content: EditableSiteContent;
 };
 
+function getContactEmails(content: EditableSiteContent) {
+  const emails = (content.contactEmails || content.contactEmail)
+    .split(/\r?\n|,/)
+    .map((email) => email.trim())
+    .filter(Boolean);
+
+  return Array.from(new Set(emails.length ? emails : [content.contactEmail]));
+}
+
 export default function ContactSection({ content }: ContactSectionProps) {
   const hasExternalLink = Boolean(content.contactExternalUrl);
+  const contactEmails = getContactEmails(content);
+  const primaryEmail = contactEmails[0] || content.contactEmail;
 
   return (
     <section className="bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="contact">
@@ -54,7 +65,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
                 )}
                 <a
                   className="inline-flex justify-center rounded-full bg-white px-8 py-4 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf] transition hover:bg-green-50"
-                  href={`mailto:${content.contactEmail}`}
+                  href={`mailto:${primaryEmail}`}
                 >
                   {content.contactMailCta}
                 </a>
@@ -81,10 +92,22 @@ export default function ContactSection({ content }: ContactSectionProps) {
               <p className="mt-3 text-green-100">{content.contactLocation}</p>
 
               <div className="mt-8 space-y-5 text-green-50">
-                <p>
-                  <span className="font-bold text-white">E-mail:</span>{" "}
-                  {content.contactEmail}
-                </p>
+                <div>
+                  <p className="font-bold text-white">
+                    E-mailadressen groepsleiding:
+                  </p>
+                  <div className="mt-2 grid gap-2">
+                    {contactEmails.map((email) => (
+                      <a
+                        className="block break-all rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold text-green-50 ring-1 ring-white/15 transition hover:bg-white/16 hover:text-white"
+                        href={`mailto:${email}`}
+                        key={email}
+                      >
+                        {email}
+                      </a>
+                    ))}
+                  </div>
+                </div>
                 <p>
                   <span className="font-bold text-white">Telefoon:</span>{" "}
                   {content.contactPhone}
@@ -101,7 +124,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
 
               <a
                 className="mt-9 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-4 text-sm font-bold text-slate-950 transition hover:bg-green-50"
-                href={`mailto:${content.contactEmail}`}
+                href={`mailto:${primaryEmail}`}
               >
                 {content.contactMailCta}
               </a>

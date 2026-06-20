@@ -91,7 +91,7 @@ export default function Activities({ content }: ActivitiesProps) {
                     </p>
                   </div>
                   <Link
-                    className="inline-flex w-fit rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-green-50"
+                    className="inline-flex min-w-40 items-center justify-center rounded-full bg-white px-5 py-2.5 text-center text-sm font-bold text-slate-950 transition hover:bg-green-50"
                     href="/zomerkamp"
                   >
                     {content.activitiesFeaturedCtaLabel}
@@ -101,7 +101,6 @@ export default function Activities({ content }: ActivitiesProps) {
             </div>
 
             <div className="relative p-7 sm:p-8">
-              <div className="absolute right-8 top-8 h-20 w-20 rounded-full bg-[#edf6e8]" />
               <div className="relative">
                 <h3 className="text-4xl font-black leading-tight text-slate-950 sm:text-5xl">
                   {content.activitiesFeaturedTitle}

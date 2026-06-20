@@ -50,39 +50,43 @@ export default function PracticalInfo({ content }: PracticalInfoProps) {
           title={content.practicalTitle}
         />
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {infoCards.map((card, index) => (
-            <article
-              className={`lift-card flex min-h-[245px] flex-col rounded-[2rem] border bg-white p-6 text-center shadow-xl shadow-green-950/6 ${
-                card.important
-                  ? "border-[#d7e8cf] ring-2 ring-[#edf6e8]"
-                  : "border-slate-200"
-              }`}
-              key={card.title}
-            >
-              <div className="flex justify-center">
-                <IconBadge
-                  icon={card.icon}
-                  tone={index === 3 ? "sand" : index === 2 ? "green" : "blue"}
-                />
-              </div>
-              <h3 className="mt-5 text-2xl font-black text-slate-950">
-                {card.title}
-              </h3>
-              <p
-                className={`mt-3 flex-1 leading-7 ${
-                  card.important
-                    ? "text-3xl font-black tracking-tight text-[#103001]"
-                    : "text-[15px] text-slate-600"
-                }`}
+        <div className="mt-12 overflow-hidden rounded-[2rem] bg-slate-200 p-px shadow-xl shadow-green-950/8">
+          <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-4">
+            {infoCards.map((card, index) => (
+              <article
+                className="group flex min-h-[220px] flex-col bg-white p-6 transition hover:bg-[#fbfdf9] sm:p-7"
+                key={card.title}
               >
-                {card.text}
-              </p>
-              <p className="mt-5 rounded-full bg-[#edf6e8] px-4 py-2 text-xs font-bold uppercase leading-5 text-[#103001] ring-1 ring-[#d7e8cf]">
-                {card.note}
-              </p>
-            </article>
-          ))}
+                <div className="flex items-start justify-between gap-4">
+                  <IconBadge
+                    icon={card.icon}
+                    tone={index === 3 ? "sand" : index === 2 ? "green" : "blue"}
+                  />
+                  {card.important ? (
+                    <span className="rounded-full bg-[#edf6e8] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#103001] ring-1 ring-[#d7e8cf]">
+                      Belangrijk
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-6 flex flex-1 flex-col">
+                  <p className="text-sm font-black uppercase tracking-[0.14em] text-[#2f6b18]">
+                    {card.title}
+                  </p>
+                  <h3
+                    className={`mt-3 font-black leading-tight text-slate-950 ${
+                      card.important ? "text-3xl" : "text-2xl"
+                    }`}
+                  >
+                    {card.text}
+                  </h3>
+                  <p className="mt-auto pt-5 text-sm font-semibold leading-6 text-slate-500">
+                    {card.note}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
 
         <div className="mt-10 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:p-10">

@@ -206,6 +206,7 @@ export type EditableSiteContent = {
   campForNewMembers: string;
   contactLocation: string;
   contactEmail: string;
+  contactEmails: string;
   contactPhone: string;
   instagram: string;
   facebook: string;
@@ -357,6 +358,8 @@ export const defaultSiteContent: EditableSiteContent = {
     "Nieuwe leden zijn welkom om eerst vrijblijvend kennis te maken.",
   contactLocation: "Diest, Belgie",
   contactEmail: "info@scoutssintjandiest.be",
+  contactEmails:
+    "info@scoutssintjandiest.be\ngroepsleiding@scoutssintjandiest.be",
   contactPhone: "+32 000 00 00 00",
   instagram: "@scoutssintjandiest",
   facebook: "Scouts Sint-Jan Berchmans",
@@ -939,6 +942,10 @@ export function sanitizeSiteContent(
 
   if (!sanitized.registrationLink) {
     sanitized.registrationLink = "#contact";
+  }
+
+  if (!sanitized.contactEmails) {
+    sanitized.contactEmails = sanitized.contactEmail;
   }
 
   return sanitized;

@@ -13,11 +13,15 @@ export default function Hero({ content }: HeroProps) {
 
   return (
     <section
-      className="hero-sky relative isolate px-5 pb-16 pt-32 text-white sm:px-8 sm:pb-24 lg:min-h-[850px] lg:px-10 lg:pb-32 lg:pt-36"
+      className="hero-sky relative isolate overflow-hidden px-5 pb-16 pt-32 text-white sm:px-8 sm:pb-24 lg:min-h-[850px] lg:px-10 lg:pb-32 lg:pt-36"
       id="home"
     >
       <div aria-hidden="true" className="hero-lines absolute inset-0" />
       <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-55" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-[#f2f8ee]/75 to-[#f2f8ee] sm:h-52 lg:h-64"
+      />
       <div className="relative mx-auto flex max-w-7xl flex-col items-center">
         <div className="section-fade max-w-5xl text-center">
           <div className="mb-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-green-50 backdrop-blur">
