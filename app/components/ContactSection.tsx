@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import IconBadge from "./IconBadge";
+import { images } from "../lib/image-placeholders";
 import type { EditableSiteContent } from "../lib/site-content-defaults";
 
 type ContactSectionProps = {
@@ -32,6 +33,10 @@ function getContactPhones(content: EditableSiteContent) {
 export default function ContactSection({ content }: ContactSectionProps) {
   const hasExternalLink = Boolean(content.contactExternalUrl);
   const contactPhones = getContactPhones(content);
+  const contactImage =
+    content.contactImageUrl ||
+    content.galleryGroepsactiviteitImageUrl ||
+    images.galleryGroepsactiviteit;
 
   return (
     <section className="bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="contact">
@@ -82,11 +87,19 @@ export default function ContactSection({ content }: ContactSectionProps) {
               </div>
             </div>
 
-            <p className="mt-6 rounded-3xl bg-white p-5 text-sm font-semibold leading-7 text-slate-600 ring-1 ring-slate-200">
-              Aanvragen en inschrijvingen verlopen via een externe link die de
-              leiding zelf beheert. Zo tonen we geen formulier dat lokaal toch
-              niet verzonden wordt.
-            </p>
+            {content.contactNoticeText ? (
+              <p className="mt-6 whitespace-pre-line rounded-3xl bg-white p-5 text-sm font-semibold leading-7 text-slate-600 ring-1 ring-slate-200">
+                {content.contactNoticeText}
+              </p>
+            ) : null}
+
+            <div className="mt-6 overflow-hidden rounded-[1.7rem] border border-slate-200 bg-white shadow-lg shadow-green-950/6">
+              <img
+                alt="Sfeerbeeld van Scouts Sint-Jan Berchmans"
+                className="h-64 w-full object-cover sm:h-72 lg:h-80"
+                src={contactImage}
+              />
+            </div>
           </article>
 
           <aside className="blue-pattern relative overflow-hidden rounded-[2rem] p-8 text-white shadow-2xl shadow-green-950/20">

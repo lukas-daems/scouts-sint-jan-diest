@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { branchProfiles } from "../lib/branches";
 import { sitePageGroups } from "../lib/site-pages";
+import type { EditableSiteContent } from "../lib/site-content-defaults";
 
 const homeSectionLinks = [
   { label: "Takken", href: "/#takken" },
@@ -16,27 +17,52 @@ const homeSectionLinks = [
   { label: "Contact", href: "/#contact" },
 ];
 
-const navigationGroups = [
+function getNavigationGroups(content?: EditableSiteContent) {
+  const groupLabels: Record<string, string> = {
+    Activiteiten: content?.navActivitiesLabel || "Activiteiten",
+    "Steun ons": content?.navSupportLabel || "Steun ons",
+    Praktisch: content?.navPracticalLabel || "Praktisch",
+    Meer: content?.navMoreLabel || "Meer",
+  };
+
+  return [
+    {
+      id: "home",
+      label: content?.navHomeLabel || "Home",
+      href: "/#home",
+      slugs: [""],
+      items: homeSectionLinks,
+    },
+    {
+      id: "takken",
+      label: content?.navBranchesLabel || "Takken",
+      href: "/takken",
+      slugs: ["takken"],
+      items: [
+        { label: "Alle takken", href: "/takken" },
+        ...branchProfiles.map((branch) => ({
+          label: branch.name,
+          href: `/takken/${branch.slug}`,
+          meta: branch.age,
+        })),
+      ],
+    },
+    ...sitePageGroups.map((group) => ({
+      ...group,
+      id: group.label.toLowerCase().replace(/\s+/g, "-"),
+      label: groupLabels[group.label] || group.label,
+    })),
+  ];
+}
+
+const fallbackNavigationGroups = [
   {
+    id: "home",
     label: "Home",
     href: "/#home",
     slugs: [""],
     items: homeSectionLinks,
   },
-  {
-    label: "Takken",
-    href: "/takken",
-    slugs: ["takken"],
-    items: [
-      { label: "Alle takken", href: "/takken" },
-      ...branchProfiles.map((branch) => ({
-        label: branch.name,
-        href: `/takken/${branch.slug}`,
-        meta: branch.age,
-      })),
-    ],
-  },
-  ...sitePageGroups,
 ];
 
 function Chevron() {
@@ -59,17 +85,23 @@ function Chevron() {
 type NavbarProps = {
   logoUrl?: string;
   siteName?: string;
+  content?: EditableSiteContent;
 };
 
 export default function Navbar({
   logoUrl = "",
   siteName = "Scouts Sint-Jan Berchmans",
+  content,
 }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openMobileGroup, setOpenMobileGroup] = useState(
+    fallbackNavigationGroups[0].id
+  );
   const [logoFailed, setLogoFailed] = useState(false);
   const pathname = usePathname();
   const activeSlug = pathname.replace(/^\//, "").split("/")[0];
   const logoSrc = !logoFailed ? logoUrl || "/assets/logo.png" : "";
+  const navigationGroups = getNavigationGroups(content);
 
   function isActive(slugs: string[]) {
     if (slugs.includes("")) {
@@ -107,7 +139,7 @@ export default function Navbar({
 
         <div className="hidden items-center gap-1 lg:flex">
           {navigationGroups.map((group) => (
-            <div className="group relative py-6" key={group.label}>
+            <div className="group relative py-6" key={group.id}>
               <Link
                 className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold transition hover:bg-white/10 hover:text-white xl:px-4 ${
                   isActive(group.slugs)
@@ -126,7 +158,7 @@ export default function Navbar({
                     className="mb-2 block rounded-2xl bg-[#edf6e8] px-4 py-3 text-sm font-black text-[#103001] transition hover:bg-[#d7e8cf]"
                     href={group.href}
                   >
-                    {group.label === "Home" ? "Naar de homepage" : group.label}
+                    {group.id === "home" ? "Naar de homepage" : group.label}
                   </Link>
                   {group.items.map((item) => (
                     <Link
@@ -135,7 +167,7 @@ export default function Navbar({
                       key={item.href}
                     >
                       <span>{item.label}</span>
-                      {"meta" in item && item.meta ? (
+                      {"meta" in item && typeof item.meta === "string" && item.meta ? (
                         <span className="text-xs font-semibold text-slate-400">
                           {item.meta}
                         </span>
@@ -152,7 +184,7 @@ export default function Navbar({
           className="hidden rounded-full bg-white px-6 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-green-950/20 transition hover:-translate-y-0.5 hover:bg-green-50 lg:inline-flex"
           href="/#contact"
         >
-          Word lid
+          {content?.navCtaLabel || "Word lid"}
         </Link>
 
         <button
@@ -187,31 +219,57 @@ export default function Navbar({
       >
         <div className="flex max-h-[calc(100vh-6rem)] flex-col gap-1 overflow-y-auto p-3">
           {navigationGroups.map((group) => (
-            <div key={group.label}>
-              <Link
-                className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-black text-slate-800 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
-                href={group.href}
-                onClick={() => setIsOpen(false)}
+            <div className="rounded-2xl bg-[#fbfdf9] ring-1 ring-slate-200" key={group.id}>
+              <button
+                aria-expanded={openMobileGroup === group.id}
+                className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-black text-slate-800 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                onClick={() =>
+                  setOpenMobileGroup((current) =>
+                    current === group.id ? "" : group.id
+                  )
+                }
+                type="button"
               >
                 {group.label}
-                <Chevron />
-              </Link>
-              <div className="mb-2 ml-3 border-l border-slate-200 pl-3">
-                {group.items.map((item) => (
+                <span
+                  className={`transition ${
+                    openMobileGroup === group.id ? "rotate-180" : ""
+                  }`}
+                >
+                  <Chevron />
+                </span>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  openMobileGroup === group.id
+                    ? "max-h-[520px] opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="mx-3 mb-3 grid gap-1 border-l border-slate-200 pl-3">
                   <Link
-                    className="flex items-center justify-between gap-4 rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
-                    href={item.href}
-                    key={item.href}
+                    className="rounded-2xl bg-white px-4 py-2.5 text-sm font-black text-[#103001] ring-1 ring-slate-100 transition hover:bg-[#edf6e8]"
+                    href={group.href}
                     onClick={() => setIsOpen(false)}
                   >
-                    <span>{item.label}</span>
-                    {"meta" in item && item.meta ? (
-                      <span className="text-xs font-semibold text-slate-400">
-                        {item.meta}
-                      </span>
-                    ) : null}
+                    {group.id === "home" ? "Naar de homepage" : `Naar ${group.label}`}
                   </Link>
-                ))}
+                  {group.items.map((item) => (
+                    <Link
+                      className="flex items-center justify-between gap-4 rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                      href={item.href}
+                      key={item.href}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>{item.label}</span>
+                      {"meta" in item && typeof item.meta === "string" && item.meta ? (
+                        <span className="text-xs font-semibold text-slate-400">
+                          {item.meta}
+                        </span>
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
@@ -220,8 +278,8 @@ export default function Navbar({
             href="/#contact"
             onClick={() => setIsOpen(false)}
           >
-            Word lid
-          </Link>
+          {content?.navCtaLabel || "Word lid"}
+        </Link>
         </div>
       </div>
     </header>

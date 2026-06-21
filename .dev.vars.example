@@ -1,2 +1,12 @@
-ADMIN_PASSWORD=kies-een-sterk-wachtwoord
-ADMIN_SESSION_SECRET=vervang-dit-door-een-lange-willekeurige-tekst
+# Kopieer dit bestand lokaal naar .dev.vars en vul sterke wachtwoorden in.
+# Commit .dev.vars nooit naar GitHub.
+
+ADMIN_PASSWORD=kies-een-sterk-hoofdadmin-wachtwoord
+ADMIN_SESSION_SECRET=gebruik-hier-een-lange-willekeurige-tekst
+
+# Optionele takaccounts. Laat een regel leeg of weg als die tak nog niet mag inloggen.
+KAPOENLEIDING_PASSWORD=kies-een-sterk-wachtwoord
+WELPENLEIDING_PASSWORD=kies-een-sterk-wachtwoord
+JONGVERKENNERLEIDING_PASSWORD=kies-een-sterk-wachtwoord
+VERKENNERLEIDING_PASSWORD=kies-een-sterk-wachtwoord
+JINLEIDING_PASSWORD=kies-een-sterk-wachtwoord

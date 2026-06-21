@@ -29,14 +29,26 @@ function CardsGrid({ page }: { page: EditableSitePage }) {
     return null;
   }
 
+  const headings: Record<string, { eyebrow: string; title: string }> = {
+    overview: { eyebrow: "Overzicht", title: "Wat vind je hier?" },
+    camp: { eyebrow: "Kampinformatie", title: "Alles rond het zomerkamp" },
+    event: { eyebrow: "Evenement", title: "Praktische afspraken" },
+    order: { eyebrow: "Verkoopactie", title: "Bestellen en steunen" },
+    reservation: { eyebrow: "Reservatie", title: "Menu, planning en reservatie" },
+    shop: { eyebrow: "Shop", title: "Wat kan je aanvragen?" },
+    links: { eyebrow: "Links", title: "Nuttige verwijzingen" },
+    single: { eyebrow: "Informatie", title: "Meer uitleg" },
+  };
+  const heading = headings[page.kind] ?? headings.overview;
+
   return (
     <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8">
       <div className="max-w-3xl">
         <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
-          Overzicht
+          {heading.eyebrow}
         </p>
         <h2 className="mt-2 text-3xl font-black text-slate-950">
-          Belangrijk op deze pagina
+          {heading.title}
         </h2>
       </div>
       <div className="mt-7 grid gap-4 md:grid-cols-2">
@@ -341,6 +353,78 @@ function LinksBlock({ page }: { page: EditableSitePage }) {
   );
 }
 
+function ActionFeatureBlocks({ page }: { page: EditableSitePage }) {
+  const labels: Record<string, string> = {
+    event: "Evenement",
+    order: "Verkoopactie",
+    reservation: "Reservatie",
+  };
+  const actionLabel = labels[page.kind] ?? "Actie";
+  const hasLink = Boolean(page.externalCta?.href);
+
+  return (
+    <div className="grid gap-8">
+      <section
+        className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-green-950/8"
+        id="aanvragen"
+      >
+        <div className="grid gap-0 lg:grid-cols-[0.86fr_1.14fr]">
+          <div className="bg-[#103001] p-6 text-white sm:p-8 lg:p-10">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-green-100">
+              {actionLabel}
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              {page.externalCta?.title || page.title}
+            </h2>
+            <p className="mt-4 whitespace-pre-line leading-8 text-green-50">
+              {page.externalCta?.text || page.sidebarText}
+            </p>
+            {page.externalCta ? (
+              hasLink ? (
+                <Link
+                  className="mt-7 inline-flex rounded-full bg-white px-7 py-4 text-sm font-bold text-slate-950 shadow-xl shadow-green-950/20 transition hover:-translate-y-0.5 hover:bg-green-50"
+                  href={page.externalCta.href}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {page.externalCta.button}
+                </Link>
+              ) : (
+                <span className="mt-7 inline-flex rounded-full bg-white/12 px-7 py-4 text-sm font-bold text-white ring-1 ring-white/25">
+                  Link volgt binnenkort
+                </span>
+              )
+            ) : null}
+          </div>
+
+          <div className="grid gap-4 p-6 sm:p-8 md:grid-cols-2 lg:p-10">
+            {page.facts.map((fact) => (
+              <article
+                className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+                key={`${fact.label}-${fact.value}`}
+              >
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                  {fact.label}
+                </p>
+                <p className="mt-2 text-xl font-black text-slate-950">
+                  {fact.value}
+                </p>
+                {fact.note ? (
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {fact.note}
+                  </p>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <CardsGrid page={page} />
+    </div>
+  );
+}
+
 function RentalPageContent({
   page,
   content,
@@ -563,6 +647,10 @@ function CommitteePageContent({
 }
 
 function FeatureBlocks({ page }: { page: EditableSitePage }) {
+  if (["event", "order", "reservation"].includes(page.kind)) {
+    return <ActionFeatureBlocks page={page} />;
+  }
+
   return (
     <div className="grid gap-8">
       <CardsGrid page={page} />
@@ -588,7 +676,11 @@ export default async function InfoPage({ params }: InfoPageProps) {
   return (
     <main className="min-h-screen bg-[#f7fbff] text-slate-950">
       <section className="hero-sky relative isolate overflow-hidden px-5 pb-20 pt-32 text-white sm:px-8 sm:pb-24 lg:px-10 lg:pt-36">
-        <Navbar logoUrl={siteContent.siteLogoUrl} siteName={siteContent.siteName} />
+        <Navbar
+          content={siteContent}
+          logoUrl={siteContent.siteLogoUrl}
+          siteName={siteContent.siteName}
+        />
         <div aria-hidden="true" className="hero-lines absolute inset-0" />
         <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.95fr_1.05fr]">
@@ -660,7 +752,6 @@ export default async function InfoPage({ params }: InfoPageProps) {
                       </div>
                     </section>
                   ) : null}
-                  <CardsGrid page={page} />
                   <ExternalCtaBlock page={page} />
                 </div>
               ) : (

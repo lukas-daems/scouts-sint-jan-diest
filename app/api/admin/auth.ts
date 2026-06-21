@@ -18,6 +18,12 @@ type AdminUser = AdminSession & {
   password: string;
 };
 
+type AdminUserConfig = Omit<AdminSession, "username" | "displayName"> & {
+  username: string;
+  displayName: string;
+  passwordKeys: string[];
+};
+
 function getRuntimeValue(key: string) {
   const runtimeEnv = env as unknown as Record<string, string | undefined>;
   const globalProcess = globalThis as typeof globalThis & {
@@ -34,62 +40,139 @@ function getRuntimeValue(key: string) {
   return workerValue ?? globalProcess.process?.env?.[key];
 }
 
+function getFirstRuntimeValue(keys: string[]) {
+  for (const key of keys) {
+    const value = getRuntimeValue(key)?.trim();
+    if (value) {
+      return value;
+    }
+  }
+
+  return "";
+}
+
 export function getAdminPassword() {
-  // Demo fallback for local testing. TODO: replace with real secure auth before publishing.
-  return getRuntimeValue("ADMIN_PASSWORD") ?? "scouts-admin";
+  return getFirstRuntimeValue(["ADMIN_SUPERADMIN_PASSWORD", "ADMIN_PASSWORD"]);
 }
 
 function getSessionSecret() {
-  return (
-    getRuntimeValue("ADMIN_SESSION_SECRET") ||
-    getRuntimeValue("ADMIN_PASSWORD") ||
-    "scouts-demo-session-secret"
-  );
+  return getFirstRuntimeValue(["ADMIN_SESSION_SECRET"]);
 }
 
-function getDemoAdminUsers(): AdminUser[] {
-  // TODO: vervang deze demo-gebruikers later door echte beveiligde authenticatie.
+const adminUserConfigs: AdminUserConfig[] = [
+  {
+    username: "groepsleiding",
+    displayName: "Groepsleiding",
+    role: "superadmin",
+    passwordKeys: ["ADMIN_SUPERADMIN_PASSWORD", "ADMIN_PASSWORD"],
+  },
+  {
+    username: "kapoenleiding",
+    displayName: "Kapoenleiding",
+    role: "branch",
+    branchSlug: "kapoenen",
+    passwordKeys: ["KAPOENLEIDING_PASSWORD", "KAPOENEN_PASSWORD"],
+  },
+  {
+    username: "welpenleiding",
+    displayName: "Welpenleiding",
+    role: "branch",
+    branchSlug: "welpen",
+    passwordKeys: ["WELPENLEIDING_PASSWORD", "WELPEN_PASSWORD"],
+  },
+  {
+    username: "jongverkennerleiding",
+    displayName: "Jongverkennerleiding",
+    role: "branch",
+    branchSlug: "jongverkenners",
+    passwordKeys: [
+      "JONGVERKENNERLEIDING_PASSWORD",
+      "JONGVERKENNERS_PASSWORD",
+    ],
+  },
+  {
+    username: "verkennerleiding",
+    displayName: "Verkennerleiding",
+    role: "branch",
+    branchSlug: "verkenners",
+    passwordKeys: ["VERKENNERLEIDING_PASSWORD", "VERKENNERS_PASSWORD"],
+  },
+  {
+    username: "jinleiding",
+    displayName: "Jinleiding",
+    role: "branch",
+    branchSlug: "jins",
+    passwordKeys: ["JINLEIDING_PASSWORD", "JINS_PASSWORD"],
+  },
+];
+
+function getAdminUsers(): AdminUser[] {
+  return adminUserConfigs
+    .map((user) => ({
+      ...user,
+      password: getFirstRuntimeValue(user.passwordKeys),
+    }))
+    .filter((user) => user.password);
+}
+
+export function getAdminAuthStatus() {
+  const hasSessionSecret = Boolean(getSessionSecret());
+  const hasSuperAdmin = Boolean(getAdminPassword());
+
+  return {
+    configured: hasSessionSecret && hasSuperAdmin,
+    missing: [
+      hasSuperAdmin ? "" : "ADMIN_PASSWORD",
+      hasSessionSecret ? "" : "ADMIN_SESSION_SECRET",
+    ].filter(Boolean),
+    users: getAdminUsers().map((user) => ({
+      username: user.username,
+      displayName: user.displayName,
+      role: user.role,
+      branchSlug: user.branchSlug,
+    })),
+  };
+}
+
+function getConfiguredAdminUsers(): AdminUser[] {
+  if (!getAdminAuthStatus().configured) {
+    return [];
+  }
+
+  return getAdminUsers();
+}
+
+export function getAdminSetupHelp() {
   return [
     {
       username: "groepsleiding",
-      password: getAdminPassword(),
-      displayName: "Groepsleiding",
-      role: "superadmin",
+      env: "ADMIN_PASSWORD",
+      role: "Hoofdadmin",
     },
     {
       username: "kapoenleiding",
-      password: "kapoenen",
-      displayName: "Kapoenleiding",
-      role: "branch",
-      branchSlug: "kapoenen",
+      env: "KAPOENLEIDING_PASSWORD",
+      role: "Kapoenen",
     },
     {
       username: "welpenleiding",
-      password: "welpen",
-      displayName: "Welpenleiding",
-      role: "branch",
-      branchSlug: "welpen",
+      env: "WELPENLEIDING_PASSWORD",
+      role: "Welpen",
     },
     {
       username: "jongverkennerleiding",
-      password: "jongverkenners",
-      displayName: "Jongverkennerleiding",
-      role: "branch",
-      branchSlug: "jongverkenners",
+      env: "JONGVERKENNERLEIDING_PASSWORD",
+      role: "Jongverkenners",
     },
     {
       username: "verkennerleiding",
-      password: "verkenners",
-      displayName: "Verkennerleiding",
-      role: "branch",
-      branchSlug: "verkenners",
+      env: "VERKENNERLEIDING_PASSWORD",
+      role: "Verkenners",
     },
     {
       username: "jinleiding",
-      password: "jins",
-      displayName: "Jinleiding",
-      role: "branch",
-      branchSlug: "jins",
+      env: "JINLEIDING_PASSWORD",
+      role: "Jins",
     },
   ];
 }
@@ -102,6 +185,9 @@ function toHex(bytes: ArrayBuffer) {
 
 async function signSession(payload: string) {
   const secret = getSessionSecret();
+  if (!secret) {
+    throw new Error("ADMIN_SESSION_SECRET ontbreekt.");
+  }
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
@@ -136,7 +222,7 @@ function getCookieFromHeader(cookieHeader: string, name: string) {
 }
 
 function getUserByUsername(username: string) {
-  return getDemoAdminUsers().find(
+  return getConfiguredAdminUsers().find(
     (user) => user.username.toLowerCase() === username.toLowerCase()
   );
 }
@@ -165,6 +251,10 @@ export function clearAdminSessionCookie() {
 }
 
 export async function getAdminSessionFromCookieHeader(cookieHeader: string) {
+  if (!getAdminAuthStatus().configured) {
+    return null;
+  }
+
   const value = getCookieFromHeader(cookieHeader, ADMIN_COOKIE);
 
   if (!value) {
@@ -217,6 +307,10 @@ export async function isAdminRequest(request: Request) {
 }
 
 export function verifyAdminLogin(username: string, password: string) {
+  if (!getAdminAuthStatus().configured) {
+    return null;
+  }
+
   const normalizedUsername = username.trim() || "groepsleiding";
   const user = getUserByUsername(normalizedUsername);
 
@@ -224,7 +318,7 @@ export function verifyAdminLogin(username: string, password: string) {
     return null;
   }
 
-  if (user.password !== password) {
+  if (!constantTimeEqual(user.password, password)) {
     return null;
   }
 
@@ -299,4 +393,26 @@ export function canUploadToSlot(session: AdminSession, slot: string) {
     branch.contentKeys.imageUrl,
     branch.contentKeys.leaderPhotoUrl,
   ].includes(slot as keyof EditableSiteContent);
+}
+
+export function canDeleteMediaKey(session: AdminSession, key: string) {
+  if (session.role === "superadmin") {
+    return true;
+  }
+
+  const branch = branchProfiles.find(
+    (item) => item.slug === session.branchSlug
+  );
+
+  if (!branch) {
+    return false;
+  }
+
+  const allowedPrefixes = [
+    branch.logoKey,
+    branch.contentKeys.imageUrl,
+    branch.contentKeys.leaderPhotoUrl,
+  ].map((slot) => `uploads/${slot}-`);
+
+  return allowedPrefixes.some((prefix) => key.startsWith(prefix));
 }

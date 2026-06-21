@@ -87,7 +87,9 @@ export function parseImageListValue(value: string) {
   try {
     const parsed = JSON.parse(value);
     return Array.isArray(parsed)
-      ? parsed.filter((item): item is string => typeof item === "string" && item)
+      ? parsed.filter(
+          (item): item is string => typeof item === "string" && item.length > 0
+        )
       : [];
   } catch {
     return value

@@ -38,7 +38,11 @@ export default async function GalleryDetailPage({
   return (
     <main className="min-h-screen bg-[#f7fbff] text-slate-950">
       <section className="hero-sky relative isolate overflow-hidden px-5 pb-20 pt-32 text-white sm:px-8 sm:pb-24 lg:px-10 lg:pt-36">
-        <Navbar logoUrl={siteContent.siteLogoUrl} siteName={siteContent.siteName} />
+        <Navbar
+          content={siteContent}
+          logoUrl={siteContent.siteLogoUrl}
+          siteName={siteContent.siteName}
+        />
         <div aria-hidden="true" className="hero-lines absolute inset-0" />
         <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
         <div className="relative mx-auto max-w-7xl">

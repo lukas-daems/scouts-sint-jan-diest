@@ -35,6 +35,12 @@ import {
   stringifyProgramItems,
   type ProgramItem,
 } from "../lib/program";
+import {
+  createFaqItem,
+  parseFaqItems,
+  stringifyFaqItems,
+  type FAQItem,
+} from "../lib/faq";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 type AdminSection =
@@ -60,6 +66,20 @@ type AdminSession = {
   branchSlug?: string;
 };
 
+type MediaLibraryItem = {
+  key: string;
+  url: string;
+  size: number;
+  uploaded: string;
+  contentType?: string;
+};
+
+type AdminSetupHelpItem = {
+  username: string;
+  env: string;
+  role: string;
+};
+
 const sections: Array<{
   id: AdminSection;
   label: string;
@@ -76,9 +96,14 @@ const sections: Array<{
     description: "Hero, praktisch en kamp",
   },
   {
+    id: "takken",
+    label: "Takken",
+    description: "Kapoenen, welpen en andere takken",
+  },
+  {
     id: "pages",
     label: "Pagina's",
-    description: "Takken en infopagina's",
+    description: "Activiteiten, acties en infopagina's",
   },
   {
     id: "media",
@@ -206,8 +231,14 @@ const homepageGroups: Array<{
       { key: "galleryTitle", label: "Fotogalerij titel" },
       { key: "gallerySubtitle", label: "Fotogalerij intro", kind: "textarea" },
       { key: "joinTitle", label: "Inschrijven titel" },
+      { key: "joinHeading", label: "Inschrijven hoofdtitel" },
       { key: "joinSubtitle", label: "Inschrijven intro", kind: "textarea" },
+      { key: "joinStepOneLabel", label: "Stap 1" },
+      { key: "joinStepTwoLabel", label: "Stap 2" },
+      { key: "joinStepThreeLabel", label: "Stap 3" },
+      { key: "joinStepFourLabel", label: "Stap 4" },
       { key: "joinCtaLabel", label: "Inschrijfknop" },
+      { key: "joinSecondaryCtaLabel", label: "Tweede knop" },
       { key: "faqBadge", label: "FAQ badge" },
       { key: "faqTitle", label: "FAQ titel" },
       { key: "faqSubtitle", label: "FAQ intro", kind: "textarea" },
@@ -230,6 +261,7 @@ const contactFields: FieldConfig[] = [
   { key: "contactExternalButton", label: "Externe link knoptekst" },
   { key: "contactExternalUrl", label: "Externe formulierlink" },
   { key: "contactMailCta", label: "Mailknop" },
+  { key: "contactNoticeText", label: "Infotekst onder contact-CTA", kind: "textarea" },
   { key: "contactTrustText", label: "Vertrouwenszin", kind: "textarea" },
 ];
 
@@ -239,6 +271,16 @@ const footerFields: FieldConfig[] = [
   { key: "facebookUrl", label: "Facebooklink" },
   { key: "footerNotice", label: "Footer melding", kind: "textarea" },
   { key: "footerCopyright", label: "Copyrightlijn" },
+];
+
+const navigationFields: FieldConfig[] = [
+  { key: "navHomeLabel", label: "Label Home" },
+  { key: "navBranchesLabel", label: "Label Takken" },
+  { key: "navActivitiesLabel", label: "Label Activiteiten" },
+  { key: "navSupportLabel", label: "Label Steun ons" },
+  { key: "navPracticalLabel", label: "Label Praktisch" },
+  { key: "navMoreLabel", label: "Label Meer" },
+  { key: "navCtaLabel", label: "CTA-knop rechts" },
 ];
 
 const mediaFields: Array<{
@@ -306,6 +348,8 @@ function getPreviewPath(
 
 export default function AdminDashboard() {
   const [configured, setConfigured] = useState(true);
+  const [missingConfig, setMissingConfig] = useState<string[]>([]);
+  const [setupHelp, setSetupHelp] = useState<AdminSetupHelpItem[]>([]);
   const [authenticated, setAuthenticated] = useState(false);
   const [adminSession, setAdminSession] = useState<AdminSession | null>(null);
   const [loading, setLoading] = useState(true);
@@ -323,6 +367,8 @@ export default function AdminDashboard() {
   );
   const [activePageItemId, setActivePageItemId] = useState(pageEditorItems[0].id);
   const [previewVersion, setPreviewVersion] = useState(1);
+  const [mediaLibrary, setMediaLibrary] = useState<MediaLibraryItem[]>([]);
+  const [mediaLibraryLoading, setMediaLibraryLoading] = useState(false);
 
   const isSuperAdmin = adminSession?.role === "superadmin";
   const allowedBranches = useMemo(() => {
@@ -338,7 +384,7 @@ export default function AdminDashboard() {
     () =>
       !adminSession || isSuperAdmin
         ? sections
-        : sections.filter((section) => section.id === "pages"),
+        : sections.filter((section) => section.id === "takken"),
     [adminSession, isSuperAdmin]
   );
   const activeSectionId = visibleSections.some(
@@ -375,14 +421,18 @@ export default function AdminDashboard() {
       const session = (await response.json()) as {
         authenticated: boolean;
         configured: boolean;
+        missing?: string[];
+        setupHelp?: AdminSetupHelpItem[];
         session: AdminSession | null;
       };
 
       setConfigured(session.configured);
+      setMissingConfig(session.missing ?? []);
+      setSetupHelp(session.setupHelp ?? []);
       setAuthenticated(session.authenticated);
       setAdminSession(session.session);
       if (session.session?.role === "branch" && session.session.branchSlug) {
-        setActiveSection("pages");
+        setActiveSection("takken");
         setActiveBranchSlug(session.session.branchSlug);
       }
       setLoading(false);
@@ -398,6 +448,12 @@ export default function AdminDashboard() {
     });
   }, []);
 
+  useEffect(() => {
+    if (authenticated && activeSectionId === "media") {
+      void loadMediaLibrary();
+    }
+  }, [authenticated, activeSectionId]);
+
   async function loadContent() {
     const response = await fetch("/api/admin/content");
     if (!response.ok) {
@@ -407,6 +463,101 @@ export default function AdminDashboard() {
 
     const payload = (await response.json()) as { content: EditableSiteContent };
     setContent(payload.content);
+  }
+
+  async function loadMediaLibrary() {
+    setMediaLibraryLoading(true);
+    const response = await fetch("/api/admin/media", { cache: "no-store" });
+    setMediaLibraryLoading(false);
+
+    if (!response.ok) {
+      setMessage("Kon de mediabibliotheek niet laden.");
+      return;
+    }
+
+    const payload = (await response.json()) as { media: MediaLibraryItem[] };
+    setMediaLibrary(payload.media ?? []);
+  }
+
+  function extractMediaKey(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return "";
+    }
+
+    try {
+      const pathname = trimmed.startsWith("http")
+        ? new URL(trimmed).pathname
+        : trimmed;
+      return pathname
+        .replace(/^\/api\/media\//, "")
+        .replace(/^api\/media\//, "")
+        .replace(/^\/+/, "");
+    } catch {
+      return "";
+    }
+  }
+
+  function getUsedMediaKeys() {
+    const keys = new Set<string>();
+    const mediaPattern = /(?:\/api\/media\/)?(uploads\/[^"'\s)\\\]]+)/g;
+
+    for (const value of Object.values(content)) {
+      if (typeof value !== "string") {
+        continue;
+      }
+
+      for (const match of value.matchAll(mediaPattern)) {
+        const key = extractMediaKey(match[1] ?? "");
+        if (key) {
+          keys.add(key);
+        }
+      }
+    }
+
+    return keys;
+  }
+
+  async function deleteMediaItem(item: MediaLibraryItem) {
+    const response = await fetch("/api/admin/media", {
+      body: JSON.stringify({ key: item.key }),
+      headers: { "Content-Type": "application/json" },
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      setMessage(payload.error ?? "Bestand verwijderen is niet gelukt.");
+      return false;
+    }
+
+    setMediaLibrary((current) =>
+      current.filter((mediaItem) => mediaItem.key !== item.key)
+    );
+    return true;
+  }
+
+  async function cleanupUnusedMedia() {
+    const usedKeys = getUsedMediaKeys();
+    const unusedMedia = mediaLibrary.filter((item) => !usedKeys.has(item.key));
+
+    if (unusedMedia.length === 0) {
+      setMessage("Er zijn geen ongebruikte uploads om op te ruimen.");
+      return;
+    }
+
+    let deletedCount = 0;
+    for (const item of unusedMedia) {
+      if (await deleteMediaItem(item)) {
+        deletedCount += 1;
+      }
+    }
+
+    setMessage(
+      `${deletedCount} ongebruikte upload${deletedCount === 1 ? "" : "s"} verwijderd.`
+    );
   }
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
@@ -431,7 +582,7 @@ export default function AdminDashboard() {
     setAuthenticated(true);
     setAdminSession(payload.session);
     if (payload.session.role === "branch" && payload.session.branchSlug) {
-      setActiveSection("pages");
+      setActiveSection("takken");
       setActiveBranchSlug(payload.session.branchSlug);
     }
     setPassword("");
@@ -535,6 +686,7 @@ export default function AdminDashboard() {
 
     const payload = (await response.json()) as { url: string };
     updateField(key, payload.url);
+    void loadMediaLibrary();
     setMessage(
       prepared.optimized
         ? "Upload gelukt. De afbeelding werd automatisch verkleind zodat ze lokaal past. Klik op opslaan."
@@ -601,6 +753,7 @@ export default function AdminDashboard() {
     setMessage(
       `${uploadedUrls.length} foto${uploadedUrls.length === 1 ? "" : "'s"} toegevoegd aan ${theme.label}. Klik op opslaan.`
     );
+    void loadMediaLibrary();
   }
 
   async function replaceGalleryImage(
@@ -653,6 +806,7 @@ export default function AdminDashboard() {
       };
     });
     setMessage(`Foto vervangen in ${theme.label}. Klik op opslaan.`);
+    void loadMediaLibrary();
   }
 
   function removeGalleryImage(theme: GalleryTheme, index: number) {
@@ -696,7 +850,6 @@ export default function AdminDashboard() {
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     event.stopPropagation();
-    event.nativeEvent.stopImmediatePropagation?.();
   }
 
   function renderField(field: FieldConfig) {
@@ -984,6 +1137,101 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+    );
+  }
+
+  function updateFaqItem(
+    index: number,
+    field: keyof FAQItem,
+    value: string
+  ) {
+    const items = parseFaqItems(content.faqItems);
+    const nextItems = items.map((item, itemIndex) =>
+      itemIndex === index ? { ...item, [field]: value } : item
+    );
+    updateField("faqItems", stringifyFaqItems(nextItems));
+  }
+
+  function addFaqItem() {
+    const items = parseFaqItems(content.faqItems);
+    updateField("faqItems", stringifyFaqItems([...items, createFaqItem()]));
+    setMessage("FAQ-vraag toegevoegd. Klik op opslaan.");
+  }
+
+  function removeFaqItem(index: number) {
+    const items = parseFaqItems(content.faqItems);
+    updateField(
+      "faqItems",
+      stringifyFaqItems(items.filter((_, itemIndex) => itemIndex !== index))
+    );
+    setMessage("FAQ-vraag verwijderd. Klik op opslaan.");
+  }
+
+  function renderFaqManager() {
+    const items = parseFaqItems(content.faqItems);
+
+    return (
+      <article className="rounded-3xl border border-slate-200 p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-black">FAQ-vragen</h2>
+            <p className="mt-2 max-w-2xl text-slate-600">
+              Beheer hier alle veelgestelde vragen en antwoorden op de homepage.
+            </p>
+          </div>
+          <button
+            className="inline-flex rounded-full bg-[#103001] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={addFaqItem}
+            type="button"
+          >
+            Vraag toevoegen
+          </button>
+        </div>
+
+        <div className="mt-6 grid gap-4">
+          {items.map((item, index) => (
+            <div
+              className="grid gap-4 rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+              key={`faq-${index}`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-lg font-black text-slate-950">
+                  Vraag {index + 1}
+                </h3>
+                <button
+                  className="rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-100"
+                  onClick={() => removeFaqItem(index)}
+                  type="button"
+                >
+                  Verwijder
+                </button>
+              </div>
+              <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                Vraag
+                <input
+                  className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                  onKeyDown={stopTextKeyPropagation}
+                  onChange={(event) =>
+                    updateFaqItem(index, "question", event.target.value)
+                  }
+                  value={item.question}
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                Antwoord
+                <textarea
+                  className="min-h-28 rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal leading-7 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                  onKeyDown={stopTextKeyPropagation}
+                  onChange={(event) =>
+                    updateFaqItem(index, "answer", event.target.value)
+                  }
+                  value={item.answer}
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+      </article>
     );
   }
 
@@ -1380,6 +1628,108 @@ export default function AdminDashboard() {
     );
   }
 
+  function renderMediaLibrary() {
+    const usedKeys = getUsedMediaKeys();
+    const unusedCount = mediaLibrary.filter((item) => !usedKeys.has(item.key)).length;
+
+    return (
+      <article className="rounded-3xl border border-slate-200 bg-white p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h3 className="text-2xl font-black text-slate-950">
+              Mediabibliotheek
+            </h3>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Hier zie je alle uploads in de media-opslag. Verwijder alleen
+              ongebruikte bestanden; foto&apos;s die nog in de site staan krijgen
+              het label &quot;in gebruik&quot;.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              className="rounded-full bg-[#edf6e8] px-5 py-3 text-sm font-bold text-[#103001] transition hover:bg-[#d7e8cf]"
+              onClick={loadMediaLibrary}
+              type="button"
+            >
+              Vernieuw
+            </button>
+            <button
+              className="rounded-full bg-[#103001] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#1e4b0d] disabled:cursor-not-allowed disabled:bg-slate-300"
+              disabled={unusedCount === 0}
+              onClick={cleanupUnusedMedia}
+              type="button"
+            >
+              Ongebruikte uploads opruimen
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          {mediaLibraryLoading ? (
+            <div className="rounded-3xl bg-[#fbfdf9] p-6 text-sm font-semibold text-slate-600 ring-1 ring-slate-200">
+              Mediabibliotheek laden...
+            </div>
+          ) : mediaLibrary.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {mediaLibrary.map((item) => {
+                const isUsed = usedKeys.has(item.key);
+                const sizeInKb = Math.max(1, Math.round(item.size / 1024));
+
+                return (
+                  <div
+                    className="overflow-hidden rounded-3xl border border-slate-200 bg-[#fbfdf9]"
+                    key={item.key}
+                  >
+                    <img
+                      alt=""
+                      className="h-36 w-full bg-white object-cover"
+                      src={item.url}
+                    />
+                    <div className="grid gap-3 p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-black ${
+                            isUsed
+                              ? "bg-[#edf6e8] text-[#103001]"
+                              : "bg-amber-50 text-amber-800"
+                          }`}
+                        >
+                          {isUsed ? "In gebruik" : "Ongebruikt"}
+                        </span>
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-500 ring-1 ring-slate-200">
+                          {sizeInKb} KB
+                        </span>
+                      </div>
+                      <p className="break-all text-xs leading-5 text-slate-500">
+                        {item.key}
+                      </p>
+                      <button
+                        className="rounded-full bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+                        disabled={isUsed}
+                        onClick={async () => {
+                          if (await deleteMediaItem(item)) {
+                            setMessage("Ongebruikt bestand definitief verwijderd.");
+                          }
+                        }}
+                        type="button"
+                      >
+                        {isUsed ? "Eerst uit site halen" : "Bestand verwijderen"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-slate-300 bg-[#fbfdf9] p-6 text-sm leading-6 text-slate-500">
+              Nog geen uploads gevonden in de mediabibliotheek.
+            </div>
+          )}
+        </div>
+      </article>
+    );
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#f2f8ee] px-5 py-16 text-slate-950">
@@ -1403,7 +1753,7 @@ export default function AdminDashboard() {
             </h1>
             <p className="mt-2 max-w-2xl text-green-100">
               Een rustig dashboard voor desktop: kies een categorie, pas de
-              inhoud aan en controleer rechts meteen het voorbeeld.
+              inhoud aan en open daarna een voorbeeld van de publieke site.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -1432,16 +1782,37 @@ export default function AdminDashboard() {
 
         {!configured ? (
           <section className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
-            <h2 className="text-xl font-bold">Nog geen beheerwachtwoord</h2>
+            <h2 className="text-xl font-bold">Beheer is nog niet geconfigureerd</h2>
             <p className="mt-3 leading-7">
               Maak lokaal een bestand <code>.dev.vars</code> aan in de
-              projectmap en zet daarin ADMIN_PASSWORD en ADMIN_SESSION_SECRET.
+              projectmap en zet minstens <code>ADMIN_PASSWORD</code> en{" "}
+              <code>ADMIN_SESSION_SECRET</code>. Online zet je dezelfde waarden
+              als geheime hosting-variabelen.
             </p>
+            {missingConfig.length > 0 ? (
+              <p className="mt-3 text-sm font-bold">
+                Ontbreekt nu: {missingConfig.join(", ")}
+              </p>
+            ) : null}
+            <div className="mt-5 grid gap-2 md:grid-cols-2">
+              {setupHelp.map((item) => (
+                <div
+                  className="rounded-2xl bg-white/70 px-4 py-3 text-sm ring-1 ring-amber-200"
+                  key={item.username}
+                >
+                  <span className="font-black">{item.username}</span>
+                  <span className="block text-amber-800">
+                    {item.role}: <code>{item.env}</code>
+                  </span>
+                </div>
+              ))}
+            </div>
           </section>
         ) : null}
 
         {!authenticated ? (
-          <form
+          configured ? (
+            <form
             className="mx-auto max-w-xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
             onSubmit={handleLogin}
           >
@@ -1478,10 +1849,12 @@ export default function AdminDashboard() {
               Inloggen
             </button>
             <p className="mt-4 rounded-2xl bg-[#fbfdf9] p-4 text-sm leading-6 text-slate-500">
-              Demo-authenticatie: vervang deze tijdelijke gebruikers later door
-              echte beveiligde accounts voordat de site publiek gebruikt wordt.
+              De wachtwoorden staan niet in de code. Ze worden gelezen uit
+              geheime omgevingsvariabelen zoals <code>ADMIN_PASSWORD</code> en
+              de takspecifieke wachtwoorden.
             </p>
-          </form>
+            </form>
+          ) : null
         ) : (
           <form
             className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]"
@@ -1571,6 +1944,7 @@ export default function AdminDashboard() {
                       </div>
                     </article>
                   ))}
+                  {renderFaqManager()}
                   <article className="rounded-3xl border border-slate-200 p-5">
                     <div className="mb-5">
                       <h2 className="text-2xl font-black">
@@ -1639,22 +2013,24 @@ export default function AdminDashboard() {
                     </p>
                   </div>
 
-                  <div className="mb-6 grid gap-4 rounded-3xl bg-[#fbfdf9] p-5">
-                    <div className="grid gap-5 md:grid-cols-2">
-                      {renderField({
-                        key: "branchesPageTitle",
-                        label: "Titel overzichtspagina",
-                      })}
-                      {renderField({
-                        key: "branchesPageSubtitle",
-                        label: "Intro overzichtspagina",
-                        kind: "textarea",
-                      })}
+                  {isSuperAdmin ? (
+                    <div className="mb-6 grid gap-4 rounded-3xl bg-[#fbfdf9] p-5">
+                      <div className="grid gap-5 md:grid-cols-2">
+                        {renderField({
+                          key: "branchesPageTitle",
+                          label: "Titel overzichtspagina",
+                        })}
+                        {renderField({
+                          key: "branchesPageSubtitle",
+                          label: "Intro overzichtspagina",
+                          kind: "textarea",
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
 
                   <div className="mb-6 flex flex-wrap gap-2">
-                    {branchProfiles.map((branch) => (
+                    {allowedBranches.map((branch) => (
                       <button
                         className={`rounded-full px-4 py-2 text-sm font-bold transition ${
                           activeBranchSlug === branch.slug
@@ -1777,12 +2153,12 @@ export default function AdminDashboard() {
                   <div className="mt-8 grid gap-5">
                     {galleryThemes.map(renderGalleryManager)}
                   </div>
+                  <div className="mt-8">{renderMediaLibrary()}</div>
                 </div>
               ) : null}
 
               {activeSectionId === "pages" ? (
                 <div className="grid gap-6">
-                  {renderBranchesManager()}
                   {isSuperAdmin ? (
                     <article
                       className="rounded-3xl border border-slate-200 p-5"
@@ -1898,6 +2274,9 @@ export default function AdminDashboard() {
                         verschijnen en naar welke pagina of sectie ze linken.
                       </p>
                     </div>
+                    <div className="mb-6 grid gap-5 rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200 md:grid-cols-2">
+                      {navigationFields.map(renderField)}
+                    </div>
                     <div className="grid gap-4">
                       <div className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200">
                         <h3 className="text-lg font-black text-slate-950">
@@ -1964,6 +2343,11 @@ export default function AdminDashboard() {
                   </div>
                   <div className="grid gap-5 md:grid-cols-2">
                     {contactFields.map(renderField)}
+                    {renderMediaCard(
+                      "contactImageUrl",
+                      "Contactfoto",
+                      "Foto die de lege ruimte in het contactblok opvult."
+                    )}
                     {renderContactPhoneManager()}
                   </div>
                 </div>

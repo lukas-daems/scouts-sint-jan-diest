@@ -1,3 +1,4 @@
+import { defaultFaqItems, stringifyFaqItems } from "./faq";
 import { stringifyProgramItems } from "./program";
 
 const pageContentDefaults = {
@@ -23,7 +24,7 @@ const pageContentDefaults = {
   pageZomerkampEyebrow: "Kampinformatie",
   pageZomerkampTitle: "Zomerkamp met Scouts Sint-Jan Berchmans",
   pageZomerkampImageUrl: "",
-  pageZomerkampSidebarTitle: "Alles voor ouders op één plek",
+  pageZomerkampSidebarTitle: "Alles voor ouders op een plek",
   pageZomerkampSidebarText:
     "Hier komt de praktische kampinfo samen: data, locatie, prijs, documenten, updates en contactpersoon. Definitieve info kan per tak verschillen en wordt tijdig aangevuld.",
   pageZomerkampCards:
@@ -80,7 +81,7 @@ const pageContentDefaults = {
   pageSteakBurgerdayImageUrl: "",
   pageSteakBurgerdaySidebarTitle: "Gezellig eten voor de groepswerking",
   pageSteakBurgerdaySidebarText:
-    "Steak- en Burgerday is een fysiek eetmoment voor leden, ouders, oud-leiding en sympathisanten. Het is gezellig én ondersteunt de scouts.",
+    "Steak- en Burgerday is een fysiek eetmoment voor leden, ouders, oud-leiding en sympathisanten. Het is gezellig en ondersteunt de scouts.",
   pageSteakBurgerdayCards:
     "Datum|Datum en uren worden tijdig aangekondigd.\nLocatie|De locatie wordt bij de reservatie gedeeld.\nMenu|Steak, burger of vegetarische optie.\nReservatie|Reserveer vooraf zodat we goed kunnen plannen.",
   pageSteakBurgerdayFacts:
@@ -179,7 +180,7 @@ const pageContentDefaults = {
   pageOudLeidingImageUrl: "",
   pageOudLeidingSidebarTitle: "Ruimte voor geschiedenis en contact",
   pageOudLeidingSidebarText:
-    "Deze pagina blijft bewust rustig. Later kan hier informatie komen over oud-leiding, foto’s, contactmomenten of ondersteuning.",
+    "Deze pagina blijft bewust rustig. Later kan hier informatie komen over oud-leiding, foto's, contactmomenten of ondersteuning.",
   pageOudLeidingCards:
     "Info|Plaats hier later praktische info over oud-leiding.\nFoto's|Voeg later sfeerbeelden of archieffoto's toe.\nContact|Voeg later een contactpersoon of mailadres toe.",
   pageOudLeidingPrimaryCtaLabel: "Neem contact op",
@@ -257,7 +258,14 @@ export const defaultSiteContent: EditableSiteContent = {
   siteName: "Scouts Sint-Jan Berchmans",
   sitePrimaryColor: "#103001",
   siteLogoUrl: "",
-  heroEyebrow: "OFFICIËLE SCOUTSGROEP UIT DIEST",
+  navHomeLabel: "Home",
+  navBranchesLabel: "Takken",
+  navActivitiesLabel: "Activiteiten",
+  navSupportLabel: "Steun ons",
+  navPracticalLabel: "Praktisch",
+  navMoreLabel: "Meer",
+  navCtaLabel: "Word lid",
+  heroEyebrow: "OFFICIELE SCOUTSGROEP UIT DIEST",
   heroTitleLineOne: "Avontuur begint bij",
   heroTitleLineTwo: "Scouts Sint-Jan Berchmans",
   heroSubtitle:
@@ -284,7 +292,7 @@ export const defaultSiteContent: EditableSiteContent = {
     "Leden leren samenwerken, initiatief nemen en zichzelf beter kennen in een veilige en warme groep.",
   aboutCardThreeTitle: "Jongens van 6 tot 18",
   aboutCardThreeText:
-    "Onze takken bieden activiteiten op maat van elke leeftijdsgroep, van jonge kapoenen tot geengageerde jins.",
+    "Onze takken bieden activiteiten op maat van elke leeftijdsgroep, van jonge kapoenen tot geëngageerde jins.",
   branchesHomeTitle: "Onze takken",
   branchesHomeSubtitle:
     "Elke leeftijdsgroep heeft een eigen tak, met activiteiten die passen bij hun leefwereld, energie en zelfstandigheid.",
@@ -341,14 +349,21 @@ export const defaultSiteContent: EditableSiteContent = {
   gallerySubtitle:
     "Een blik op activiteiten, kampen, weekends en momenten die onze scouts maken tot wat ze is.",
   joinTitle: "Hoe word je lid?",
+  joinHeading: "Eerst proberen, daarna inschrijven",
   joinSubtitle:
     "Inschrijven begint met kennismaken. Zo zorgen we dat elk nieuw lid goed terechtkomt.",
+  joinStepOneLabel: "Neem contact op",
+  joinStepTwoLabel: "Kom kennismaken",
+  joinStepThreeLabel: "Kies de juiste tak",
+  joinStepFourLabel: "Schrijf je in",
   joinCtaLabel: "Ik wil mijn kind inschrijven",
+  joinSecondaryCtaLabel: "Stel je vraag",
   faqBadge: "FAQ",
   faqTitle: "Vragen van ouders",
   faqSubtitle:
     "Nieuwe leden en ouders zitten vaak met praktische vragen. Hieronder vind je antwoorden op de belangrijkste vragen over onze werking.",
   faqCtaLabel: "Stel je vraag",
+  faqItems: stringifyFaqItems(defaultFaqItems),
   contactBadge: "Contact en inschrijving",
   contactTitle: "Klaar om kennis te maken?",
   contactSubtitle:
@@ -359,13 +374,16 @@ export const defaultSiteContent: EditableSiteContent = {
   contactExternalButton: "Stel je vraag",
   contactExternalUrl: "",
   contactMailCta: "Stuur ons een mail",
+  contactNoticeText:
+    "Aanvragen en inschrijvingen verlopen via een externe link die de leiding zelf beheert. Zo tonen we geen formulier dat lokaal toch niet verzonden wordt.",
   contactTrustText:
     "Nieuwe leden zijn welkom om eerst vrijblijvend kennis te maken.",
   contactLocation: "Diest, Belgie",
-  contactEmail: "info@scoutssintjandiest.be",
+  contactEmail: "groepsleiding.sintjan@gmail.com",
   contactPhone: "+32 000 00 00 00",
   contactPhones:
     "Groepsleiding|+32 000 00 00 00\nTakleiding|+32 000 00 00 00",
+  contactImageUrl: "",
   instagram: "@scoutssintjandiest",
   facebook: "Scouts Sint-Jan Berchmans",
   instagramUrl: "/#contact",

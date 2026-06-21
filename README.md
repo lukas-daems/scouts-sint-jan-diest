@@ -1,6 +1,6 @@
-# Scouts Sint-Jan Diest website
+# Scouts Sint-Jan Berchmans website
 
-Moderne, responsive website voor Scouts Sint-Jan Diest uit Diest. De site is gebouwd als statische frontend met vinext, React en Tailwind CSS, op basis van de Sites-starter.
+Moderne website voor Scouts Sint-Jan Berchmans uit Diest. De site gebruikt vinext, React, Tailwind CSS, D1 voor beheerde content en R2 voor uploads.
 
 ## Lokaal starten
 
@@ -9,11 +9,7 @@ npm install
 npm run dev
 ```
 
-## Build controleren
-
-```bash
-npm run build
-```
+Open daarna `http://localhost:3000`.
 
 ## Beheeromgeving
 
@@ -23,48 +19,51 @@ Open lokaal:
 http://localhost:3000/admin
 ```
 
-Demo-wachtwoord voor lokaal gebruik:
+De admin gebruikt geen ingebouwde demo-wachtwoorden meer. Kopieer `.dev.vars.example` naar `.dev.vars` en vul minstens deze waarden in:
 
 ```text
-scouts-admin
+ADMIN_PASSWORD=...
+ADMIN_SESSION_SECRET=...
 ```
 
-Dit staat in `.dev.vars`. Vervang dit wachtwoord voordat je de site publiek gebruikt.
+Optionele takaccounts:
 
-Via de beheerpagina kun je onder meer aanpassen:
+```text
+KAPOENLEIDING_PASSWORD=...
+WELPENLEIDING_PASSWORD=...
+JONGVERKENNERLEIDING_PASSWORD=...
+VERKENNERLEIDING_PASSWORD=...
+JINLEIDING_PASSWORD=...
+```
 
-- hero titel en intro
-- activiteitmomenten en adres
-- inschrijvingslink
-- kampteksten
-- contactgegevens
-- footer melding
-- foto URLs
+Gebruikersnamen:
 
-## Live bewerken op de site
+- `groepsleiding`
+- `kapoenleiding`
+- `welpenleiding`
+- `jongverkennerleiding`
+- `verkennerleiding`
+- `jinleiding`
 
-1. Start de site met `npm run dev`.
-2. Open `/admin`.
-3. Log in met het beheerwachtwoord.
-4. Klik op `Bekijk site`.
-5. Rechtsonder verschijnt `Bewerk site`.
+Zet echte wachtwoorden nooit in GitHub. Online moeten dezelfde waarden als geheime hosting-variabelen worden ingesteld.
 
-Daarmee kun je de site aanpassen terwijl je de gewone homepage blijft zien.
+## Wat kan via de admin?
 
-## Foto's beheren
+- algemene branding, logo en hoofdkleur
+- homepage-inhoud, FAQ en contactblok
+- takpagina's, leiding, programma en belangrijke data
+- aparte pagina's zoals Dropping, Ontbijtmanden, Steak- en Burgerday, Verhuur en Oudercomite
+- sfeerbeelden, collages en mediabibliotheek
+- footer, sociale links en contactgegevens
 
-In de live bewerkmodus kun je foto's uploaden voor:
+## Foto's en uploads
 
-- hero
-- kampsectie
-- fotogalerij
+Uploads gaan via de `MEDIA` R2-binding. In de admin kun je foto's uploaden, vervangen, uit de site halen en ongebruikte uploads opruimen via de mediabibliotheek.
 
-De upload gebruikt de `MEDIA` R2-binding. Lokaal werkt dit via de Sites/Vinext dev-server. Voor publicatie moet de Sites-omgeving ook een R2 bucket en de admin secrets krijgen.
+De zichtbare content wordt opgeslagen in D1 via de `DB` binding. Zonder juiste D1/R2-bindingen blijven de standaardteksten en placeholders zichtbaar.
 
-## Belangrijke plekken om later aan te passen
+## Build controleren
 
-- Logo: vervang `src/assets/logo.png`.
-- Publieke logo fallback: vervang ook `public/assets/logo.png` als je de publieke asset direct wil gebruiken.
-- Hero en gallery placeholders: zie `app/components/Hero.tsx`, `app/components/CampInfo.tsx` en `app/components/PhotoGallery.tsx`.
-- Contactgegevens, activiteitendag, uren, lokaaladres en inschrijvingslink: pas aan via `/admin`.
-- Formulierverzending: zie `app/components/ContactSection.tsx`.
+```bash
+npm run build
+```

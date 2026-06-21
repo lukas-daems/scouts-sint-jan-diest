@@ -58,7 +58,11 @@ export default async function BranchDetailPage({
   return (
     <main className="min-h-screen bg-[#f7fbff] text-slate-950">
       <section className="hero-sky relative isolate overflow-hidden px-5 pb-16 pt-28 text-white sm:px-8 sm:pb-20 sm:pt-32 lg:px-10">
-        <Navbar logoUrl={siteContent.siteLogoUrl} siteName={siteContent.siteName} />
+        <Navbar
+          content={siteContent}
+          logoUrl={siteContent.siteLogoUrl}
+          siteName={siteContent.siteName}
+        />
         <div aria-hidden="true" className="hero-lines absolute inset-0" />
         <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
@@ -131,7 +135,7 @@ export default async function BranchDetailPage({
                   </p>
                   <p className="mt-2 text-[15px] leading-7 text-slate-700">
                     Activiteiten op maat van hun leeftijd, begeleid door
-                    geengageerde leiding.
+                    geëngageerde leiding.
                   </p>
                 </div>
               </div>

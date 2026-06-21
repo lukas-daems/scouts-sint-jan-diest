@@ -5,7 +5,6 @@ import ContactSection from "./components/ContactSection";
 import FAQ from "./components/FAQ";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
-import HowToJoin from "./components/HowToJoin";
 import Navbar from "./components/Navbar";
 import PhotoGallery from "./components/PhotoGallery";
 import PracticalInfo from "./components/PracticalInfo";
@@ -21,7 +20,11 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-[#f7fbff] text-slate-950">
       <div className="relative bg-[#103001]">
-        <Navbar logoUrl={siteContent.siteLogoUrl} siteName={siteContent.siteName} />
+        <Navbar
+          content={siteContent}
+          logoUrl={siteContent.siteLogoUrl}
+          siteName={siteContent.siteName}
+        />
         <Hero content={siteContent} />
       </div>
       <Branches content={siteContent} />
@@ -30,7 +33,6 @@ export default async function Home() {
       <PracticalInfo content={siteContent} />
       <CampInfo content={siteContent} />
       <PhotoGallery content={siteContent} />
-      <HowToJoin content={siteContent} />
       <FAQ content={siteContent} />
       <ContactSection content={siteContent} />
       <Footer content={siteContent} />
