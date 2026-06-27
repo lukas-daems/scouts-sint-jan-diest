@@ -3,7 +3,6 @@
 /* eslint-disable @next/next/no-img-element */
 
 import IconBadge from "./IconBadge";
-import { images } from "../lib/image-placeholders";
 import type { EditableSiteContent } from "../lib/site-content-defaults";
 
 type ContactSectionProps = {
@@ -33,10 +32,6 @@ function getContactPhones(content: EditableSiteContent) {
 export default function ContactSection({ content }: ContactSectionProps) {
   const hasExternalLink = Boolean(content.contactExternalUrl);
   const contactPhones = getContactPhones(content);
-  const contactImage =
-    content.contactImageUrl ||
-    content.galleryGroepsactiviteitImageUrl ||
-    images.galleryGroepsactiviteit;
   const hasUploadedLogo = Boolean(content.siteLogoUrl);
 
   return (
@@ -94,12 +89,41 @@ export default function ContactSection({ content }: ContactSectionProps) {
               </p>
             ) : null}
 
-            <div className="mt-6 overflow-hidden rounded-[1.7rem] border border-slate-200 bg-white shadow-lg shadow-green-950/6">
-              <img
-                alt="Sfeerbeeld van Scouts Sint-Jan Berchmans"
-                className="h-64 w-full object-cover sm:h-72 lg:h-80"
-                src={contactImage}
-              />
+            <div className="mt-6 rounded-[1.7rem] border border-slate-200 bg-white p-5 shadow-lg shadow-green-950/6 sm:p-6">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                {content.contactStepsTitle || "Wat gebeurt er daarna?"}
+              </p>
+              <div className="mt-5 grid gap-3">
+                {[
+                  [
+                    "1",
+                    content.contactStepOne ||
+                      "We bekijken bij welke tak je zoon past.",
+                  ],
+                  [
+                    "2",
+                    content.contactStepTwo ||
+                      "Je krijgt praktische info over zaterdag 14u-17u.",
+                  ],
+                  [
+                    "3",
+                    content.contactStepThree ||
+                      "Nieuwe leden mogen eerst vrijblijvend proberen.",
+                  ],
+                ].map(([step, text]) => (
+                  <div
+                    className="flex items-center gap-4 rounded-2xl bg-[#fbfdf9] px-4 py-3 ring-1 ring-slate-200"
+                    key={step}
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#103001] text-sm font-black text-white">
+                      {step}
+                    </span>
+                    <p className="text-sm font-semibold leading-6 text-slate-700">
+                      {text}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </article>
 
@@ -108,7 +132,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
               {hasUploadedLogo ? (
                 <img
                   alt={`Logo van ${content.siteName}`}
-                  className="site-logo-cutout h-24 max-w-[300px] object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.3)]"
+                  className="site-logo-cutout h-28 max-w-[310px] object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.3)]"
                   src={content.siteLogoUrl}
                 />
               ) : (
