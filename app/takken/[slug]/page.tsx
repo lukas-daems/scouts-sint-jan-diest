@@ -68,14 +68,14 @@ export default async function BranchDetailPage({
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="section-fade">
             <Link
-              className="mb-5 inline-flex rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 backdrop-blur transition hover:bg-white/20"
+              className="forest-glass-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 transition hover:bg-white/20"
               href="/takken"
             >
               Terug naar alle takken
             </Link>
             <div className="mb-6 flex items-center gap-4">
               <BranchLogo branch={branch} content={siteContent} size="hero" />
-              <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-[#103001] shadow-xl shadow-green-950/10">
+              <span className="forest-glass-light rounded-full px-4 py-2 text-sm font-black text-[#103001]">
                 {branch.age}
               </span>
             </div>
@@ -88,7 +88,7 @@ export default async function BranchDetailPage({
             <div className="mt-7 flex flex-wrap gap-3">
               {branch.highlights.map((highlight) => (
                 <span
-                  className="rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-green-50 backdrop-blur"
+                  className="forest-glass-pill rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-green-50"
                   key={highlight}
                 >
                   {highlight}
@@ -121,7 +121,7 @@ export default async function BranchDetailPage({
                 Praktisch voor {branch.name}
               </h2>
               <div className="mt-6 grid gap-3">
-                <div className="rounded-3xl bg-[#edf6e8] p-4 ring-1 ring-[#d7e8cf]">
+                <div className="forest-glass-light rounded-3xl p-4">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#103001]">
                     Leeftijd
                   </p>
@@ -129,7 +129,7 @@ export default async function BranchDetailPage({
                     {branch.age}
                   </p>
                 </div>
-                <div className="rounded-3xl bg-emerald-50 p-4 ring-1 ring-emerald-100">
+                <div className="forest-glass-light rounded-3xl p-4">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-emerald-700">
                     Werking
                   </p>
@@ -205,14 +205,14 @@ export default async function BranchDetailPage({
               {leaderNames.length > 0 ? (
                 leaderNames.map((name) => (
                   <div
-                    className="inline-flex max-w-full rounded-2xl bg-[#edf6e8] px-4 py-2.5 text-sm font-bold leading-6 text-[#103001] ring-1 ring-[#d7e8cf]"
+                    className="forest-glass-light inline-flex max-w-full rounded-2xl px-4 py-2.5 text-sm font-bold leading-6 text-[#103001]"
                     key={name}
                   >
                     {name}
                   </div>
                 ))
               ) : (
-                <div className="inline-flex max-w-full rounded-2xl bg-[#edf6e8] px-4 py-2.5 text-sm font-bold leading-6 text-[#103001] ring-1 ring-[#d7e8cf]">
+                <div className="forest-glass-light inline-flex max-w-full rounded-2xl px-4 py-2.5 text-sm font-bold leading-6 text-[#103001]">
                   Leiding wordt binnenkort aangevuld
                 </div>
               )}
@@ -318,7 +318,7 @@ export default async function BranchDetailPage({
                   },
                 ].map((item) => (
                   <div
-                    className="rounded-2xl bg-white/78 p-4 ring-1 ring-white"
+                    className="forest-glass-light rounded-2xl p-4"
                     key={item.label}
                   >
                     <dt className="font-black uppercase tracking-[0.12em] text-[#2f6b18]">
@@ -365,7 +365,7 @@ export default async function BranchDetailPage({
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {otherBranches.map((item, index) => (
               <Link
-                className="lift-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+                className="forest-glass-light lift-card rounded-3xl p-6 shadow-sm"
                 href={`/takken/${item.slug}`}
                 key={item.slug}
               >

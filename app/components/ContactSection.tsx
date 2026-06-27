@@ -37,6 +37,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
     content.contactImageUrl ||
     content.galleryGroepsactiviteitImageUrl ||
     images.galleryGroepsactiviteit;
+  const hasUploadedLogo = Boolean(content.siteLogoUrl);
 
   return (
     <section className="bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="contact">
@@ -104,13 +105,21 @@ export default function ContactSection({ content }: ContactSectionProps) {
 
           <aside className="blue-pattern relative overflow-hidden rounded-[2rem] p-8 text-white shadow-2xl shadow-green-950/20">
             <div className="relative">
-              <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/35">
+              {hasUploadedLogo ? (
                 <img
                   alt={`Logo van ${content.siteName}`}
-                  className="h-full w-full rounded-full object-cover"
-                  src={content.siteLogoUrl || "/assets/logo.png"}
+                  className="site-logo-cutout h-24 max-w-[300px] object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.3)]"
+                  src={content.siteLogoUrl}
                 />
-              </span>
+              ) : (
+                <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/35">
+                  <img
+                    alt={`Logo van ${content.siteName}`}
+                    className="h-full w-full rounded-full object-cover"
+                    src="/assets/logo.png"
+                  />
+                </span>
+              )}
               <h3 className="mt-8 text-3xl font-black">{content.siteName}</h3>
               <p className="mt-3 text-green-100">{content.contactLocation}</p>
 

@@ -23,7 +23,7 @@ export default function BranchLogo({
   if (logoUrl) {
     return (
       <span
-        className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-3xl bg-white p-2 shadow-xl shadow-green-950/10 ring-1 ring-slate-200`}
+        className={`forest-glass-light ${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-3xl p-2 shadow-xl shadow-green-950/10 ring-1 ring-white/70`}
       >
         <img
           alt={`Logo van de ${branch.name}`}

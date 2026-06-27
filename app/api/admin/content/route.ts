@@ -1,4 +1,8 @@
-import { getSiteContent, updateSiteContent } from "@/db/site-content";
+import {
+  getSiteContent,
+  getSiteContentWithStatus,
+  updateSiteContent,
+} from "@/db/site-content";
 import {
   canEditContentKey,
   getAdminSession,
@@ -48,7 +52,8 @@ export async function GET(request: Request) {
     return response;
   }
 
-  return Response.json({ content: await getSiteContent() });
+  const { content, status } = await getSiteContentWithStatus();
+  return Response.json({ content, status });
 }
 
 export async function PUT(request: Request) {
@@ -63,13 +68,25 @@ export async function PUT(request: Request) {
   const payload = (await request.json().catch(() => ({}))) as {
     content?: Record<string, unknown>;
   };
-  const currentContent = await getSiteContent();
-  const allowedContent = mergeAllowedContent(
-    currentContent,
-    payload.content ?? {},
-    session
-  );
-  const content = await updateSiteContent(allowedContent);
+  try {
+    const currentContent = await getSiteContent();
+    const allowedContent = mergeAllowedContent(
+      currentContent,
+      payload.content ?? {},
+      session
+    );
+    const content = await updateSiteContent(allowedContent);
 
-  return Response.json({ content });
+    return Response.json({ content });
+  } catch (error) {
+    return Response.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Opslaan is niet gelukt door een databankfout.",
+      },
+      { status: 500 }
+    );
+  }
 }

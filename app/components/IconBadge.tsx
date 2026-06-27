@@ -135,9 +135,11 @@ const tones = {
 };
 
 export default function IconBadge({ icon, tone = "blue" }: IconBadgeProps) {
+  const glassClass = tone === "light" ? "forest-glass-pill" : "forest-glass-light";
+
   return (
     <span
-      className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg ring-1 ${tones[tone]}`}
+      className={`${glassClass} inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg ring-1 ${tones[tone]}`}
     >
       <svg
         aria-hidden="true"

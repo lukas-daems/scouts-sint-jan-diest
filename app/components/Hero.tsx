@@ -43,7 +43,7 @@ export default function Hero({ content }: HeroProps) {
               {content.heroPrimaryCtaLabel}
             </a>
             <a
-              className="inline-flex w-full items-center justify-center rounded-full border border-white/45 bg-white/10 px-9 py-4 text-sm font-bold text-white backdrop-blur transition hover:-translate-y-1 hover:bg-white/20 sm:w-auto"
+              className="forest-glass-pill inline-flex w-full items-center justify-center rounded-full px-9 py-4 text-sm font-bold text-white transition hover:-translate-y-1 hover:bg-white/20 sm:w-auto"
               href="#takken"
             >
               {content.heroSecondaryCtaLabel}

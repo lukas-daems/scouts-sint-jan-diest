@@ -26,13 +26,13 @@ export default async function GalleryDetailPage({
   params,
 }: GalleryDetailPageProps) {
   const { theme: themeSlug } = await params;
-  const theme = getGalleryThemeBySlug(themeSlug);
+  const siteContent = await getSiteContent();
+  const theme = getGalleryThemeBySlug(themeSlug, siteContent);
 
   if (!theme) {
     notFound();
   }
 
-  const siteContent = await getSiteContent();
   const photos = getGalleryImages(theme, siteContent);
 
   return (
@@ -47,14 +47,14 @@ export default async function GalleryDetailPage({
         <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
         <div className="relative mx-auto max-w-7xl">
           <Link
-            className="mb-5 inline-flex rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 backdrop-blur transition hover:bg-white/20"
-            href="/#fotos"
+            className="forest-glass-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 transition hover:bg-white/20"
+            href="/fotos"
           >
             Terug naar sfeerbeelden
           </Link>
           <div className="grid items-end gap-10 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <p className="mb-5 inline-flex rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 backdrop-blur">
+              <p className="forest-glass-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50">
                 Fotocollage
               </p>
               <h1 className="text-5xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
@@ -118,7 +118,7 @@ export default async function GalleryDetailPage({
                   src={photo}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/0 to-transparent opacity-70" />
-                <div className="absolute bottom-5 left-5 rounded-full bg-white/90 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#103001] backdrop-blur">
+                <div className="forest-glass-light absolute bottom-5 left-5 rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#103001]">
                   {theme.label}
                 </div>
               </article>

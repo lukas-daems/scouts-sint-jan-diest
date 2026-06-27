@@ -87,9 +87,13 @@ const pageContentDefaults = {
   pageSteakBurgerdayFacts:
     "Voor wie?|Iedereen welkom|Leden, ouders en sympathisanten\nPrijs|Prijzen per menu-optie worden gedeeld|Per menu-optie\nReservatie|Via externe link|Google Form of andere link via admin",
   pageSteakBurgerdayMenuOptions: "Steak,Burger,Vegetarisch,Kinderportie",
+  pageSteakBurgerdayHighlightLabel: "Waarom deze eetdag?",
+  pageSteakBurgerdayHighlightTitle: "Samen eten, samen onze werking steunen",
+  pageSteakBurgerdayHighlightText:
+    "Met Steak- en Burgerday brengen we leden, ouders, oud-leiding en sympathisanten samen rond een gezellige maaltijd. De opbrengst helpt ons om materiaal, weekends en activiteiten betaalbaar en sterk te houden.",
   pageSteakBurgerdayExternalCtaTitle: "Reserveer je plaats",
   pageSteakBurgerdayExternalCtaText:
-    "Wanneer de reservaties openen, plaatsen we hier de externe reservatielink voor naam, aantal personen, menu-keuze en opmerkingen.",
+    "Wanneer de reservaties openen, plaatsen we hier de externe reservatielink. Iedereen die mee wil eten kan dan naam, aantal personen, menu-keuze en opmerkingen doorgeven.",
   pageSteakBurgerdayExternalCtaButton: "Naar reservatieformulier",
   pageSteakBurgerdayExternalCtaUrl: "",
   pageSteakBurgerdayPrimaryCtaLabel: "Reserveer",
@@ -202,6 +206,7 @@ export type EditableSiteContent = {
   practicalAddress: string;
   registrationLink: string;
   campSubtitle: string;
+  campHomepageNote: string;
   campWhat: string;
   campForParents: string;
   campForNewMembers: string;
@@ -225,6 +230,7 @@ export type EditableSiteContent = {
   galleryWeekendImages: string;
   galleryGroepsactiviteitImages: string;
   galleryKampvuurImages: string;
+  galleryCustomThemes: string;
   pageActivitiesIntro: string;
   pageDroppingIntro: string;
   pageOntbijtmandenIntro: string;
@@ -339,6 +345,8 @@ export const defaultSiteContent: EditableSiteContent = {
   campTitle: "Op kamp met Scouts Sint-Jan Berchmans",
   campSubtitle:
     "Het zomerkamp in de zomervakantie is voor veel leden het hoogtepunt van het jaar: samenleven, spelen, koken, ontdekken en groeien als groep.",
+  campHomepageNote:
+    "Elk jaar gaan onze takken op kamp. Alle praktische info zoals data, locatie, prijs en bagagelijst wordt tijdig gedeeld.",
   campWhat:
     "Tijdens het kamp trekken leden er meerdere dagen op uit met hun tak. Ze slapen samen, spelen grote spelen, leren praktische vaardigheden en beleven echte scoutssfeer.",
   campForParents:
@@ -407,6 +415,7 @@ export const defaultSiteContent: EditableSiteContent = {
   galleryWeekendImages: "",
   galleryGroepsactiviteitImages: "",
   galleryKampvuurImages: "",
+  galleryCustomThemes: "",
   pageActivitiesIntro:
     "Elke zaterdag van 14u tot 17u maken we ruimte voor spel, natuur, creativiteit en groepsgevoel. Daarnaast zijn er twee weekends per jaar, een zomerkamp en doorheen het jaar speciale evenementen en steunacties.",
   pageDroppingIntro:

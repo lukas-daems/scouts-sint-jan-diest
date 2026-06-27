@@ -198,7 +198,7 @@ function valueFor(
   return content[keyFor(page, suffix)] || "";
 }
 
-function parseCards(value: string): SitePageCard[] {
+export function parseCards(value: string): SitePageCard[] {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -210,7 +210,7 @@ function parseCards(value: string): SitePageCard[] {
     .filter((item) => item.title || item.text);
 }
 
-function parseFacts(value: string): SitePageFact[] {
+export function parseFacts(value: string): SitePageFact[] {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -226,7 +226,7 @@ function parseFacts(value: string): SitePageFact[] {
     .filter((item) => item.label || item.value);
 }
 
-function parseDocuments(value: string): SitePageDocument[] {
+export function parseDocuments(value: string): SitePageDocument[] {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -242,7 +242,7 @@ function parseDocuments(value: string): SitePageDocument[] {
     .filter((item) => item.label);
 }
 
-function parseProducts(value: string): SitePageProduct[] {
+export function parseProducts(value: string): SitePageProduct[] {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -260,7 +260,7 @@ function parseProducts(value: string): SitePageProduct[] {
     .filter((item) => item.name);
 }
 
-function parseLinks(value: string): SitePageLinkItem[] {
+export function parseLinks(value: string): SitePageLinkItem[] {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -278,11 +278,68 @@ function parseLinks(value: string): SitePageLinkItem[] {
     .filter((item) => item.label);
 }
 
-function parseLines(value: string) {
+export function parseLines(value: string) {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
+}
+
+export function stringifyCards(items: SitePageCard[]) {
+  return items
+    .filter((item) => item.title.trim() || item.text.trim())
+    .map((item) => `${item.title.trim()}|${item.text.trim()}`)
+    .join("\n");
+}
+
+export function stringifyFacts(items: SitePageFact[]) {
+  return items
+    .filter((item) => item.label.trim() || item.value.trim() || item.note?.trim())
+    .map((item) =>
+      [item.label.trim(), item.value.trim(), (item.note ?? "").trim()].join("|")
+    )
+    .join("\n");
+}
+
+export function stringifyDocuments(items: SitePageDocument[]) {
+  return items
+    .filter((item) => item.label.trim() || item.href.trim() || item.description.trim())
+    .map((item) =>
+      [item.label.trim(), item.href.trim(), item.description.trim()].join("|")
+    )
+    .join("\n");
+}
+
+export function stringifyProducts(items: SitePageProduct[]) {
+  return items
+    .filter((item) => item.name.trim() || item.price.trim() || item.sizes.trim())
+    .map((item) =>
+      [
+        item.name.trim(),
+        item.price.trim(),
+        item.sizes.trim(),
+        item.action.trim(),
+      ].join("|")
+    )
+    .join("\n");
+}
+
+export function stringifyLinks(items: SitePageLinkItem[]) {
+  return items
+    .filter((item) => item.label.trim() || item.href.trim() || item.description.trim())
+    .map((item) =>
+      [
+        item.category.trim(),
+        item.label.trim(),
+        item.href.trim(),
+        item.description.trim(),
+      ].join("|")
+    )
+    .join("\n");
+}
+
+export function stringifyLines(items: string[]) {
+  return items.map((item) => item.trim()).filter(Boolean).join("\n");
 }
 
 export function getEditableSitePage(
@@ -355,48 +412,75 @@ export function getSitePageBySlug(slug: string) {
 export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[] {
   const groups: SitePageAdminGroup[] = [
     {
-      title: "Inhoud",
-      description: "Hero, intro en hoofdbeeld.",
+      title: "Bovenkant van de pagina",
+      description: "De badge, titel en introtekst die bezoekers als eerste zien.",
       fields: [
-        { key: keyFor(page, "Eyebrow"), label: "Badge boven titel" },
-        { key: page.titleKey ?? keyFor(page, "Title"), label: "Titel" },
-        { key: page.introKey, label: "Intro tekst", kind: "textarea" },
+        { key: keyFor(page, "Eyebrow"), label: "Kleine tekst boven de titel" },
+        { key: page.titleKey ?? keyFor(page, "Title"), label: "Grote titel" },
+        { key: page.introKey, label: "Korte uitleg onder de titel", kind: "textarea" },
       ],
     },
     {
-      title: "Praktische info",
+      title: "Inhoudsblokken",
       description:
-        "Zijblok, infokaarten en eventuele highlight. Gebruik bij kaarten: titel|tekst. Gebruik bij praktische info: label|waarde|kleine nota.",
+        "De tekstblokken, infokaarten en het opvallende accentblok op deze pagina.",
       fields: [
-        { key: keyFor(page, "SidebarTitle"), label: "Zijblok titel" },
-        { key: keyFor(page, "SidebarText"), label: "Zijblok tekst", kind: "textarea" },
-        { key: keyFor(page, "Cards"), label: "Kaarten, 1 per lijn: titel|tekst", kind: "textarea" },
-        { key: keyFor(page, "Facts"), label: "Praktische info, 1 per lijn: label|waarde|nota", kind: "textarea" },
-        { key: keyFor(page, "HighlightLabel"), label: "Highlight label" },
-        { key: keyFor(page, "HighlightTitle"), label: "Highlight titel" },
-        { key: keyFor(page, "HighlightText"), label: "Highlight tekst", kind: "textarea" },
+        { key: keyFor(page, "SidebarTitle"), label: "Titel van het eerste tekstblok" },
+        { key: keyFor(page, "SidebarText"), label: "Tekst van het eerste tekstblok", kind: "textarea" },
+        { key: keyFor(page, "Cards"), label: "Witte tekstkaarten", kind: "textarea" },
+        { key: keyFor(page, "Facts"), label: "Kleine praktische infokaarten", kind: "textarea" },
+        { key: keyFor(page, "HighlightLabel"), label: "Accentblok: kleine tekst" },
+        { key: keyFor(page, "HighlightTitle"), label: "Accentblok: titel" },
+        { key: keyFor(page, "HighlightText"), label: "Accentblok: uitleg", kind: "textarea" },
       ],
     },
     {
-      title: "CTA's",
-      description: "Knoppen bovenaan en onderaan de pagina.",
+      title: "Knoppen",
+      description: "De knoppen bovenaan en de gedeelde contactbalk onderaan de pagina.",
       fields: [
-        { key: keyFor(page, "PrimaryCtaLabel"), label: "Primaire knop tekst" },
-        { key: keyFor(page, "PrimaryCtaHref"), label: "Primaire knop link" },
-        { key: keyFor(page, "SecondaryCtaLabel"), label: "Secundaire knop tekst" },
-        { key: keyFor(page, "SecondaryCtaHref"), label: "Secundaire knop link" },
-        { key: "pageSharedCtaEyebrow", label: "Gedeelde CTA kleine tekst" },
-        { key: "pageSharedCtaTitle", label: "Gedeelde CTA titel" },
-        { key: "pageSharedCtaButton", label: "Gedeelde CTA knop" },
+        { key: keyFor(page, "PrimaryCtaLabel"), label: "Eerste knop: tekst" },
+        { key: keyFor(page, "PrimaryCtaHref"), label: "Eerste knop: link" },
+        { key: keyFor(page, "SecondaryCtaLabel"), label: "Tweede knop: tekst" },
+        { key: keyFor(page, "SecondaryCtaHref"), label: "Tweede knop: link" },
+        { key: "pageSharedCtaEyebrow", label: "Contactbalk onderaan: kleine tekst" },
+        { key: "pageSharedCtaTitle", label: "Contactbalk onderaan: titel" },
+        { key: "pageSharedCtaButton", label: "Contactbalk onderaan: knop" },
       ],
     },
   ];
 
   if (page.kind === "camp") {
+    groups[1] = {
+      title: "Kampverhaal",
+      description:
+        "De twee zichtbare inhoudsblokken op de zomerkamppagina: kampverhaal en korte duiding.",
+      fields: [
+        { key: "campHomepageNote", label: "Korte duiding bij kamp", kind: "textarea" },
+        { key: "campWhat", label: "Wat is kamp?", kind: "textarea" },
+        { key: "campForParents", label: "Voor ouders", kind: "textarea" },
+        { key: "campForNewMembers", label: "Voor nieuwe leden", kind: "textarea" },
+      ],
+    };
+  }
+
+  if (page.slug === "steak-en-burgerday") {
+    groups[1] = {
+      title: "Steunverhaal",
+      description:
+        "Deze tekst legt uit waarom Steak- en Burgerday bestaat en hoe bezoekers de scouts steunen.",
+      fields: [
+        { key: keyFor(page, "HighlightLabel"), label: "Kleine tekst boven titel" },
+        { key: keyFor(page, "HighlightTitle"), label: "Titel steunverhaal" },
+        { key: keyFor(page, "HighlightText"), label: "Uitleg steunverhaal", kind: "textarea" },
+      ],
+    };
+  }
+
+  if (page.kind === "camp") {
     groups.push({
       title: "Documenten en updates",
       description:
-        "Gebruik bij documenten: naam|link|uitleg. Updates mogen meerdere regels bevatten.",
+        "Documenten en updates voor kampinfo. Updates mogen meerdere regels bevatten.",
       fields: [
         { key: keyFor(page, "Documents"), label: "Documenten", kind: "textarea" },
         { key: keyFor(page, "Updates"), label: "Praktische updates", kind: "textarea" },
@@ -407,7 +491,7 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
   if (page.kind === "shop") {
     groups.push({
       title: "Productcatalogus",
-      description: "Gebruik: productnaam|prijs|maten|knoptekst.",
+      description: "Producten die als aparte productkaarten op de shop-pagina verschijnen.",
       fields: [
         { key: keyFor(page, "Products"), label: "Producten", kind: "textarea" },
       ],
@@ -417,7 +501,7 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
   if (page.kind === "links") {
     groups.push({
       title: "Linkpagina",
-      description: "Gebruik: categorie|label|url|uitleg.",
+      description: "Links die per categorie gegroepeerd worden op de linkpagina.",
       fields: [
         { key: keyFor(page, "Items"), label: "Links", kind: "textarea" },
       ],
@@ -426,9 +510,9 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
 
   if (page.kind === "rental") {
     groups.push({
-      title: "Verhuurstructuur",
+      title: "Blokken op de verhuurpagina",
       description:
-        "Titels voor de specifieke blokken op de verhuurpagina.",
+        "Titels voor de aparte onderdelen rond materiaal en prijzen.",
       fields: [
         { key: keyFor(page, "MaterialsTitle"), label: "Titel materiaalblok" },
         { key: keyFor(page, "PricesTitle"), label: "Titel prijzenblok" },
@@ -438,9 +522,9 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
 
   if (page.kind === "committee") {
     groups.push({
-      title: "Oudercomite structuur",
+      title: "Blokken op de oudercomitepagina",
       description:
-        "Titels en ledenlijst voor de oudercomitepagina. Gebruik bij ledenlijst: 1 naam of regel per lijn.",
+        "Titels en ledenlijst voor de pagina van het oudercomite.",
       fields: [
         { key: keyFor(page, "WorkTitle"), label: "Titel werkingblok" },
         { key: keyFor(page, "JoinTitle"), label: "Titel aansluitblok" },
@@ -460,14 +544,14 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
 
   if (["event", "order", "reservation", "shop", "committee", "rental"].includes(page.kind)) {
     groups.push({
-      title: "Externe formulierlink",
+      title: "Externe linkbalk",
       description:
-        "Geen ingebouwd formulier op de site. Plaats hier de link naar bijvoorbeeld Google Forms, Microsoft Forms of een ander extern formulier.",
+        "Geen formulier op de site zelf. Plaats hier de link naar bijvoorbeeld Google Forms, Microsoft Forms of een mailadres.",
       fields: [
-        { key: keyFor(page, "ExternalCtaTitle"), label: "Titel van de CTA-balk" },
-        { key: keyFor(page, "ExternalCtaText"), label: "Korte uitlegtekst", kind: "textarea" },
-        { key: keyFor(page, "ExternalCtaButton"), label: "Knoptekst" },
-        { key: keyFor(page, "ExternalCtaUrl"), label: "Externe formulierlink" },
+        { key: keyFor(page, "ExternalCtaTitle"), label: "Titel van de linkbalk" },
+        { key: keyFor(page, "ExternalCtaText"), label: "Korte uitleg in de linkbalk", kind: "textarea" },
+        { key: keyFor(page, "ExternalCtaButton"), label: "Tekst op de knop" },
+        { key: keyFor(page, "ExternalCtaUrl"), label: "Link of mailadres" },
       ],
     });
   }
@@ -515,7 +599,10 @@ export const sitePageGroups = [
   {
     label: "Meer",
     href: "/oud-leiding",
-    slugs: ["oud-leiding"],
-    items: [{ label: "Oud-leiding", href: "/oud-leiding" }],
+    slugs: ["oud-leiding", "fotos"],
+    items: [
+      { label: "Foto's", href: "/fotos" },
+      { label: "Oud-leiding", href: "/oud-leiding" },
+    ],
   },
 ];

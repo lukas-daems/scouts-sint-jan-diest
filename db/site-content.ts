@@ -12,6 +12,11 @@ type SiteContentRow = {
   value: string;
 };
 
+export type SiteContentStatus = {
+  source: "database" | "defaults";
+  error?: string;
+};
+
 const createTableSql =
   "CREATE TABLE IF NOT EXISTS site_content (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL, updated_at INTEGER NOT NULL)";
 
@@ -36,20 +41,52 @@ function overlayDefaults(rows: SiteContentRow[]) {
   return content;
 }
 
-export async function getSiteContent(): Promise<EditableSiteContent> {
+function describeDatabaseError(error: unknown) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "Onbekende databankfout.";
+}
+
+export async function getSiteContentWithStatus(): Promise<{
+  content: EditableSiteContent;
+  status: SiteContentStatus;
+}> {
   const db = getD1Binding();
 
   if (!db) {
-    return defaultSiteContent;
+    return {
+      content: defaultSiteContent,
+      status: {
+        source: "defaults",
+        error:
+          "De databankbinding DB is niet beschikbaar. De site gebruikt nu standaardinhoud.",
+      },
+    };
   }
 
   try {
     await ensureSiteContentTable(db);
     const result = await db.prepare("SELECT key, value FROM site_content").all();
-    return overlayDefaults((result.results ?? []) as SiteContentRow[]);
-  } catch {
-    return defaultSiteContent;
+    return {
+      content: overlayDefaults((result.results ?? []) as SiteContentRow[]),
+      status: { source: "database" },
+    };
+  } catch (error) {
+    return {
+      content: defaultSiteContent,
+      status: {
+        source: "defaults",
+        error: `De databank kon niet gelezen worden. De site gebruikt nu standaardinhoud. Technische fout: ${describeDatabaseError(error)}`,
+      },
+    };
   }
+}
+
+export async function getSiteContent(): Promise<EditableSiteContent> {
+  const { content } = await getSiteContentWithStatus();
+  return content;
 }
 
 export async function updateSiteContent(

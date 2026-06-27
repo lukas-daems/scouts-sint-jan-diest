@@ -10,7 +10,7 @@ const navLinks = [
   ["Takken", "/takken"],
   ["Activiteiten", "/activiteiten"],
   ["Zomerkamp", "/zomerkamp"],
-  ["Foto's", "/#fotos"],
+  ["Foto's", "/fotos"],
   ["Contact", "/#contact"],
 ];
 
@@ -46,6 +46,7 @@ function getContactPhones(content: EditableSiteContent) {
 
 export default function Footer({ content }: FooterProps) {
   const logoSrc = content.siteLogoUrl || "/assets/logo.png";
+  const hasUploadedLogo = Boolean(content.siteLogoUrl);
   const contactPhones = getContactPhones(content);
 
   return (
@@ -54,20 +55,30 @@ export default function Footer({ content }: FooterProps) {
         <div className="grid gap-12 border-t border-white/10 pt-12 md:grid-cols-2 lg:grid-cols-[1.2fr_0.75fr_0.8fr_0.85fr_0.9fr]">
           <div>
             <div className="flex items-center gap-3">
-              <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/35">
-                {logoSrc ? (
-                  <img
-                    alt={`Logo van ${content.siteName}`}
-                    className="h-full w-full rounded-full object-cover"
-                    src={logoSrc}
-                  />
-                ) : (
-                  <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
-                    SJ
+              {hasUploadedLogo ? (
+                <img
+                  alt={`Logo van ${content.siteName}`}
+                  className="site-logo-cutout h-28 max-w-[260px] object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.28)] sm:h-32 sm:max-w-[320px]"
+                  src={content.siteLogoUrl}
+                />
+              ) : (
+                <>
+                  <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/35">
+                    {logoSrc ? (
+                      <img
+                        alt={`Logo van ${content.siteName}`}
+                        className="h-full w-full rounded-full object-cover"
+                        src={logoSrc}
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
+                        SJ
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <h2 className="text-lg font-bold">{content.siteName}</h2>
+                  <h2 className="text-lg font-bold">{content.siteName}</h2>
+                </>
+              )}
             </div>
             <p className="mt-5 max-w-sm text-sm leading-7 text-green-100">
               {content.footerDescription}

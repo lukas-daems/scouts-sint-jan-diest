@@ -1,4 +1,4 @@
-const localUploadLimitBytes = 900_000;
+const localUploadLimitBytes = 850_000;
 
 type PreparedUpload = {
   file: File;
@@ -14,7 +14,11 @@ function withExtension(name: string, extension: string) {
   return `${baseName}.${extension}`;
 }
 
-function canvasToBlob(canvas: HTMLCanvasElement, type: string) {
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality?: number
+) {
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (!blob) {
@@ -23,11 +27,16 @@ function canvasToBlob(canvas: HTMLCanvasElement, type: string) {
       }
 
       resolve(blob);
-    }, type);
+    }, type, quality);
   });
 }
 
-async function resizeImage(file: File, maxSide: number, type: string) {
+async function resizeImage(
+  file: File,
+  maxSide: number,
+  type: string,
+  quality?: number
+) {
   const image = await createImageBitmap(file);
   const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
   const width = Math.max(1, Math.round(image.width * scale));
@@ -45,7 +54,9 @@ async function resizeImage(file: File, maxSide: number, type: string) {
   context.clearRect(0, 0, width, height);
   context.drawImage(image, 0, 0, width, height);
 
-  return canvasToBlob(canvas, type);
+  image.close?.();
+
+  return canvasToBlob(canvas, type, quality);
 }
 
 export async function prepareImageForUpload(
@@ -54,38 +65,90 @@ export async function prepareImageForUpload(
 ): Promise<PreparedUpload> {
   const extension = getExtension(file.name);
   const isSvg = extension === "svg" || file.type === "image/svg+xml";
+  const isGif = extension === "gif" || file.type === "image/gif";
 
-  if (file.size <= localUploadLimitBytes || isSvg) {
+  if (file.size <= localUploadLimitBytes || isSvg || isGif) {
     return { file, optimized: false };
   }
 
   const preserveTransparency =
     options.logo || extension === "png" || file.type === "image/png";
-  const outputType = preserveTransparency ? "image/png" : "image/jpeg";
-  const outputExtension = preserveTransparency ? "png" : "jpg";
-  const targetSizes = options.logo
-    ? [768, 640, 512, 384, 256]
-    : [1600, 1280, 960, 768, 640];
+  const candidates = [
+    ...(preserveTransparency
+      ? [
+          {
+            type: "image/png",
+            extension: "png",
+            qualities: [undefined],
+            sizes: options.logo
+              ? [768, 640, 512, 384, 256, 180, 128]
+              : [1400, 1100, 900, 720, 560, 420],
+          },
+          {
+            type: "image/webp",
+            extension: "webp",
+            qualities: [0.86, 0.76, 0.66, 0.56],
+            sizes: options.logo
+              ? [768, 640, 512, 384, 256, 180, 128]
+              : [1400, 1100, 900, 720, 560, 420],
+          },
+        ]
+      : [
+          {
+            type: "image/webp",
+            extension: "webp",
+            qualities: [0.84, 0.74, 0.64, 0.54],
+            sizes: [1800, 1500, 1200, 960, 768, 640],
+          },
+          {
+            type: "image/jpeg",
+            extension: "jpg",
+            qualities: [0.84, 0.74, 0.64, 0.54],
+            sizes: [1800, 1500, 1200, 960, 768, 640],
+          },
+        ]),
+  ];
 
-  let bestBlob: Blob | null = null;
+  let best: { blob: Blob; extension: string; type: string } | null = null;
 
-  for (const size of targetSizes) {
-    const blob = await resizeImage(file, size, outputType);
-    bestBlob = blob;
+  for (const candidate of candidates) {
+    for (const size of candidate.sizes) {
+      for (const quality of candidate.qualities) {
+        const blob = await resizeImage(file, size, candidate.type, quality);
 
-    if (blob.size <= localUploadLimitBytes) {
-      break;
+        if (!best || blob.size < best.blob.size) {
+          best = {
+            blob,
+            extension: candidate.extension,
+            type: candidate.type,
+          };
+        }
+
+        if (blob.size <= localUploadLimitBytes) {
+          return {
+            file: new File(
+              [blob],
+              withExtension(file.name, candidate.extension),
+              {
+                lastModified: Date.now(),
+                type: candidate.type,
+              }
+            ),
+            optimized: true,
+          };
+        }
+      }
     }
   }
 
-  if (!bestBlob) {
+  if (!best) {
     return { file, optimized: false };
   }
 
   return {
-    file: new File([bestBlob], withExtension(file.name, outputExtension), {
+    file: new File([best.blob], withExtension(file.name, best.extension), {
       lastModified: Date.now(),
-      type: outputType,
+      type: best.type,
     }),
     optimized: true,
   };

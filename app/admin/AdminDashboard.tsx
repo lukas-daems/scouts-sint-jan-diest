@@ -18,15 +18,36 @@ import {
 import { branchProfiles } from "../lib/branches";
 import {
   galleryThemes,
+  parseCustomGalleryThemes,
   parseImageListValue,
+  slugifyGalleryLabel,
+  stringifyCustomGalleryThemes,
   stringifyImageListValue,
+  type CustomGalleryTheme,
   type GalleryTheme,
 } from "../lib/gallery";
 import {
   getSitePageAdminGroups,
   getSitePageImageKey,
+  parseCards,
+  parseDocuments,
+  parseFacts,
+  parseLines,
+  parseLinks,
+  parseProducts,
   sitePageGroups,
   sitePages,
+  stringifyCards,
+  stringifyDocuments,
+  stringifyFacts,
+  stringifyLines,
+  stringifyLinks,
+  stringifyProducts,
+  type SitePageCard,
+  type SitePageDocument,
+  type SitePageFact,
+  type SitePageLinkItem,
+  type SitePageProduct,
 } from "../lib/site-pages";
 import { prepareImageForUpload } from "../lib/prepare-image-upload";
 import {
@@ -57,6 +78,8 @@ type FieldConfig = {
   key: keyof EditableSiteContent;
   label: string;
   kind?: "input" | "textarea";
+  help?: string;
+  placeholder?: string;
 };
 
 type AdminSession = {
@@ -78,6 +101,11 @@ type AdminSetupHelpItem = {
   username: string;
   env: string;
   role: string;
+};
+
+type SiteContentAdminStatus = {
+  source: "database" | "defaults";
+  error?: string;
 };
 
 const sections: Array<{
@@ -133,60 +161,70 @@ const homepageGroups: Array<{
   fields: FieldConfig[];
 }> = [
   {
-    title: "Hero",
-    description: "De eerste indruk bovenaan de homepage.",
+    title: "Bovenkant homepage",
+    description: "De grote eerste indruk: badge, titel, knoppen, foto en vier kleine infokaartjes.",
     fields: [
-      { key: "heroEyebrow", label: "Kleine tekst boven titel" },
-      { key: "heroOrgLabel", label: "Organisatiebadge naast kleine tekst" },
-      { key: "heroTitleLineOne", label: "Titel regel 1" },
-      { key: "heroTitleLineTwo", label: "Titel regel 2" },
-      { key: "heroSubtitle", label: "Intro tekst", kind: "textarea" },
-      { key: "heroPrimaryCtaLabel", label: "Primaire knop" },
-      { key: "heroSecondaryCtaLabel", label: "Secundaire knop" },
-      { key: "heroStatOneTitle", label: "Infokaart 1 titel" },
-      { key: "heroStatOneLabel", label: "Infokaart 1 tekst" },
-      { key: "heroStatTwoTitle", label: "Infokaart 2 titel" },
-      { key: "heroStatTwoLabel", label: "Infokaart 2 tekst" },
-      { key: "heroStatThreeTitle", label: "Infokaart 3 titel" },
-      { key: "heroStatThreeLabel", label: "Infokaart 3 tekst" },
-      { key: "heroStatFourTitle", label: "Infokaart 4 titel" },
-      { key: "heroStatFourLabel", label: "Infokaart 4 tekst" },
+      { key: "heroEyebrow", label: "Badge: eerste tekst" },
+      { key: "heroOrgLabel", label: "Badge: tweede tekst" },
+      { key: "heroTitleLineOne", label: "Grote titel: eerste regel" },
+      { key: "heroTitleLineTwo", label: "Grote titel: tweede regel" },
+      {
+        key: "heroSubtitle",
+        label: "Korte uitleg onder de titel",
+        kind: "textarea",
+        help: "Deze tekst staat direct onder de grote hero-titel.",
+      },
+      { key: "heroPrimaryCtaLabel", label: "Witte knop" },
+      { key: "heroSecondaryCtaLabel", label: "Doorzichtige knop" },
+      { key: "heroStatOneTitle", label: "Infokaartje 1: grote tekst" },
+      { key: "heroStatOneLabel", label: "Infokaartje 1: kleine tekst" },
+      { key: "heroStatTwoTitle", label: "Infokaartje 2: grote tekst" },
+      { key: "heroStatTwoLabel", label: "Infokaartje 2: kleine tekst" },
+      { key: "heroStatThreeTitle", label: "Infokaartje 3: grote tekst" },
+      { key: "heroStatThreeLabel", label: "Infokaartje 3: kleine tekst" },
+      { key: "heroStatFourTitle", label: "Infokaartje 4: grote tekst" },
+      { key: "heroStatFourLabel", label: "Infokaartje 4: kleine tekst" },
     ],
   },
   {
-    title: "Takken-preview",
-    description: "Korte takkenblok op de homepage.",
+    title: "Takkenblok op homepage",
+    description: "De compacte blok met de vijf takken en de knop naar de takkenpagina.",
     fields: [
       { key: "branchesHomeTitle", label: "Titel" },
       { key: "branchesHomeSubtitle", label: "Intro tekst", kind: "textarea" },
-      { key: "branchesHomeCtaLabel", label: "Knoptekst" },
+      { key: "branchesHomeCtaLabel", label: "Knop onder de takken" },
     ],
   },
   {
-    title: "Activiteiten-preview",
-    description: "Homepageblok met de grote zomerkampkaart.",
+    title: "Activiteitenblok op homepage",
+    description: "De titel, intro, grote zomerkampkaart en de kleine activiteitkaartjes.",
     fields: [
       { key: "activitiesTitle", label: "Titel" },
       { key: "activitiesSubtitle", label: "Intro tekst", kind: "textarea" },
-      { key: "activitiesFeaturedBadge", label: "Badge grote kaart" },
-      { key: "activitiesFeaturedTitle", label: "Titel grote kaart" },
-      { key: "activitiesFeaturedText", label: "Tekst grote kaart", kind: "textarea" },
-      { key: "activitiesFeaturedMiniTitle", label: "Fotoblok titel" },
-      { key: "activitiesFeaturedMiniText", label: "Fotoblok tekst", kind: "textarea" },
-      { key: "activitiesFeaturedCtaLabel", label: "Knop grote kaart" },
-      { key: "activitiesMoreTitle", label: "Extra kaart titel" },
-      { key: "activitiesMoreText", label: "Extra kaart tekst", kind: "textarea" },
-      { key: "activitiesMoreCtaLabel", label: "Extra kaart knop" },
+      { key: "activitiesFeaturedBadge", label: "Zomerkampkaart: badge" },
+      { key: "activitiesFeaturedTitle", label: "Zomerkampkaart: titel" },
+      { key: "activitiesFeaturedText", label: "Zomerkampkaart: tekst", kind: "textarea" },
+      { key: "activitiesFeaturedMiniTitle", label: "Fotolabel in zomerkampkaart" },
+      { key: "activitiesFeaturedMiniText", label: "Korte tekst bij fotolabel", kind: "textarea" },
+      { key: "activitiesFeaturedCtaLabel", label: "Knop in zomerkampkaart" },
+      { key: "activitiesMoreTitle", label: "CTA-balk onder activiteiten: titel" },
+      { key: "activitiesMoreText", label: "CTA-balk onder activiteiten: tekst", kind: "textarea" },
+      { key: "activitiesMoreCtaLabel", label: "CTA-balk onder activiteiten: knop" },
     ],
   },
   {
-    title: "Waarom kiezen ouders?",
-    description: "Blauwe overtuigingssectie.",
+    title: "Waarom scouts?",
+    description: "De overtuigingssectie voor ouders op de homepage.",
     fields: [
       { key: "whyJoinBadge", label: "Badge" },
       { key: "whyJoinTitle", label: "Titel" },
       { key: "whyJoinText", label: "Intro tekst", kind: "textarea" },
-      { key: "whyJoinBullets", label: "Bulletpoints, 1 per lijn", kind: "textarea" },
+      {
+        key: "whyJoinBullets",
+        label: "Voordelenlijst",
+        kind: "textarea",
+        help: "Zet elk voordeel op een aparte regel.",
+      },
     ],
   },
   {
@@ -219,6 +257,7 @@ const homepageGroups: Array<{
       { key: "campBadge", label: "Badge" },
       { key: "campTitle", label: "Titel" },
       { key: "campSubtitle", label: "Kamp intro", kind: "textarea" },
+      { key: "campHomepageNote", label: "Korte nota op homepage", kind: "textarea" },
       { key: "campWhat", label: "Wat is kamp?", kind: "textarea" },
       { key: "campForParents", label: "Voor ouders", kind: "textarea" },
       { key: "campForNewMembers", label: "Voor nieuwe leden", kind: "textarea" },
@@ -244,6 +283,28 @@ const homepageGroups: Array<{
       { key: "faqSubtitle", label: "FAQ intro", kind: "textarea" },
       { key: "faqCtaLabel", label: "FAQ knop" },
     ],
+  },
+];
+
+const homepageEditorItems: Array<{
+  id: string;
+  title: string;
+  description: string;
+  group?: (typeof homepageGroups)[number];
+  type: "fields" | "faq";
+}> = [
+  ...homepageGroups.map((group, index) => ({
+    id: `homepage-${index}`,
+    title: group.title,
+    description: group.description,
+    group,
+    type: "fields" as const,
+  })),
+  {
+    id: "homepage-faq-list",
+    title: "FAQ-vragen",
+    description: "Beheer de losse vragen en antwoorden die in de FAQ verschijnen.",
+    type: "faq",
   },
 ];
 
@@ -300,6 +361,22 @@ const mediaFields: Array<{
   },
 ];
 
+const pageAdminDescriptions: Record<string, string> = {
+  activiteiten:
+    "Overzicht van wekelijkse werking, kamp, evenementen en steunacties.",
+  zomerkamp: "Kampverhaal, documenten, updates en kampgerichte CTA's.",
+  dropping: "Evenementpagina met praktische info en externe inschrijflink.",
+  ontbijtmanden: "Verkoopactie met bestellink en uitleg rond steun.",
+  "steak-en-burgerday":
+    "Eetmoment en steunactie met steunverhaal en reservatielink.",
+  shop: "Productcatalogus en externe aanvraaglink voor shopmateriaal.",
+  oudercomite:
+    "Warme infopagina over het oudercomite, werking, ledenlijst en contact.",
+  verhuur: "Duidelijke pagina over lokalen, materiaal, prijzen en verhuurcontact.",
+  "oud-leiding": "Rustige tekstpagina met ruimte voor latere info en contact.",
+  links: "Beheerbare linkpagina met categorieen en nuttige verwijzingen.",
+};
+
 const pageEditorItems: Array<{
   id: string;
   title: string;
@@ -310,7 +387,9 @@ const pageEditorItems: Array<{
 }> = sitePages.map((page) => ({
   id: page.slug,
   title: page.navLabel,
-  description: `${page.navLabel} pagina beheren: inhoud, praktische info, functies en CTA's.`,
+  description:
+    pageAdminDescriptions[page.slug] ||
+    `${page.navLabel} pagina beheren: tekst, info, knoppen en beeld.`,
   href: `/${page.slug}`,
   adminGroups: getSitePageAdminGroups(page),
   imageKey: getSitePageImageKey(page),
@@ -328,7 +407,7 @@ function getPreviewPath(
   }
 
   if (section === "media") {
-    return `/?${marker}#fotos`;
+    return `/fotos?${marker}`;
   }
 
   if (section === "pages") {
@@ -357,13 +436,17 @@ export default function AdminDashboard() {
   const [password, setPassword] = useState("");
   const [content, setContent] = useState<EditableSiteContent>(defaultSiteContent);
   const [message, setMessage] = useState("");
+  const [contentStatus, setContentStatus] =
+    useState<SiteContentAdminStatus | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("idle");
-  const [uploadingKey, setUploadingKey] =
-    useState<keyof EditableSiteContent | null>(null);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
   const [activeSection, setActiveSection] =
     useState<AdminSection>("homepage");
   const [activeBranchSlug, setActiveBranchSlug] = useState(
     branchProfiles[0].slug
+  );
+  const [activeHomepageItemId, setActiveHomepageItemId] = useState(
+    homepageEditorItems[0].id
   );
   const [activePageItemId, setActivePageItemId] = useState(pageEditorItems[0].id);
   const [previewVersion, setPreviewVersion] = useState(1);
@@ -402,6 +485,10 @@ export default function AdminDashboard() {
   const activePageItem =
     pageEditorItems.find((item) => item.id === activePageItemId) ??
     pageEditorItems[0];
+  const activeHomepageItem =
+    homepageEditorItems.find((item) => item.id === activeHomepageItemId) ??
+    homepageEditorItems[0];
+  const customGalleryThemes = parseCustomGalleryThemes(content.galleryCustomThemes);
 
   const previewMarker = `adminPreview=${previewVersion}`;
   const previewPath =
@@ -461,8 +548,12 @@ export default function AdminDashboard() {
       return;
     }
 
-    const payload = (await response.json()) as { content: EditableSiteContent };
+    const payload = (await response.json()) as {
+      content: EditableSiteContent;
+      status?: SiteContentAdminStatus;
+    };
     setContent(payload.content);
+    setContentStatus(payload.status ?? null);
   }
 
   async function loadMediaLibrary() {
@@ -499,10 +590,80 @@ export default function AdminDashboard() {
   }
 
   function getUsedMediaKeys() {
-    const keys = new Set<string>();
+    return new Set(getMediaUsageMap().keys());
+  }
+
+  function addMediaUsage(
+    usageMap: Map<string, string[]>,
+    key: string,
+    label: string
+  ) {
+    if (!key) {
+      return;
+    }
+
+    const labels = usageMap.get(key) ?? [];
+    if (!labels.includes(label)) {
+      labels.push(label);
+    }
+    usageMap.set(key, labels);
+  }
+
+  function getMediaUsageLabel(contentKey: keyof EditableSiteContent) {
+    if (contentKey === "siteLogoUrl") {
+      return "Logo in navigatie en footer";
+    }
+    if (contentKey === "heroImageUrl") {
+      return "Homepage hero-foto";
+    }
+    if (contentKey === "campImageUrl") {
+      return "Homepage kampsectie";
+    }
+    if (contentKey === "contactImageUrl") {
+      return "Contactblok";
+    }
+
+    const galleryTheme = galleryThemes.find(
+      (theme) =>
+        theme.coverKey === contentKey || theme.collageKey === contentKey
+    );
+    if (galleryTheme) {
+      return galleryTheme.coverKey === contentKey
+        ? `Hoofdfoto sfeerbeeld ${galleryTheme.label}`
+        : `Collage ${galleryTheme.label}`;
+    }
+
+    const branch = branchProfiles.find(
+      (item) =>
+        item.logoKey === contentKey ||
+        item.contentKeys.imageUrl === contentKey ||
+        item.contentKeys.leaderPhotoUrl === contentKey
+    );
+    if (branch) {
+      if (branch.logoKey === contentKey) {
+        return `Logo tak ${branch.name}`;
+      }
+      if (branch.contentKeys.leaderPhotoUrl === contentKey) {
+        return `Leidingsfoto ${branch.name}`;
+      }
+      return `Sfeerfoto tak ${branch.name}`;
+    }
+
+    const page = pageEditorItems.find((item) => item.imageKey === contentKey);
+    if (page) {
+      return `Hoofdbeeld pagina ${page.title}`;
+    }
+
+    return String(contentKey);
+  }
+
+  function getMediaUsageMap() {
+    const usageMap = new Map<string, string[]>();
     const mediaPattern = /(?:\/api\/media\/)?(uploads\/[^"'\s)\\\]]+)/g;
 
-    for (const value of Object.values(content)) {
+    for (const [contentKey, value] of Object.entries(content) as Array<
+      [keyof EditableSiteContent, string]
+    >) {
       if (typeof value !== "string") {
         continue;
       }
@@ -510,12 +671,12 @@ export default function AdminDashboard() {
       for (const match of value.matchAll(mediaPattern)) {
         const key = extractMediaKey(match[1] ?? "");
         if (key) {
-          keys.add(key);
+          addMediaUsage(usageMap, key, getMediaUsageLabel(contentKey));
         }
       }
     }
 
-    return keys;
+    return usageMap;
   }
 
   async function deleteMediaItem(item: MediaLibraryItem) {
@@ -601,8 +762,11 @@ export default function AdminDashboard() {
     });
 
     if (!response.ok) {
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
       setSaveState("error");
-      setMessage("Opslaan is niet gelukt. Ben je nog aangemeld?");
+      setMessage(payload.error ?? "Opslaan is niet gelukt. Ben je nog aangemeld?");
       return;
     }
 
@@ -636,6 +800,38 @@ export default function AdminDashboard() {
     setMessage(`${label} verwijderd. Klik op opslaan om dit zichtbaar te maken.`);
   }
 
+  async function uploadPreparedFile(file: File, slot: string, logo = false) {
+    const prepared = await prepareImageForUpload(file, { logo });
+    const formData = new FormData();
+    formData.append("file", prepared.file);
+    formData.append("slot", slot);
+
+    const response = await fetch("/api/admin/media", {
+      body: formData,
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      if (response.status === 413) {
+        throw new Error(
+          "Dit bestand blijft te groot, zelfs na automatisch verkleinen. Probeer een kleinere export of een foto met minder pixels."
+        );
+      }
+
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      throw new Error(payload.error ?? "Uploaden is niet gelukt.");
+    }
+
+    const payload = (await response.json()) as { url: string };
+
+    return {
+      url: payload.url,
+      optimized: prepared.optimized,
+    };
+  }
+
   async function uploadMedia(
     key: keyof EditableSiteContent,
     event: ChangeEvent<HTMLInputElement>,
@@ -649,47 +845,27 @@ export default function AdminDashboard() {
     setUploadingKey(key);
     setMessage("");
 
-    let prepared;
+    let uploaded;
     try {
-      prepared = await prepareImageForUpload(file, { logo });
-    } catch {
+      uploaded = await uploadPreparedFile(file, String(key), logo);
+    } catch (error) {
       setUploadingKey(null);
-      setMessage("Deze afbeelding kon niet voorbereid worden voor upload.");
+      event.target.value = "";
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Deze afbeelding kon niet voorbereid worden voor upload."
+      );
       return;
     }
-
-    const formData = new FormData();
-    formData.append("file", prepared.file);
-    formData.append("slot", key);
-
-    const response = await fetch("/api/admin/media", {
-      body: formData,
-      method: "POST",
-    });
 
     setUploadingKey(null);
-
-    if (!response.ok) {
-      if (response.status === 413) {
-        setMessage(
-          "Dit bestand is nog te groot. Probeer het logo kleiner te exporteren of gebruik een compactere PNG."
-        );
-        return;
-      }
-
-      const payload = (await response.json().catch(() => ({}))) as {
-        error?: string;
-      };
-      setMessage(payload.error ?? "Uploaden is niet gelukt.");
-      return;
-    }
-
-    const payload = (await response.json()) as { url: string };
-    updateField(key, payload.url);
+    event.target.value = "";
+    updateField(key, uploaded.url);
     void loadMediaLibrary();
     setMessage(
-      prepared.optimized
-        ? "Upload gelukt. De afbeelding werd automatisch verkleind zodat ze lokaal past. Klik op opslaan."
+      uploaded.optimized
+        ? "Upload gelukt. De afbeelding werd automatisch kleiner gemaakt. Klik op opslaan."
         : "Upload gelukt. Klik op opslaan om dit zichtbaar te maken."
     );
   }
@@ -698,37 +874,34 @@ export default function AdminDashboard() {
     theme: GalleryTheme,
     event: ChangeEvent<HTMLInputElement>
   ) {
+    const keys = getGalleryContentKeys(theme);
     const files = Array.from(event.target.files ?? []);
     if (files.length === 0) {
       return;
     }
 
-    setUploadingKey(theme.collageKey);
+    if (!keys) {
+      event.target.value = "";
+      return;
+    }
+
+    setUploadingKey(keys.collageKey);
     setMessage("");
 
     const uploadedUrls: string[] = [];
+    let optimizedCount = 0;
 
     for (const file of files) {
-      let prepared;
       try {
-        prepared = await prepareImageForUpload(file);
-      } catch {
-        setMessage("Een van de foto's kon niet voorbereid worden voor upload.");
-        continue;
-      }
-
-      const formData = new FormData();
-      formData.append("file", prepared.file);
-      formData.append("slot", `collage-${theme.slug}`);
-
-      const response = await fetch("/api/admin/media", {
-        body: formData,
-        method: "POST",
-      });
-
-      if (response.ok) {
-        const payload = (await response.json()) as { url: string };
-        uploadedUrls.push(payload.url);
+        const uploaded = await uploadPreparedFile(file, `collage-${theme.slug}`);
+        uploadedUrls.push(uploaded.url);
+        optimizedCount += uploaded.optimized ? 1 : 0;
+      } catch (error) {
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Een van de foto's kon niet voorbereid worden voor upload."
+        );
       }
     }
 
@@ -741,17 +914,17 @@ export default function AdminDashboard() {
     }
 
     setContent((current) => {
-      const existing = parseImageListValue(current[theme.collageKey]);
+      const existing = parseImageListValue(current[keys.collageKey]);
       const nextImages = [...existing, ...uploadedUrls];
 
       return {
         ...current,
-        [theme.collageKey]: stringifyImageListValue(nextImages),
-        [theme.coverKey]: current[theme.coverKey] || uploadedUrls[0],
+        [keys.collageKey]: stringifyImageListValue(nextImages),
+        [keys.coverKey]: current[keys.coverKey] || uploadedUrls[0],
       };
     });
     setMessage(
-      `${uploadedUrls.length} foto${uploadedUrls.length === 1 ? "" : "'s"} toegevoegd aan ${theme.label}. Klik op opslaan.`
+      `${uploadedUrls.length} foto${uploadedUrls.length === 1 ? "" : "'s"} toegevoegd aan ${theme.label}.${optimizedCount > 0 ? ` ${optimizedCount} foto${optimizedCount === 1 ? "" : "'s"} automatisch verkleind.` : ""} Klik op opslaan.`
     );
     void loadMediaLibrary();
   }
@@ -761,48 +934,43 @@ export default function AdminDashboard() {
     index: number,
     event: ChangeEvent<HTMLInputElement>
   ) {
+    const keys = getGalleryContentKeys(theme);
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
 
-    setUploadingKey(theme.collageKey);
-    setMessage("");
-
-    let prepared;
-    try {
-      prepared = await prepareImageForUpload(file);
-    } catch {
-      setUploadingKey(null);
-      setMessage("Deze foto kon niet voorbereid worden voor upload.");
+    if (!keys) {
+      event.target.value = "";
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", prepared.file);
-    formData.append("slot", `collage-${theme.slug}`);
+    setUploadingKey(keys.collageKey);
+    setMessage("");
 
-    const response = await fetch("/api/admin/media", {
-      body: formData,
-      method: "POST",
-    });
+    let uploaded;
+    try {
+      uploaded = await uploadPreparedFile(file, `collage-${theme.slug}`);
+    } catch (error) {
+      setUploadingKey(null);
+      event.target.value = "";
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Deze foto kon niet voorbereid worden voor upload."
+      );
+      return;
+    }
 
     setUploadingKey(null);
     event.target.value = "";
-
-    if (!response.ok) {
-      setMessage("Vervangen is niet gelukt.");
-      return;
-    }
-
-    const payload = (await response.json()) as { url: string };
     setContent((current) => {
-      const images = parseImageListValue(current[theme.collageKey]);
-      images[index] = payload.url;
+      const images = parseImageListValue(current[keys.collageKey]);
+      images[index] = uploaded.url;
 
       return {
         ...current,
-        [theme.collageKey]: stringifyImageListValue(images),
+        [keys.collageKey]: stringifyImageListValue(images),
       };
     });
     setMessage(`Foto vervangen in ${theme.label}. Klik op opslaan.`);
@@ -810,26 +978,36 @@ export default function AdminDashboard() {
   }
 
   function removeGalleryImage(theme: GalleryTheme, index: number) {
+    const keys = getGalleryContentKeys(theme);
+    if (!keys) {
+      return;
+    }
+
     setContent((current) => {
-      const images = parseImageListValue(current[theme.collageKey]);
+      const images = parseImageListValue(current[keys.collageKey]);
       const removedImage = images[index];
       const nextImages = images.filter((_, itemIndex) => itemIndex !== index);
 
       return {
         ...current,
-        [theme.collageKey]: stringifyImageListValue(nextImages),
-        [theme.coverKey]:
-          current[theme.coverKey] === removedImage
+        [keys.collageKey]: stringifyImageListValue(nextImages),
+        [keys.coverKey]:
+          current[keys.coverKey] === removedImage
             ? nextImages[0] || ""
-            : current[theme.coverKey],
+            : current[keys.coverKey],
       };
     });
     setMessage(`Foto verwijderd uit ${theme.label}. Klik op opslaan.`);
   }
 
   function moveGalleryImage(theme: GalleryTheme, index: number, direction: -1 | 1) {
+    const keys = getGalleryContentKeys(theme);
+    if (!keys) {
+      return;
+    }
+
     setContent((current) => {
-      const images = parseImageListValue(current[theme.collageKey]);
+      const images = parseImageListValue(current[keys.collageKey]);
       const targetIndex = index + direction;
 
       if (targetIndex < 0 || targetIndex >= images.length) {
@@ -840,10 +1018,290 @@ export default function AdminDashboard() {
 
       return {
         ...current,
-        [theme.collageKey]: stringifyImageListValue(images),
+        [keys.collageKey]: stringifyImageListValue(images),
       };
     });
     setMessage(`Volgorde aangepast in ${theme.label}. Klik op opslaan.`);
+  }
+
+  function getGalleryContentKeys(theme: GalleryTheme) {
+    if (!theme.coverKey || !theme.collageKey) {
+      setMessage("Deze collage gebruikt geen vaste homepagevelden.");
+      return null;
+    }
+
+    return {
+      coverKey: theme.coverKey,
+      collageKey: theme.collageKey,
+    };
+  }
+
+  function updateCustomGalleryThemes(items: CustomGalleryTheme[]) {
+    updateField("galleryCustomThemes", stringifyCustomGalleryThemes(items));
+  }
+
+  function getUniqueCustomGallerySlug(
+    label: string,
+    items: CustomGalleryTheme[],
+    currentId?: string
+  ) {
+    const baseSlug = slugifyGalleryLabel(label, items.length);
+    let slug = baseSlug;
+    let counter = 2;
+
+    while (
+      items.some((item) => item.id !== currentId && item.slug === slug)
+    ) {
+      slug = `${baseSlug}-${counter}`;
+      counter += 1;
+    }
+
+    return slug;
+  }
+
+  function addCustomGalleryTheme() {
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    const label = `Nieuwe collage ${items.length + 1}`;
+    const nextItem: CustomGalleryTheme = {
+      id:
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `custom-${Date.now()}`,
+      slug: getUniqueCustomGallerySlug(label, items),
+      label,
+      alt: `Sfeerbeelden van ${label}`,
+      coverUrl: "",
+      images: [],
+    };
+
+    updateCustomGalleryThemes([...items, nextItem]);
+    setMessage("Nieuwe collage toegevoegd. Pas de naam en foto's aan en klik op opslaan.");
+  }
+
+  function updateCustomGalleryTheme(
+    id: string,
+    field: "label" | "alt",
+    value: string
+  ) {
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    const nextItems = items.map((item) => {
+      if (item.id !== id) {
+        return item;
+      }
+
+      if (field === "label") {
+        return {
+          ...item,
+          label: value,
+          slug: getUniqueCustomGallerySlug(value, items, id),
+          alt:
+            !item.alt || item.alt.startsWith("Sfeerbeelden van ")
+              ? `Sfeerbeelden van ${value}`
+              : item.alt,
+        };
+      }
+
+      return { ...item, [field]: value };
+    });
+
+    updateCustomGalleryThemes(nextItems);
+  }
+
+  function removeCustomGalleryTheme(id: string) {
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    updateCustomGalleryThemes(items.filter((item) => item.id !== id));
+    setMessage("Collage verwijderd. Klik op opslaan om dit zichtbaar te maken.");
+  }
+
+  async function uploadCustomGalleryCover(
+    theme: CustomGalleryTheme,
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setUploadingKey(`custom-cover-${theme.id}`);
+    setMessage("");
+
+    let uploaded;
+    try {
+      uploaded = await uploadPreparedFile(file, `custom-collage-${theme.slug}`);
+    } catch (error) {
+      setUploadingKey(null);
+      event.target.value = "";
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Deze hoofdfoto kon niet voorbereid worden voor upload."
+      );
+      return;
+    }
+
+    setUploadingKey(null);
+    event.target.value = "";
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    updateCustomGalleryThemes(
+      items.map((item) =>
+        item.id === theme.id ? { ...item, coverUrl: uploaded.url } : item
+      )
+    );
+    setMessage(
+      uploaded.optimized
+        ? "Hoofdfoto toegevoegd en automatisch kleiner gemaakt. Klik op opslaan."
+        : "Hoofdfoto toegevoegd. Klik op opslaan."
+    );
+    void loadMediaLibrary();
+  }
+
+  async function uploadCustomGalleryImages(
+    theme: CustomGalleryTheme,
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
+      return;
+    }
+
+    setUploadingKey(`custom-images-${theme.id}`);
+    setMessage("");
+
+    const uploadedUrls: string[] = [];
+    let optimizedCount = 0;
+
+    for (const file of files) {
+      try {
+        const uploaded = await uploadPreparedFile(file, `custom-collage-${theme.slug}`);
+        uploadedUrls.push(uploaded.url);
+        optimizedCount += uploaded.optimized ? 1 : 0;
+      } catch (error) {
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Een van de foto's kon niet voorbereid worden voor upload."
+        );
+      }
+    }
+
+    setUploadingKey(null);
+    event.target.value = "";
+
+    if (uploadedUrls.length === 0) {
+      setMessage("Uploaden is niet gelukt.");
+      return;
+    }
+
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    updateCustomGalleryThemes(
+      items.map((item) =>
+        item.id === theme.id
+          ? {
+              ...item,
+              coverUrl: item.coverUrl || uploadedUrls[0],
+              images: [...item.images, ...uploadedUrls],
+            }
+          : item
+      )
+    );
+    setMessage(
+      `${uploadedUrls.length} foto${uploadedUrls.length === 1 ? "" : "'s"} toegevoegd.${optimizedCount > 0 ? ` ${optimizedCount} automatisch verkleind.` : ""} Klik op opslaan.`
+    );
+    void loadMediaLibrary();
+  }
+
+  async function replaceCustomGalleryImage(
+    theme: CustomGalleryTheme,
+    index: number,
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setUploadingKey(`custom-replace-${theme.id}-${index}`);
+    setMessage("");
+
+    let uploaded;
+    try {
+      uploaded = await uploadPreparedFile(file, `custom-collage-${theme.slug}`);
+    } catch (error) {
+      setUploadingKey(null);
+      event.target.value = "";
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Deze foto kon niet voorbereid worden voor upload."
+      );
+      return;
+    }
+
+    setUploadingKey(null);
+    event.target.value = "";
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    updateCustomGalleryThemes(
+      items.map((item) => {
+        if (item.id !== theme.id) {
+          return item;
+        }
+
+        const images = [...item.images];
+        images[index] = uploaded.url;
+
+        return { ...item, images };
+      })
+    );
+    setMessage("Foto vervangen. Klik op opslaan.");
+    void loadMediaLibrary();
+  }
+
+  function removeCustomGalleryImage(theme: CustomGalleryTheme, index: number) {
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    updateCustomGalleryThemes(
+      items.map((item) => {
+        if (item.id !== theme.id) {
+          return item;
+        }
+
+        const removedImage = item.images[index];
+        const images = item.images.filter((_, itemIndex) => itemIndex !== index);
+
+        return {
+          ...item,
+          images,
+          coverUrl: item.coverUrl === removedImage ? images[0] || "" : item.coverUrl,
+        };
+      })
+    );
+    setMessage("Foto verwijderd. Klik op opslaan.");
+  }
+
+  function moveCustomGalleryImage(
+    theme: CustomGalleryTheme,
+    index: number,
+    direction: -1 | 1
+  ) {
+    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+    updateCustomGalleryThemes(
+      items.map((item) => {
+        if (item.id !== theme.id) {
+          return item;
+        }
+
+        const images = [...item.images];
+        const targetIndex = index + direction;
+
+        if (targetIndex < 0 || targetIndex >= images.length) {
+          return item;
+        }
+
+        [images[index], images[targetIndex]] = [images[targetIndex], images[index]];
+
+        return { ...item, images };
+      })
+    );
+    setMessage("Volgorde aangepast. Klik op opslaan.");
   }
 
   function stopTextKeyPropagation(
@@ -861,11 +1319,17 @@ export default function AdminDashboard() {
         key={field.key}
       >
         {field.label}
+        {field.help ? (
+          <span className="-mt-1 text-xs font-medium leading-5 text-slate-500">
+            {field.help}
+          </span>
+        ) : null}
         {field.kind === "textarea" ? (
           <textarea
             className="min-h-32 rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal leading-7 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
             onKeyDown={stopTextKeyPropagation}
             onChange={(event) => updateField(field.key, event.target.value)}
+            placeholder={field.placeholder}
             value={content[field.key]}
           />
         ) : (
@@ -873,11 +1337,625 @@ export default function AdminDashboard() {
             className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
             onKeyDown={stopTextKeyPropagation}
             onChange={(event) => updateField(field.key, event.target.value)}
+            placeholder={field.placeholder}
             value={content[field.key]}
           />
         )}
       </label>
     );
+  }
+
+  function updateCardsField(
+    key: keyof EditableSiteContent,
+    index: number,
+    field: keyof SitePageCard,
+    value: string
+  ) {
+    const items = parseCards(content[key]);
+    items[index] = { ...items[index], [field]: value };
+    updateField(key, stringifyCards(items));
+  }
+
+  function addCardField(key: keyof EditableSiteContent) {
+    updateField(
+      key,
+      stringifyCards([...parseCards(content[key]), { title: "", text: "" }])
+    );
+  }
+
+  function removeCardField(key: keyof EditableSiteContent, index: number) {
+    updateField(
+      key,
+      stringifyCards(parseCards(content[key]).filter((_, itemIndex) => itemIndex !== index))
+    );
+  }
+
+  function renderCardsManager(field: FieldConfig) {
+    const items = parseCards(content[field.key]);
+
+    return (
+      <section
+        className="rounded-3xl bg-white p-5 ring-1 ring-slate-200 md:col-span-2"
+        key={field.key}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h5 className="text-lg font-black text-slate-950">{field.label}</h5>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Dit zijn de witte tekstblokken op de pagina. Elk blok heeft een
+              titel en korte uitleg. Lege blokken verschijnen niet.
+            </p>
+          </div>
+          <button
+            className="rounded-full bg-[#103001] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={() => addCardField(field.key)}
+            type="button"
+          >
+            Tekstblok toevoegen
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4">
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <div
+                className="grid gap-4 rounded-3xl bg-[#fbfdf9] p-4 ring-1 ring-slate-200 md:grid-cols-[1fr_1.4fr_auto]"
+                key={`${field.key}-card-${index}`}
+              >
+                <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                  Titel van dit blok
+                  <input
+                    className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateCardsField(field.key, index, "title", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={item.title}
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                  Tekst in dit blok
+                  <textarea
+                    className="min-h-24 rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal leading-7 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateCardsField(field.key, index, "text", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={item.text}
+                  />
+                </label>
+                <button
+                  className="self-end rounded-full border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  onClick={() => removeCardField(field.key, index)}
+                  type="button"
+                >
+                  Verwijder blok
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-[#fbfdf9] p-4 text-sm text-slate-500">
+              Nog geen tekstblokken toegevoegd.
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  function updateFactsField(
+    key: keyof EditableSiteContent,
+    index: number,
+    field: keyof SitePageFact,
+    value: string
+  ) {
+    const items = parseFacts(content[key]);
+    items[index] = { ...items[index], [field]: value };
+    updateField(key, stringifyFacts(items));
+  }
+
+  function renderFactsManager(field: FieldConfig) {
+    const items = parseFacts(content[field.key]);
+
+    return (
+      <section
+        className="rounded-3xl bg-white p-5 ring-1 ring-slate-200 md:col-span-2"
+        key={field.key}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h5 className="text-lg font-black text-slate-950">{field.label}</h5>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Dit zijn kleine infokaartjes, bijvoorbeeld datum, prijs, locatie
+              of leeftijd. De kleine nota is optioneel.
+            </p>
+          </div>
+          <button
+            className="rounded-full bg-[#103001] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={() =>
+              updateField(
+                field.key,
+                stringifyFacts([
+                  ...items,
+                  { label: "", value: "", note: "" },
+                ])
+              )
+            }
+            type="button"
+          >
+            Infokaart toevoegen
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4">
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <div
+                className="grid gap-4 rounded-3xl bg-[#fbfdf9] p-4 ring-1 ring-slate-200 md:grid-cols-[1fr_1fr_1fr_auto]"
+                key={`${field.key}-fact-${index}`}
+              >
+                {(["label", "value", "note"] as Array<keyof SitePageFact>).map(
+                  (itemField) => (
+                    <label
+                      className="grid gap-2 text-sm font-semibold text-slate-700"
+                      key={itemField}
+                    >
+                      {itemField === "label"
+                        ? "Kleine titel"
+                        : itemField === "value"
+                          ? "Belangrijkste tekst"
+                          : "Extra uitleg"}
+                      <input
+                        className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                        onChange={(event) =>
+                          updateFactsField(
+                            field.key,
+                            index,
+                            itemField,
+                            event.target.value
+                          )
+                        }
+                        onKeyDown={stopTextKeyPropagation}
+                        value={item[itemField] ?? ""}
+                      />
+                    </label>
+                  )
+                )}
+                <button
+                  className="self-end rounded-full border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  onClick={() =>
+                    updateField(
+                      field.key,
+                      stringifyFacts(
+                        items.filter((_, itemIndex) => itemIndex !== index)
+                      )
+                    )
+                  }
+                  type="button"
+                >
+                  Verwijder kaart
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-[#fbfdf9] p-4 text-sm text-slate-500">
+              Nog geen infokaarten toegevoegd.
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  function renderDocumentsManager(field: FieldConfig) {
+    const items = parseDocuments(content[field.key]);
+
+    function updateItem(
+      index: number,
+      itemField: keyof SitePageDocument,
+      value: string
+    ) {
+      const nextItems = [...items];
+      nextItems[index] = { ...nextItems[index], [itemField]: value };
+      updateField(field.key, stringifyDocuments(nextItems));
+    }
+
+    return (
+      <section
+        className="rounded-3xl bg-white p-5 ring-1 ring-slate-200 md:col-span-2"
+        key={field.key}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h5 className="text-lg font-black text-slate-950">{field.label}</h5>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Voeg documenten of externe links toe, zoals kampboekje,
+              bagagelijst, medische fiche of een PDF-link.
+            </p>
+          </div>
+          <button
+            className="rounded-full bg-[#103001] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={() =>
+              updateField(
+                field.key,
+                stringifyDocuments([
+                  ...items,
+                  { label: "", href: "", description: "" },
+                ])
+              )
+            }
+            type="button"
+          >
+            Document toevoegen
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4">
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <div
+                className="grid gap-4 rounded-3xl bg-[#fbfdf9] p-4 ring-1 ring-slate-200 md:grid-cols-2"
+                key={`${field.key}-document-${index}`}
+              >
+                <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                  Naam van het document
+                  <input
+                    className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateItem(index, "label", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={item.label}
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                  Link naar document
+                  <input
+                    className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateItem(index, "href", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={item.href}
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-700 md:col-span-2">
+                  Korte uitleg
+                  <textarea
+                    className="min-h-24 rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal leading-7 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateItem(index, "description", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={item.description}
+                  />
+                </label>
+                <button
+                  className="w-fit rounded-full border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  onClick={() =>
+                    updateField(
+                      field.key,
+                      stringifyDocuments(
+                        items.filter((_, itemIndex) => itemIndex !== index)
+                      )
+                    )
+                  }
+                  type="button"
+                >
+                  Verwijder document
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-[#fbfdf9] p-4 text-sm text-slate-500">
+              Nog geen documenten toegevoegd.
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  function renderProductsManager(field: FieldConfig) {
+    const items = parseProducts(content[field.key]);
+
+    function updateItem(
+      index: number,
+      itemField: keyof SitePageProduct,
+      value: string
+    ) {
+      const nextItems = [...items];
+      nextItems[index] = { ...nextItems[index], [itemField]: value };
+      updateField(field.key, stringifyProducts(nextItems));
+    }
+
+    return (
+      <section
+        className="rounded-3xl bg-white p-5 ring-1 ring-slate-200 md:col-span-2"
+        key={field.key}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h5 className="text-lg font-black text-slate-950">{field.label}</h5>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Producten die in de shop verschijnen. Vul naam, prijs, opties en
+              de knoptekst in.
+            </p>
+          </div>
+          <button
+            className="rounded-full bg-[#103001] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={() =>
+              updateField(
+                field.key,
+                stringifyProducts([
+                  ...items,
+                  { name: "", price: "", sizes: "", action: "Aanvragen" },
+                ])
+              )
+            }
+            type="button"
+          >
+            Product toevoegen
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4">
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <div
+                className="grid gap-4 rounded-3xl bg-[#fbfdf9] p-4 ring-1 ring-slate-200 md:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr_1fr_0.8fr_auto]"
+                key={`${field.key}-product-${index}`}
+              >
+                {([
+                  ["name", "Productnaam"],
+                  ["price", "Prijs"],
+                  ["sizes", "Maten, opties of opmerkingen"],
+                  ["action", "Tekst op knop"],
+                ] as Array<[keyof SitePageProduct, string]>).map(
+                  ([itemField, label]) => (
+                    <label
+                      className="grid gap-2 text-sm font-semibold text-slate-700"
+                      key={itemField}
+                    >
+                      {label}
+                      <input
+                        className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                        onChange={(event) =>
+                          updateItem(index, itemField, event.target.value)
+                        }
+                        onKeyDown={stopTextKeyPropagation}
+                        value={item[itemField]}
+                      />
+                    </label>
+                  )
+                )}
+                <button
+                  className="self-end rounded-full border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  onClick={() =>
+                    updateField(
+                      field.key,
+                      stringifyProducts(
+                        items.filter((_, itemIndex) => itemIndex !== index)
+                      )
+                    )
+                  }
+                  type="button"
+                >
+                  Verwijder product
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-[#fbfdf9] p-4 text-sm text-slate-500">
+              Nog geen producten toegevoegd.
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  function renderLinksManager(field: FieldConfig) {
+    const items = parseLinks(content[field.key]);
+
+    function updateItem(
+      index: number,
+      itemField: keyof SitePageLinkItem,
+      value: string
+    ) {
+      const nextItems = [...items];
+      nextItems[index] = { ...nextItems[index], [itemField]: value };
+      updateField(field.key, stringifyLinks(nextItems));
+    }
+
+    return (
+      <section
+        className="rounded-3xl bg-white p-5 ring-1 ring-slate-200 md:col-span-2"
+        key={field.key}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h5 className="text-lg font-black text-slate-950">{field.label}</h5>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Links worden per categorie gegroepeerd. Gebruik bijvoorbeeld
+              &quot;Formulieren&quot;, &quot;Scouts algemeen&quot; of &quot;Sociale media&quot;.
+            </p>
+          </div>
+          <button
+            className="rounded-full bg-[#103001] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={() =>
+              updateField(
+                field.key,
+                stringifyLinks([
+                  ...items,
+                  { category: "", label: "", href: "", description: "" },
+                ])
+              )
+            }
+            type="button"
+          >
+            Link toevoegen
+          </button>
+        </div>
+        <div className="mt-5 grid gap-4">
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <div
+                className="grid gap-4 rounded-3xl bg-[#fbfdf9] p-4 ring-1 ring-slate-200 md:grid-cols-2"
+                key={`${field.key}-link-${index}`}
+              >
+                {([
+                  ["category", "Categorie"],
+                  ["label", "Naam van de link"],
+                  ["href", "Webadres"],
+                ] as Array<[keyof SitePageLinkItem, string]>).map(
+                  ([itemField, label]) => (
+                    <label
+                      className="grid gap-2 text-sm font-semibold text-slate-700"
+                      key={itemField}
+                    >
+                      {label}
+                      <input
+                        className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                        onChange={(event) =>
+                          updateItem(index, itemField, event.target.value)
+                        }
+                        onKeyDown={stopTextKeyPropagation}
+                        value={item[itemField]}
+                      />
+                    </label>
+                  )
+                )}
+                <label className="grid gap-2 text-sm font-semibold text-slate-700 md:col-span-2">
+                  Korte uitleg bij de link
+                  <textarea
+                    className="min-h-24 rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal leading-7 outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                    onChange={(event) =>
+                      updateItem(index, "description", event.target.value)
+                    }
+                    onKeyDown={stopTextKeyPropagation}
+                    value={item.description}
+                  />
+                </label>
+                <button
+                  className="w-fit rounded-full border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  onClick={() =>
+                    updateField(
+                      field.key,
+                      stringifyLinks(
+                        items.filter((_, itemIndex) => itemIndex !== index)
+                      )
+                    )
+                  }
+                  type="button"
+                >
+                  Verwijder link
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-[#fbfdf9] p-4 text-sm text-slate-500">
+              Nog geen links toegevoegd.
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  function renderLinesManager(field: FieldConfig) {
+    const items = parseLines(content[field.key]);
+
+    return (
+      <section
+        className="rounded-3xl bg-white p-5 ring-1 ring-slate-200 md:col-span-2"
+        key={field.key}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h5 className="text-lg font-black text-slate-950">{field.label}</h5>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Voeg regels toe die op de pagina onder elkaar verschijnen,
+              bijvoorbeeld namen van leden van het oudercomite.
+            </p>
+          </div>
+          <button
+            className="rounded-full bg-[#103001] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+            onClick={() =>
+              updateField(field.key, stringifyLines([...items, "Nieuwe regel"]))
+            }
+            type="button"
+          >
+            Regel toevoegen
+          </button>
+        </div>
+        <div className="mt-5 grid gap-3">
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <div
+                className="grid gap-3 rounded-3xl bg-[#fbfdf9] p-4 ring-1 ring-slate-200 md:grid-cols-[1fr_auto]"
+                key={`${field.key}-line-${index}`}
+              >
+                <input
+                  className="min-h-12 rounded-2xl border border-slate-200 px-4 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                  onChange={(event) => {
+                    const nextItems = [...items];
+                    nextItems[index] = event.target.value;
+                    updateField(field.key, stringifyLines(nextItems));
+                  }}
+                  onKeyDown={stopTextKeyPropagation}
+                  value={item}
+                />
+                <button
+                  className="rounded-full border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  onClick={() =>
+                    updateField(
+                      field.key,
+                      stringifyLines(
+                        items.filter((_, itemIndex) => itemIndex !== index)
+                      )
+                    )
+                  }
+                  type="button"
+                >
+                  Verwijder
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-[#fbfdf9] p-4 text-sm text-slate-500">
+              Nog geen regels toegevoegd.
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  function renderPageField(field: FieldConfig) {
+    const key = String(field.key);
+
+    if (key.endsWith("Cards")) {
+      return renderCardsManager(field);
+    }
+
+    if (key.endsWith("Facts")) {
+      return renderFactsManager(field);
+    }
+
+    if (key.endsWith("Documents")) {
+      return renderDocumentsManager(field);
+    }
+
+    if (key.endsWith("Products")) {
+      return renderProductsManager(field);
+    }
+
+    if (key.endsWith("Items")) {
+      return renderLinksManager(field);
+    }
+
+    if (key.endsWith("Members")) {
+      return renderLinesManager(field);
+    }
+
+    return renderField(field);
   }
 
   function parseContactPhoneEntries(value: string) {
@@ -1370,7 +2448,7 @@ export default function AdminDashboard() {
               })}
               {renderField({
                 key: activeBranch.contentKeys.highlights,
-                label: "Highlights, 1 per lijn",
+                label: "Highlights, elk punt op een nieuwe regel",
                 kind: "textarea",
               })}
               {renderField({
@@ -1426,7 +2504,7 @@ export default function AdminDashboard() {
               })}
               {renderField({
                 key: activeBranch.contentKeys.planning.countText,
-                label: "Tekst bij ingevulde vergaderingen, gebruik {aantal}",
+                label: "Tekst bij aantal vergaderingen. Schrijf {aantal} waar het aantal moet verschijnen.",
                 kind: "textarea",
               })}
               {renderField({
@@ -1529,6 +2607,10 @@ export default function AdminDashboard() {
   }
 
   function renderGalleryManager(theme: GalleryTheme) {
+    if (!theme.coverKey || !theme.collageKey) {
+      return null;
+    }
+
     const images = parseImageListValue(content[theme.collageKey]);
 
     return (
@@ -1563,7 +2645,7 @@ export default function AdminDashboard() {
           {renderMediaCard(
             theme.coverKey,
             `Hoofdfoto ${theme.label}`,
-            "Deze foto staat op de homepagekaart.",
+            "Deze foto staat op de fotokaart en als eerste beeld van de collage.",
           )}
         </div>
 
@@ -1628,9 +2710,204 @@ export default function AdminDashboard() {
     );
   }
 
+  function renderCustomGalleryManager(theme: CustomGalleryTheme) {
+    return (
+      <article
+        className="rounded-3xl border border-slate-200 bg-white p-5"
+        key={theme.id}
+      >
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-2xl">
+            <h3 className="text-xl font-black text-slate-950">
+              Extra collage
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Deze collage krijgt een eigen fotopagina op{" "}
+              <span className="font-bold">/fotos/{theme.slug}</span>.
+            </p>
+          </div>
+          <button
+            className="inline-flex justify-center rounded-full bg-red-50 px-5 py-3 text-sm font-bold text-red-700 transition hover:bg-red-100"
+            onClick={() => removeCustomGalleryTheme(theme.id)}
+            type="button"
+          >
+            Collage verwijderen
+          </button>
+        </div>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200">
+            <div className="grid gap-4">
+              <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                Naam van de collage
+                <input
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                  onChange={(event) =>
+                    updateCustomGalleryTheme(
+                      theme.id,
+                      "label",
+                      event.target.value
+                    )
+                  }
+                  onKeyDown={stopTextKeyPropagation}
+                  value={theme.label}
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                Alt-tekst voor toegankelijkheid
+                <input
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-base font-normal outline-none transition focus:border-[#2f6b18] focus:ring-4 focus:ring-[#d7e8cf]"
+                  onChange={(event) =>
+                    updateCustomGalleryTheme(
+                      theme.id,
+                      "alt",
+                      event.target.value
+                    )
+                  }
+                  onKeyDown={stopTextKeyPropagation}
+                  value={theme.alt ?? ""}
+                />
+              </label>
+            </div>
+
+            <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              {theme.coverUrl ? (
+                <img
+                  alt={theme.alt ?? theme.label}
+                  className="h-40 w-full object-cover"
+                  src={theme.coverUrl}
+                />
+              ) : (
+                <div className="flex h-40 items-center justify-center bg-[#edf6e8] px-6 text-center text-sm font-semibold text-[#2f6b18]">
+                  Nog geen hoofdfoto. De eerste collagefoto wordt anders gebruikt.
+                </div>
+              )}
+              <div className="grid gap-2 p-3 sm:grid-cols-2">
+                <label className="cursor-pointer rounded-full bg-[#103001] px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-[#1e4b0d]">
+                  {uploadingKey === `custom-cover-${theme.id}`
+                    ? "Uploaden..."
+                    : "Hoofdfoto uploaden"}
+                  <input
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                    className="sr-only"
+                    disabled={uploadingKey === `custom-cover-${theme.id}`}
+                    onChange={(event) => uploadCustomGalleryCover(theme, event)}
+                    type="file"
+                  />
+                </label>
+                <button
+                  className="rounded-full bg-red-50 px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-100 disabled:opacity-40"
+                  disabled={!theme.coverUrl}
+                  onClick={() => {
+                    const items = parseCustomGalleryThemes(content.galleryCustomThemes);
+                    updateCustomGalleryThemes(
+                      items.map((item) =>
+                        item.id === theme.id ? { ...item, coverUrl: "" } : item
+                      )
+                    );
+                    setMessage("Hoofdfoto verwijderd. Klik op opslaan.");
+                  }}
+                  type="button"
+                >
+                  Hoofdfoto wissen
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h4 className="text-lg font-black text-slate-950">
+                  Foto&apos;s in deze collage
+                </h4>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  Voeg meerdere foto&apos;s toe, zet ze in volgorde of verwijder
+                  wat niet meer nodig is.
+                </p>
+              </div>
+              <label className="inline-flex shrink-0 cursor-pointer justify-center rounded-full bg-[#103001] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#1e4b0d]">
+                {uploadingKey === `custom-images-${theme.id}`
+                  ? "Uploaden..."
+                  : "Foto's toevoegen"}
+                <input
+                  accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                  className="sr-only"
+                  disabled={uploadingKey === `custom-images-${theme.id}`}
+                  multiple
+                  onChange={(event) => uploadCustomGalleryImages(theme, event)}
+                  type="file"
+                />
+              </label>
+            </div>
+
+            <div className="mt-5">
+              {theme.images.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {theme.images.map((image, index) => (
+                    <div
+                      className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+                      key={`${image}-${index}`}
+                    >
+                      <img
+                        alt={`${theme.label} collagefoto ${index + 1}`}
+                        className="h-36 w-full object-cover"
+                        src={image}
+                      />
+                      <div className="grid grid-cols-2 gap-2 p-3">
+                        <button
+                          className="rounded-full bg-[#edf6e8] px-3 py-2 text-xs font-bold text-[#103001] disabled:opacity-40"
+                          disabled={index === 0}
+                          onClick={() => moveCustomGalleryImage(theme, index, -1)}
+                          type="button"
+                        >
+                          Omhoog
+                        </button>
+                        <button
+                          className="rounded-full bg-[#edf6e8] px-3 py-2 text-xs font-bold text-[#103001] disabled:opacity-40"
+                          disabled={index === theme.images.length - 1}
+                          onClick={() => moveCustomGalleryImage(theme, index, 1)}
+                          type="button"
+                        >
+                          Omlaag
+                        </button>
+                        <label className="cursor-pointer rounded-full bg-white px-3 py-2 text-center text-xs font-bold text-[#103001] ring-1 ring-slate-200 transition hover:bg-[#edf6e8]">
+                          Vervang
+                          <input
+                            accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                            className="sr-only"
+                            onChange={(event) =>
+                              replaceCustomGalleryImage(theme, index, event)
+                            }
+                            type="file"
+                          />
+                        </label>
+                        <button
+                          className="rounded-full bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100"
+                          onClick={() => removeCustomGalleryImage(theme, index)}
+                          type="button"
+                        >
+                          Verwijder
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-sm leading-6 text-slate-500">
+                  Nog geen foto&apos;s in deze collage.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
   function renderMediaLibrary() {
-    const usedKeys = getUsedMediaKeys();
-    const unusedCount = mediaLibrary.filter((item) => !usedKeys.has(item.key)).length;
+    const usageMap = getMediaUsageMap();
+    const unusedCount = mediaLibrary.filter((item) => !usageMap.has(item.key)).length;
 
     return (
       <article className="rounded-3xl border border-slate-200 bg-white p-5">
@@ -1672,7 +2949,8 @@ export default function AdminDashboard() {
           ) : mediaLibrary.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {mediaLibrary.map((item) => {
-                const isUsed = usedKeys.has(item.key);
+                const usageLabels = usageMap.get(item.key) ?? [];
+                const isUsed = usageLabels.length > 0;
                 const sizeInKb = Math.max(1, Math.round(item.size / 1024));
 
                 return (
@@ -1703,6 +2981,23 @@ export default function AdminDashboard() {
                       <p className="break-all text-xs leading-5 text-slate-500">
                         {item.key}
                       </p>
+                      {isUsed ? (
+                        <div className="rounded-2xl bg-white p-3 ring-1 ring-slate-200">
+                          <p className="text-xs font-black uppercase tracking-[0.12em] text-[#2f6b18]">
+                            Gebruikt bij
+                          </p>
+                          <ul className="mt-2 grid gap-1 text-xs leading-5 text-slate-600">
+                            {usageLabels.slice(0, 5).map((label) => (
+                              <li key={label}>{label}</li>
+                            ))}
+                          </ul>
+                          {usageLabels.length > 5 ? (
+                            <p className="mt-2 text-xs font-semibold text-slate-500">
+                              +{usageLabels.length - 5} extra plaats(en)
+                            </p>
+                          ) : null}
+                        </div>
+                      ) : null}
                       <button
                         className="rounded-full bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                         disabled={isUsed}
@@ -1900,6 +3195,23 @@ export default function AdminDashboard() {
                   {activeSectionInfo.description}
                 </p>
               </div>
+              {contentStatus?.source === "defaults" ? (
+                <div className="mb-7 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-900">
+                  <h3 className="text-lg font-black">
+                    Databank niet bereikbaar
+                  </h3>
+                  <p className="mt-2 text-sm leading-6">
+                    De beheeromgeving toont nu standaardinhoud omdat de
+                    databank niet gelezen kon worden. Controleer dit voor je
+                    verder bewerkt.
+                  </p>
+                  {contentStatus.error ? (
+                    <p className="mt-3 rounded-2xl bg-white/70 p-3 text-xs leading-5">
+                      {contentStatus.error}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
               {activeSectionId === "branding" ? (
                 <div className="grid gap-6">
                   <article className="rounded-3xl border border-slate-200 p-5">
@@ -1919,7 +3231,7 @@ export default function AdminDashboard() {
                     {renderMediaCard(
                       "siteLogoUrl",
                       "Hoofdlogo website",
-                      "Wordt gebruikt in de navigatie en footer.",
+                      "Wordt gebruikt in de navigatie en footer. Een breed logo zoals op de oude site mag hier ook.",
                       true
                     )}
                   </article>
@@ -1928,54 +3240,92 @@ export default function AdminDashboard() {
 
               {activeSectionId === "homepage" ? (
                 <div className="grid gap-6">
-                  {homepageGroups.map((group) => (
-                    <article
-                      className="rounded-3xl border border-slate-200 p-5"
-                      key={group.title}
-                    >
-                      <div className="mb-6">
-                        <h2 className="text-2xl font-black">{group.title}</h2>
-                        <p className="mt-2 text-slate-600">
-                          {group.description}
-                        </p>
-                      </div>
-                      <div className="grid gap-5 md:grid-cols-2">
-                        {group.fields.map(renderField)}
-                      </div>
-                    </article>
-                  ))}
-                  {renderFaqManager()}
                   <article className="rounded-3xl border border-slate-200 p-5">
                     <div className="mb-5">
                       <h2 className="text-2xl font-black">
-                        Homepagina onderdelen
+                        Homepage onderdelen
                       </h2>
                       <p className="mt-2 text-slate-600">
-                        Deze blokken staan op de homepagina, maar hun inhoud
-                        wordt op logischere plekken beheerd.
+                        Kies eerst welk deel van de homepage je wil aanpassen.
+                        Zo hoef je niet door alle teksten te scrollen.
+                      </p>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                      {homepageEditorItems.map((item) => (
+                        <button
+                          className={`rounded-3xl border p-5 text-left transition ${
+                            activeHomepageItem.id === item.id
+                              ? "border-[#d7e8cf] bg-[#edf6e8] shadow-lg shadow-green-950/8"
+                              : "border-slate-200 bg-[#fbfdf9] hover:bg-[#f2f8ee]"
+                          }`}
+                          key={item.id}
+                          onClick={() => setActiveHomepageItemId(item.id)}
+                          type="button"
+                        >
+                          <span className="block text-lg font-black text-slate-950">
+                            {item.title}
+                          </span>
+                          <span className="mt-2 block text-sm leading-6 text-slate-600">
+                            {item.description}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 rounded-3xl bg-white p-5 ring-1 ring-slate-200">
+                      <div className="mb-5">
+                        <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                          Gekozen homepageblok
+                        </p>
+                        <h3 className="mt-2 text-2xl font-black text-slate-950">
+                          {activeHomepageItem.title}
+                        </h3>
+                        <p className="mt-2 text-slate-600">
+                          {activeHomepageItem.description}
+                        </p>
+                      </div>
+                      {activeHomepageItem.type === "fields" &&
+                      activeHomepageItem.group ? (
+                        <div className="grid gap-5 md:grid-cols-2">
+                          {activeHomepageItem.group.fields.map(renderField)}
+                        </div>
+                      ) : (
+                        <div>{renderFaqManager()}</div>
+                      )}
+                    </div>
+                  </article>
+                  <article className="rounded-3xl border border-slate-200 p-5">
+                    <div className="mb-5">
+                      <h2 className="text-2xl font-black">
+                        Waar beheer ik de rest?
+                      </h2>
+                      <p className="mt-2 text-slate-600">
+                        Sommige homepageblokken gebruiken inhoud uit een andere
+                        categorie, zodat je die maar op een plek hoeft aan te
+                        passen.
                       </p>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                       {[
                         [
-                          "Intro",
-                          "De algemene intro onder de hero staat vast in de sitecode.",
-                          "Bekijk homepage",
-                        ],
-                        [
                           "Takken-preview",
-                          "Logo's, leeftijden en takpagina's beheer je onder Pagina's.",
-                          "Naar Pagina's",
+                          "Logo's, leeftijden en takteksten beheer je onder Takken.",
+                          "Naar Takken",
                         ],
                         [
                           "Activiteiten-preview",
-                          "Intro's voor activiteiten en steunacties beheer je onder Pagina's.",
+                          "De aparte activiteiten- en actiepagina's beheer je onder Pagina's.",
                           "Naar Pagina's",
                         ],
                         [
-                          "Sfeerbeelden",
+                          "Fotopagina",
                           "Hoofdfoto's en collages beheer je onder Media.",
                           "Naar Media",
+                        ],
+                        [
+                          "Contactblok",
+                          "E-mail, telefoonnummers en sociale links beheer je onder Contact.",
+                          "Naar Contact",
                         ],
                       ].map(([title, text, action]) => (
                         <div
@@ -2051,36 +3401,48 @@ export default function AdminDashboard() {
                       <h3 className="text-xl font-black">
                         {activeBranch.name}
                       </h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        Dit zijn de teksten die bovenaan en in de korte
+                        takkaarten verschijnen.
+                      </p>
                       <div className="mt-5 grid gap-5 md:grid-cols-2">
                         {renderField({
                           key: activeBranch.contentKeys.age,
-                          label: "Leeftijd",
+                          label: "Leeftijd op kaartjes en takpagina",
                         })}
                         {renderField({
                           key: activeBranch.contentKeys.shortDescription,
-                          label: "Korte tekst op homepage",
+                          label: "Korte uitleg op takkenoverzicht",
                           kind: "textarea",
+                          help: "Deze tekst staat in de grotere takkaart op /takken.",
                         })}
                         {renderField({
                           key: activeBranch.contentKeys.intro,
-                          label: "Intro op detailpagina",
+                          label: "Intro bovenaan de takpagina",
                           kind: "textarea",
+                          help: "De eerste uitleg die ouders lezen op de aparte takpagina.",
                         })}
                         {renderField({
                           key: activeBranch.contentKeys.highlights,
-                          label: "Highlights, 1 per lijn",
+                          label: "Korte tags op de takpagina",
                           kind: "textarea",
+                          help: "Zet elke tag op een aparte regel, bijvoorbeeld: fantasie, spel, vrienden.",
                         })}
                         {renderField({
                           key: activeBranch.contentKeys.leaderNames,
-                          label: "Namen leiding, 1 per lijn",
+                          label: "Leidingnamen",
                           kind: "textarea",
+                          help: "Zet elke leider op een aparte regel. Functie of telefoonnummer mag erbij.",
                         })}
                       </div>
                     </article>
 
                     <article className="rounded-3xl border border-slate-200 p-5">
-                      <h3 className="text-xl font-black">Detailblokken</h3>
+                      <h3 className="text-xl font-black">Vier tekstblokken op de takpagina</h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        Deze blokken staan onder de hero en geven ouders snel
+                        praktische uitleg over de tak.
+                      </p>
                       <div className="mt-5 grid gap-5">
                         {activeBranch.contentKeys.blocks.map((block, index) => (
                           <div
@@ -2089,11 +3451,11 @@ export default function AdminDashboard() {
                           >
                             {renderField({
                               key: block.title,
-                              label: `Blok ${index + 1} titel`,
+                              label: `Tekstblok ${index + 1}: titel`,
                             })}
                             {renderField({
                               key: block.text,
-                              label: `Blok ${index + 1} tekst`,
+                              label: `Tekstblok ${index + 1}: uitleg`,
                               kind: "textarea",
                             })}
                           </div>
@@ -2136,9 +3498,9 @@ export default function AdminDashboard() {
                     <h2 className="text-3xl font-black">Media bewerken</h2>
                     <p className="mt-2 text-slate-600">
                       Upload foto&apos;s voor de homepage en beheer per
-                      sfeerbeeld meerdere collagefoto&apos;s. Bestanden worden
-                      via de media-endpoint opgeslagen; de gebruikte URL-lijsten
-                      staan in de site-content.
+                      sfeerbeeld meerdere collagefoto&apos;s. In de
+                      mediabibliotheek zie je ook waar elke upload gebruikt
+                      wordt.
                     </p>
                   </div>
                   <div className="grid gap-5 md:grid-cols-2">
@@ -2153,6 +3515,37 @@ export default function AdminDashboard() {
                   <div className="mt-8 grid gap-5">
                     {galleryThemes.map(renderGalleryManager)}
                   </div>
+                  <article className="mt-8 rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <h3 className="text-2xl font-black text-slate-950">
+                          Extra collages
+                        </h3>
+                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                          Voeg nieuwe fotothema&apos;s toe naast de vaste
+                          collages. Elke extra collage krijgt automatisch een
+                          eigen pagina onder /fotos.
+                        </p>
+                      </div>
+                      <button
+                        className="inline-flex justify-center rounded-full bg-[#103001] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#1e4b0d]"
+                        onClick={addCustomGalleryTheme}
+                        type="button"
+                      >
+                        Nieuwe collage toevoegen
+                      </button>
+                    </div>
+                    <div className="mt-6 grid gap-5">
+                      {customGalleryThemes.length > 0 ? (
+                        customGalleryThemes.map(renderCustomGalleryManager)
+                      ) : (
+                        <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-6 text-sm leading-6 text-slate-500">
+                          Er zijn nog geen extra collages. De vaste thema&apos;s
+                          hierboven blijven gewoon actief.
+                        </div>
+                      )}
+                    </div>
+                  </article>
                   <div className="mt-8">{renderMediaLibrary()}</div>
                 </div>
               ) : null}
@@ -2224,6 +3617,18 @@ export default function AdminDashboard() {
                             `Hoofdbeeld ${activePageItem.title}`,
                             "Afbeelding rechts in de hero van deze pagina."
                           )}
+                          <div className="rounded-3xl bg-[#edf6e8] p-5 text-sm leading-6 text-[#103001] ring-1 ring-[#d7e8cf]">
+                            <p className="font-black">
+                              Zo werkt deze pagina
+                            </p>
+                            <p className="mt-2">
+                              Elk blok hieronder komt overeen met een zichtbaar
+                              stuk op de pagina: bovenkant, tekstblokken,
+                              infokaarten, knoppen of externe linkbalk. Bij
+                              herhaalbare onderdelen kan je zelf blokken
+                              toevoegen of verwijderen.
+                            </p>
+                          </div>
                           {activePageItem.adminGroups.map((group) => (
                             <section
                               className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
@@ -2238,7 +3643,7 @@ export default function AdminDashboard() {
                                 </p>
                               </div>
                               <div className="grid gap-5 md:grid-cols-2">
-                                {group.fields.map(renderField)}
+                                {group.fields.map(renderPageField)}
                               </div>
                             </section>
                           ))}
@@ -2287,7 +3692,7 @@ export default function AdminDashboard() {
                             ["Takken", "/#takken"],
                             ["Activiteiten", "/#activiteiten"],
                             ["Kamp", "/#kamp"],
-                            ["Foto's", "/#fotos"],
+                            ["Foto's", "/fotos"],
                             ["Contact", "/#contact"],
                           ].map(([label, href]) => (
                             <div

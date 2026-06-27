@@ -6,7 +6,6 @@ import FAQ from "./components/FAQ";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
-import PhotoGallery from "./components/PhotoGallery";
 import PracticalInfo from "./components/PracticalInfo";
 import SiteEditor from "./components/SiteEditor";
 import WhyJoin from "./components/WhyJoin";
@@ -32,7 +31,6 @@ export default async function Home() {
       <WhyJoin content={siteContent} />
       <PracticalInfo content={siteContent} />
       <CampInfo content={siteContent} />
-      <PhotoGallery content={siteContent} />
       <FAQ content={siteContent} />
       <ContactSection content={siteContent} />
       <Footer content={siteContent} />

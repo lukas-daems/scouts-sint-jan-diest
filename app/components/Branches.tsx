@@ -26,7 +26,7 @@ export default function Branches({ content }: BranchesProps) {
 
             return (
               <article
-                className="lift-card relative overflow-hidden rounded-[1.7rem] border border-slate-200 bg-white p-5 text-center shadow-lg shadow-green-950/6"
+                className="forest-glass-light lift-card relative overflow-hidden rounded-[1.7rem] p-5 text-center shadow-lg shadow-green-950/6"
                 key={branch.name}
               >
                 <div className="flex justify-center">
@@ -40,12 +40,12 @@ export default function Branches({ content }: BranchesProps) {
                   {branch.name}
                 </h3>
                 <div className="mt-3 flex justify-center">
-                  <span className="rounded-full bg-[#edf6e8] px-3.5 py-1.5 text-xs font-black text-[#103001] ring-1 ring-[#d7e8cf]">
+                  <span className="forest-glass-light rounded-full px-3.5 py-1.5 text-xs font-black text-[#103001]">
                     {branch.age}
                   </span>
                 </div>
                 <Link
-                  className="mt-5 inline-flex items-center rounded-full bg-[#f2f8ee] px-4 py-2 text-sm font-black text-[#2f6b18] transition hover:bg-[#edf6e8] hover:text-[#103001]"
+                  className="forest-glass-light mt-5 inline-flex items-center rounded-full px-4 py-2 text-sm font-black text-[#2f6b18] transition hover:-translate-y-0.5 hover:text-[#103001]"
                   href={`/takken/${branch.slug}`}
                 >
                   Meer over deze tak

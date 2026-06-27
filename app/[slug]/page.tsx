@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Footer from "../components/Footer";
-import IconBadge from "../components/IconBadge";
+import IconBadge, { type IconName } from "../components/IconBadge";
 import Navbar from "../components/Navbar";
 import SiteEditor from "../components/SiteEditor";
 import {
@@ -23,6 +23,26 @@ export function generateStaticParams() {
 type InfoPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+const pageKindVisuals: Record<
+  EditableSitePage["kind"],
+  { icon: IconName; label: string }
+> = {
+  overview: { icon: "calendar", label: "Overzicht" },
+  camp: { icon: "tent", label: "Kamp" },
+  event: { icon: "route", label: "Evenement" },
+  order: { icon: "heart", label: "Verkoopactie" },
+  reservation: { icon: "campfire", label: "Eetmoment" },
+  shop: { icon: "flag", label: "Shop" },
+  committee: { icon: "users", label: "Ouders" },
+  rental: { icon: "home", label: "Verhuur" },
+  links: { icon: "map", label: "Links" },
+  single: { icon: "spark", label: "Informatie" },
+};
+
+function getPageKindVisual(page: EditableSitePage) {
+  return pageKindVisuals[page.kind] ?? pageKindVisuals.overview;
+}
 
 function CardsGrid({ page }: { page: EditableSitePage }) {
   if (page.cards.length === 0) {
@@ -112,6 +132,7 @@ function PageOverview({
   siteName: string;
 }) {
   const hasSupport = Boolean(page.highlight) || page.facts.length > 0;
+  const visual = getPageKindVisual(page);
 
   return (
     <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:p-10">
@@ -121,7 +142,7 @@ function PageOverview({
         }`}
       >
         <div>
-          <IconBadge icon={page.kind === "camp" ? "tent" : "check"} tone="green" />
+          <IconBadge icon={visual.icon} tone="green" />
           <p className="mt-6 text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
             {siteName}
           </p>
@@ -201,6 +222,67 @@ function DocumentsBlock({ page }: { page: EditableSitePage }) {
         </div>
       ) : null}
     </section>
+  );
+}
+
+function CampStoryBlocks({ content }: { content: EditableSiteContent }) {
+  const blocks = [
+    { title: "Wat is kamp?", text: content.campWhat },
+    { title: "Voor ouders", text: content.campForParents },
+    { title: "Voor nieuwe leden", text: content.campForNewMembers },
+  ].filter((block) => block.text.trim());
+
+  if (blocks.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-green-950/8">
+      <div className="grid gap-0 lg:grid-cols-[0.78fr_1.22fr]">
+        <div className="bg-[#103001] p-6 text-white sm:p-8 lg:p-9">
+          <IconBadge icon="tent" tone="light" />
+          <p className="mt-6 text-sm font-black uppercase tracking-[0.18em] text-green-100">
+            Kampverhaal
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight">
+            Wat ouders en leden mogen verwachten
+          </h2>
+          <p className="mt-4 leading-7 text-green-50">
+            {content.campHomepageNote}
+          </p>
+        </div>
+        <div className="grid gap-4 p-5 sm:p-6 lg:grid-cols-3 lg:p-7">
+          {blocks.map((block) => (
+            <article
+              className="rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5"
+              key={block.title}
+            >
+              <h3 className="text-lg font-black text-slate-950">
+                {block.title}
+              </h3>
+              <p className="mt-3 whitespace-pre-line leading-7 text-slate-600">
+                {block.text}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CampPageContent({
+  page,
+  content,
+}: {
+  page: EditableSitePage;
+  content: EditableSiteContent;
+}) {
+  return (
+    <div className="grid gap-8">
+      <CampStoryBlocks content={content} />
+      <DocumentsBlock page={page} />
+    </div>
   );
 }
 
@@ -421,6 +503,74 @@ function ActionFeatureBlocks({ page }: { page: EditableSitePage }) {
       </section>
 
       <CardsGrid page={page} />
+    </div>
+  );
+}
+
+function SteakBurgerdayContent({ page }: { page: EditableSitePage }) {
+  const hasLink = Boolean(page.externalCta?.href);
+
+  return (
+    <div className="grid gap-8">
+      <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-green-950/8">
+        <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="bg-[#103001] p-6 text-white sm:p-8 lg:p-10">
+            <IconBadge icon="heart" tone="light" />
+            <p className="mt-6 text-sm font-black uppercase tracking-[0.18em] text-green-100">
+              {page.highlight?.label || "Steunactie"}
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              {page.highlight?.title || page.title}
+            </h2>
+          </div>
+          <div className="p-6 sm:p-8 lg:p-10">
+            <p className="max-w-3xl whitespace-pre-line text-lg leading-8 text-slate-700">
+              {page.highlight?.text || page.intro}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {page.externalCta ? (
+        <section
+          className="rounded-[2rem] border border-[#d7e8cf] bg-[#edf6e8] p-6 shadow-xl shadow-green-950/8 sm:p-8"
+          id="aanvragen"
+        >
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex gap-4">
+              <div className="shrink-0">
+                <IconBadge icon="calendar" tone="green" />
+              </div>
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                  Reservatie
+                </p>
+                <h2 className="mt-2 text-3xl font-black text-slate-950">
+                  {page.externalCta.title}
+                </h2>
+                <p className="mt-3 max-w-2xl whitespace-pre-line leading-7 text-slate-700">
+                  {page.externalCta.text}
+                </p>
+              </div>
+            </div>
+
+            {hasLink ? (
+              <Link
+                className="inline-flex shrink-0 justify-center rounded-full bg-[#103001] px-7 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/15 transition hover:-translate-y-0.5 hover:bg-[#1e4b0d]"
+                href={page.externalCta.href}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {page.externalCta.button}
+              </Link>
+            ) : (
+              <span className="inline-flex shrink-0 justify-center rounded-full bg-white px-7 py-4 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
+                Link volgt binnenkort
+              </span>
+            )}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
@@ -672,6 +822,8 @@ export default async function InfoPage({ params }: InfoPageProps) {
 
   const siteContent = await getSiteContent();
   const page = getEditableSitePage(basePage, siteContent);
+  const visual = getPageKindVisual(page);
+  const heroFacts = page.facts.slice(0, 2);
 
   return (
     <main className="min-h-screen bg-[#f7fbff] text-slate-950">
@@ -685,7 +837,7 @@ export default async function InfoPage({ params }: InfoPageProps) {
         <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="section-fade">
-            <p className="mb-5 inline-flex rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 backdrop-blur">
+            <p className="forest-glass-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50">
               {page.eyebrow}
             </p>
             <h1 className="max-w-4xl text-5xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
@@ -705,7 +857,7 @@ export default async function InfoPage({ params }: InfoPageProps) {
               ) : null}
               {page.secondaryCta ? (
                 <Link
-                  className="inline-flex justify-center rounded-full border border-white/45 bg-white/10 px-7 py-4 text-sm font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20"
+                  className="forest-glass-pill inline-flex justify-center rounded-full px-7 py-4 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/20"
                   href={page.secondaryCta.href}
                 >
                   {page.secondaryCta.label}
@@ -714,7 +866,7 @@ export default async function InfoPage({ params }: InfoPageProps) {
             </div>
           </div>
 
-          <div className="hero-visual-card p-2 sm:p-3">
+          <div className="hero-visual-card relative p-2 sm:p-3">
             <div
               aria-label={`${page.title} bij ${siteContent.siteName}`}
               className="camp-scene has-photo min-h-[340px]"
@@ -723,6 +875,38 @@ export default async function InfoPage({ params }: InfoPageProps) {
                 backgroundImage: `linear-gradient(180deg, rgba(16, 48, 1, 0.03), rgba(7, 26, 2, 0.66)), url("${page.imageUrl}")`,
               }}
             />
+            <div className="forest-glass-photo absolute inset-x-4 bottom-4 rounded-[1.5rem] p-4 text-white sm:inset-x-5 sm:bottom-5 sm:p-5">
+              <div className="grid gap-4 md:grid-cols-[1fr_minmax(220px,0.58fr)] md:items-center">
+                <div className="flex items-center gap-3">
+                  <IconBadge icon={visual.icon} tone="light" />
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-green-100">
+                      {visual.label}
+                    </p>
+                    <h2 className="mt-1 text-xl font-black">
+                      {page.navLabel}
+                    </h2>
+                  </div>
+                </div>
+                {heroFacts.length > 0 ? (
+                  <div className="grid gap-2">
+                    {heroFacts.map((fact) => (
+                      <div
+                        className="rounded-2xl bg-white/10 px-3 py-2 ring-1 ring-white/15"
+                        key={`${fact.label}-${fact.value}`}
+                      >
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-green-100">
+                          {fact.label}
+                        </p>
+                        <p className="mt-0.5 text-sm font-bold leading-5 text-white">
+                          {fact.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -733,6 +917,10 @@ export default async function InfoPage({ params }: InfoPageProps) {
             <RentalPageContent page={page} content={siteContent} />
           ) : page.kind === "committee" ? (
             <CommitteePageContent page={page} content={siteContent} />
+          ) : page.kind === "camp" ? (
+            <CampPageContent page={page} content={siteContent} />
+          ) : page.slug === "steak-en-burgerday" ? (
+            <SteakBurgerdayContent page={page} />
           ) : (
             <>
               <PageOverview page={page} siteName={siteContent.siteName} />

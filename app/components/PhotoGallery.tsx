@@ -1,13 +1,15 @@
 import Link from "next/link";
 import SectionHeader from "./SectionHeader";
 import type { EditableSiteContent } from "../lib/site-content-defaults";
-import { galleryThemes, getGalleryCover } from "../lib/gallery";
+import { getAllGalleryThemes, getGalleryCover } from "../lib/gallery";
 
 type PhotoGalleryProps = {
   content: EditableSiteContent;
 };
 
 export default function PhotoGallery({ content }: PhotoGalleryProps) {
+  const themes = getAllGalleryThemes(content);
+
   return (
     <section className="bg-[#f7fbff] px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="fotos">
       <div className="mx-auto max-w-7xl">
@@ -17,7 +19,7 @@ export default function PhotoGallery({ content }: PhotoGalleryProps) {
         />
 
         <div className="mt-12 grid auto-rows-[230px] gap-5 md:grid-cols-6 lg:auto-rows-[255px]">
-          {galleryThemes.map((theme, index) => (
+          {themes.map((theme) => (
             <Link
               aria-label={`${theme.label} foto's bekijken`}
               className={`gallery-card has-photo group transition duration-200 hover:-translate-y-1 hover:shadow-2xl hover:shadow-green-950/15 ${theme.className}`}
@@ -28,7 +30,7 @@ export default function PhotoGallery({ content }: PhotoGalleryProps) {
               }}
             >
               <div className="absolute inset-0 bg-slate-950/0 transition group-hover:bg-slate-950/25" />
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+              <div className="forest-glass-photo absolute inset-x-4 bottom-4 rounded-[1.4rem] p-4 text-white sm:inset-x-5 sm:bottom-5 sm:p-5">
                 <p className="text-sm font-semibold uppercase text-green-50">
                   {content.siteName}
                 </p>
@@ -37,11 +39,6 @@ export default function PhotoGallery({ content }: PhotoGalleryProps) {
                   Bekijk collage
                 </p>
               </div>
-              {index === 0 ? (
-                <div className="absolute left-6 top-6 rounded-full bg-white/90 px-4 py-2 text-xs font-bold uppercase text-slate-950 shadow-lg backdrop-blur">
-                  Momenten die blijven
-                </div>
-              ) : null}
             </Link>
           ))}
         </div>

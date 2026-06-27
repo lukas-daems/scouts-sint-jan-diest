@@ -25,7 +25,7 @@ export default async function BranchesPage() {
         <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="section-fade">
-            <p className="mb-5 inline-flex rounded-full border border-white/25 bg-white/12 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 backdrop-blur">
+            <p className="forest-glass-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50">
               Takken van {siteContent.siteName}
             </p>
             <h1 className="text-5xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
@@ -42,7 +42,7 @@ export default async function BranchesPage() {
                 Vraag info aan
               </Link>
               <Link
-                className="inline-flex justify-center rounded-full border border-white/45 bg-white/10 px-7 py-4 text-sm font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20"
+                className="forest-glass-pill inline-flex justify-center rounded-full px-7 py-4 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/20"
                 href="/#takken"
               >
                 Terug naar homepage
@@ -84,7 +84,7 @@ export default async function BranchesPage() {
 
               return (
                 <Link
-                  className="lift-card group relative overflow-hidden rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/6 sm:p-7"
+                  className="forest-glass-light lift-card group relative overflow-hidden rounded-[1.8rem] p-6 shadow-xl shadow-green-950/6 sm:p-7"
                   href={`/takken/${branch.slug}`}
                   key={branch.slug}
                 >
@@ -99,7 +99,7 @@ export default async function BranchesPage() {
                         <h3 className="text-2xl font-black text-slate-950">
                           {branch.name}
                         </h3>
-                        <span className="rounded-full bg-[#edf6e8] px-3.5 py-1.5 text-xs font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
+                        <span className="forest-glass-light rounded-full px-3.5 py-1.5 text-xs font-bold text-[#103001]">
                           {branch.age}
                         </span>
                       </div>
@@ -109,7 +109,7 @@ export default async function BranchesPage() {
                       <div className="mt-5 flex flex-wrap gap-2">
                         {branch.highlights.slice(0, 3).map((highlight) => (
                           <span
-                            className="rounded-full bg-slate-50 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-slate-500 ring-1 ring-slate-200"
+                            className="forest-glass-light rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-slate-500"
                             key={highlight}
                           >
                             {highlight}

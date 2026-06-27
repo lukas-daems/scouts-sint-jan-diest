@@ -13,7 +13,6 @@ const homeSectionLinks = [
   { label: "Takken", href: "/#takken" },
   { label: "Activiteiten", href: "/#activiteiten" },
   { label: "Kamp", href: "/#kamp" },
-  { label: "Foto's", href: "/#fotos" },
   { label: "Contact", href: "/#contact" },
 ];
 
@@ -101,6 +100,7 @@ export default function Navbar({
   const pathname = usePathname();
   const activeSlug = pathname.replace(/^\//, "").split("/")[0];
   const logoSrc = !logoFailed ? logoUrl || "/assets/logo.png" : "";
+  const hasUploadedLogo = Boolean(logoUrl && !logoFailed);
   const navigationGroups = getNavigationGroups(content);
 
   function isActive(slugs: string[]) {
@@ -118,23 +118,36 @@ export default function Navbar({
         className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10"
       >
         <Link className="flex min-w-0 items-center gap-3.5 text-white" href="/#home">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/40">
-            {logoSrc ? (
+          {hasUploadedLogo ? (
+            <span className="flex h-14 max-w-[230px] shrink-0 items-center overflow-visible sm:h-16 sm:max-w-[280px] lg:h-[4.35rem] lg:max-w-[340px]">
               <img
                 alt={`Logo van ${siteName}`}
-                className="h-full w-full rounded-full object-cover"
+                className="site-logo-cutout h-full w-auto max-w-full object-contain drop-shadow-[0_12px_24px_rgba(7,26,2,0.28)]"
                 onError={() => setLogoFailed(true)}
-                src={logoSrc}
+                src={logoUrl}
               />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
-                SJ
+            </span>
+          ) : (
+            <>
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/40 lg:h-12 lg:w-12">
+                {logoSrc ? (
+                  <img
+                    alt={`Logo van ${siteName}`}
+                    className="h-full w-full rounded-full object-cover"
+                    onError={() => setLogoFailed(true)}
+                    src={logoSrc}
+                  />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
+                    SJ
+                  </span>
+                )}
               </span>
-            )}
-          </span>
-          <span className="truncate text-sm font-bold tracking-tight sm:text-base">
-            {siteName}
-          </span>
+              <span className="truncate text-sm font-bold tracking-tight sm:text-base">
+                {siteName}
+              </span>
+            </>
+          )}
         </Link>
 
         <div className="hidden items-center gap-1 lg:flex">
@@ -143,7 +156,7 @@ export default function Navbar({
               <Link
                 className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold transition hover:bg-white/10 hover:text-white xl:px-4 ${
                   isActive(group.slugs)
-                    ? "bg-white/12 text-white ring-1 ring-white/20"
+                    ? "bg-white/15 text-white ring-1 ring-white/25"
                     : "text-white/82"
                 }`}
                 href={group.href}
@@ -153,7 +166,7 @@ export default function Navbar({
               </Link>
 
               <div className="pointer-events-none absolute left-1/2 top-full w-72 -translate-x-1/2 translate-y-3 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
-                <div className="rounded-3xl border border-white/30 bg-white p-3 text-slate-950 shadow-2xl shadow-green-950/20">
+                <div className="forest-glass-menu rounded-3xl p-3 text-slate-950">
                   <Link
                     className="mb-2 block rounded-2xl bg-[#edf6e8] px-4 py-3 text-sm font-black text-[#103001] transition hover:bg-[#d7e8cf]"
                     href={group.href}
@@ -190,7 +203,7 @@ export default function Navbar({
         <button
           aria-expanded={isOpen}
           aria-label="Menu openen"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20 lg:hidden"
+          className="forest-glass-pill inline-flex h-11 w-11 items-center justify-center rounded-full text-white transition hover:bg-white/20 lg:hidden"
           onClick={() => setIsOpen((current) => !current)}
           type="button"
         >
@@ -213,7 +226,7 @@ export default function Navbar({
       </nav>
 
       <div
-        className={`mx-5 overflow-hidden rounded-3xl bg-white shadow-2xl shadow-green-950/20 transition-all duration-300 sm:mx-8 lg:hidden ${
+        className={`forest-glass-menu mx-5 overflow-hidden rounded-3xl transition-all duration-300 sm:mx-8 lg:hidden ${
           isOpen ? "max-h-[900px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
