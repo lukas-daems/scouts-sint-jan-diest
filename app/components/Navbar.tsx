@@ -99,8 +99,9 @@ export default function Navbar({
   const [logoFailed, setLogoFailed] = useState(false);
   const pathname = usePathname();
   const activeSlug = pathname.replace(/^\//, "").split("/")[0];
-  const logoSrc = !logoFailed ? logoUrl || "/assets/logo.png" : "";
-  const hasUploadedLogo = Boolean(logoUrl && !logoFailed);
+  const preferredLogo = content?.siteLogoDarkBackgroundUrl || logoUrl;
+  const logoSrc = !logoFailed ? preferredLogo || "/assets/logo.png" : "";
+  const hasUploadedLogo = Boolean(preferredLogo && !logoFailed);
   const navigationGroups = getNavigationGroups(content);
 
   function isActive(slugs: string[]) {
@@ -115,13 +116,13 @@ export default function Navbar({
     <header className="absolute inset-x-0 top-0 z-50">
       <nav
         aria-label="Hoofdnavigatie"
-        className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10"
+        className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-10"
       >
         <Link
-          className="flex min-w-0 items-center gap-3 text-white lg:max-w-[300px] xl:max-w-[380px]"
+          className="flex min-w-0 flex-1 items-center gap-3 text-white lg:max-w-[300px] lg:flex-none xl:max-w-[380px]"
           href="/#home"
         >
-          <span className="flex h-12 max-w-[86px] shrink-0 items-center overflow-visible sm:h-14 sm:max-w-[104px] lg:h-16 lg:max-w-[116px]">
+          <span className="flex h-11 max-w-[76px] shrink-0 items-center overflow-visible sm:h-14 sm:max-w-[104px] lg:h-16 lg:max-w-[116px]">
             {logoSrc ? (
               <img
                 alt={`Logo van ${siteName}`}
@@ -137,8 +138,8 @@ export default function Navbar({
               </span>
             )}
           </span>
-          <span className="hidden min-w-0 sm:block">
-            <span className="block truncate text-sm font-black tracking-tight text-white sm:text-base">
+          <span className="min-w-0">
+            <span className="block max-w-[155px] truncate text-xs font-black leading-tight tracking-tight text-white sm:max-w-[240px] sm:text-base lg:max-w-[260px]">
               {siteName}
             </span>
             <span className="hidden truncate text-xs font-semibold text-green-100/90 xl:block">
@@ -200,7 +201,7 @@ export default function Navbar({
         <button
           aria-expanded={isOpen}
           aria-label="Menu openen"
-          className="forest-glass-pill inline-flex h-11 w-11 items-center justify-center rounded-full text-white transition hover:bg-white/20 lg:hidden"
+          className="forest-glass-pill inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/20 lg:hidden"
           onClick={() => setIsOpen((current) => !current)}
           type="button"
         >
@@ -224,10 +225,10 @@ export default function Navbar({
 
       <div
         className={`forest-glass-menu mx-5 overflow-hidden rounded-3xl transition-all duration-300 sm:mx-8 lg:hidden ${
-          isOpen ? "max-h-[900px] opacity-100" : "max-h-0 opacity-0"
+          isOpen ? "max-h-[calc(100vh-6.5rem)] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="flex max-h-[calc(100vh-6rem)] flex-col gap-1 overflow-y-auto p-3">
+        <div className="flex max-h-[calc(100vh-6.5rem)] flex-col gap-1 overflow-y-auto p-3">
           {navigationGroups.map((group) => (
             <div className="rounded-2xl bg-[#fbfdf9] ring-1 ring-slate-200" key={group.id}>
               <button
