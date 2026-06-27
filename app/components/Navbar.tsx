@@ -117,37 +117,34 @@ export default function Navbar({
         aria-label="Hoofdnavigatie"
         className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10"
       >
-        <Link className="flex min-w-0 items-center gap-3.5 text-white" href="/#home">
-          {hasUploadedLogo ? (
-            <span className="flex h-14 max-w-[230px] shrink-0 items-center overflow-visible sm:h-16 sm:max-w-[280px] lg:h-[4.35rem] lg:max-w-[340px]">
+        <Link
+          className="flex min-w-0 items-center gap-3 text-white lg:max-w-[300px] xl:max-w-[380px]"
+          href="/#home"
+        >
+          <span className="flex h-12 max-w-[86px] shrink-0 items-center overflow-visible sm:h-14 sm:max-w-[104px] lg:h-16 lg:max-w-[116px]">
+            {logoSrc ? (
               <img
                 alt={`Logo van ${siteName}`}
-                className="site-logo-cutout h-full w-auto max-w-full object-contain drop-shadow-[0_12px_24px_rgba(7,26,2,0.28)]"
+                className={`h-full w-auto max-w-full object-contain drop-shadow-[0_12px_24px_rgba(7,26,2,0.28)] ${
+                  hasUploadedLogo ? "site-logo-cutout" : "rounded-full"
+                }`}
                 onError={() => setLogoFailed(true)}
-                src={logoUrl}
+                src={logoSrc}
               />
+            ) : (
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001] shadow-xl shadow-green-950/20 ring-1 ring-white/40">
+                SJ
+              </span>
+            )}
+          </span>
+          <span className="hidden min-w-0 sm:block">
+            <span className="block truncate text-sm font-black tracking-tight text-white sm:text-base">
+              {siteName}
             </span>
-          ) : (
-            <>
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/40 lg:h-12 lg:w-12">
-                {logoSrc ? (
-                  <img
-                    alt={`Logo van ${siteName}`}
-                    className="h-full w-full rounded-full object-cover"
-                    onError={() => setLogoFailed(true)}
-                    src={logoSrc}
-                  />
-                ) : (
-                  <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
-                    SJ
-                  </span>
-                )}
-              </span>
-              <span className="truncate text-sm font-bold tracking-tight sm:text-base">
-                {siteName}
-              </span>
-            </>
-          )}
+            <span className="hidden truncate text-xs font-semibold text-green-100/90 xl:block">
+              {content?.heroOrgLabel || "Scouts en Gidsen Vlaanderen"}
+            </span>
+          </span>
         </Link>
 
         <div className="hidden items-center gap-1 lg:flex">
@@ -291,8 +288,8 @@ export default function Navbar({
             href="/#contact"
             onClick={() => setIsOpen(false)}
           >
-          {content?.navCtaLabel || "Word lid"}
-        </Link>
+            {content?.navCtaLabel || "Word lid"}
+          </Link>
         </div>
       </div>
     </header>
