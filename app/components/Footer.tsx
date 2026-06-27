@@ -45,7 +45,9 @@ function getContactPhones(content: EditableSiteContent) {
 }
 
 export default function Footer({ content }: FooterProps) {
-  const logoSrc = content.siteLogoUrl || "/assets/logo.png";
+  const contrastLogoSrc = content.siteLogoDarkBackgroundUrl || "";
+  const logoSrc = contrastLogoSrc || content.siteLogoUrl || "/assets/logo.png";
+  const hasLogoForGreenBackground = Boolean(contrastLogoSrc);
   const contactPhones = getContactPhones(content);
 
   return (
@@ -54,10 +56,20 @@ export default function Footer({ content }: FooterProps) {
         <div className="grid gap-10 border-t border-white/10 pt-10 lg:grid-cols-[1.25fr_1.75fr] lg:gap-14">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/10">
             <div className="flex flex-col items-start gap-6">
-              <span className="inline-flex rounded-[1.6rem] bg-[#f7f0dc] p-3.5 shadow-2xl shadow-black/20 ring-1 ring-white/20">
+              <span
+                className={
+                  hasLogoForGreenBackground
+                    ? "inline-flex max-w-full"
+                    : "inline-flex max-w-full rounded-[1.6rem] bg-[#f7f0dc] p-3.5 shadow-2xl shadow-black/20 ring-1 ring-white/20"
+                }
+              >
                 <img
                   alt={`Logo van ${content.siteName}`}
-                  className="site-logo-cutout h-28 max-w-[300px] object-contain drop-shadow-[0_12px_20px_rgba(16,48,1,0.2)] sm:h-32"
+                  className={`max-w-full object-contain ${
+                    hasLogoForGreenBackground
+                      ? "h-28 drop-shadow-[0_18px_30px_rgba(0,0,0,0.32)] sm:h-32"
+                      : "site-logo-cutout h-28 drop-shadow-[0_12px_20px_rgba(16,48,1,0.2)] sm:h-32"
+                  }`}
                   src={logoSrc}
                 />
               </span>
