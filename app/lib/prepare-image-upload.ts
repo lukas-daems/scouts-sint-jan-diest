@@ -31,11 +31,38 @@ function canvasToBlob(
   });
 }
 
+function removeWhiteLogoBackground(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number
+) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let index = 0; index < data.length; index += 4) {
+    const red = data[index];
+    const green = data[index + 1];
+    const blue = data[index + 2];
+    const alpha = data[index + 3];
+    const brightness = Math.max(red, green, blue);
+    const darkness = Math.min(red, green, blue);
+    const saturation = brightness - darkness;
+
+    if (alpha > 0 && brightness > 238 && saturation < 22) {
+      data[index + 3] = 0;
+    } else if (alpha > 0 && brightness > 224 && saturation < 30) {
+      data[index + 3] = Math.round(alpha * 0.25);
+    }
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
 async function resizeImage(
   file: File,
   maxSide: number,
   type: string,
-  quality?: number
+  options: { logo?: boolean; quality?: number } = {}
 ) {
   const image = await createImageBitmap(file);
   const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
@@ -54,9 +81,13 @@ async function resizeImage(
   context.clearRect(0, 0, width, height);
   context.drawImage(image, 0, 0, width, height);
 
+  if (options.logo) {
+    removeWhiteLogoBackground(context, width, height);
+  }
+
   image.close?.();
 
-  return canvasToBlob(canvas, type, quality);
+  return canvasToBlob(canvas, type, options.quality);
 }
 
 export async function prepareImageForUpload(
@@ -67,7 +98,7 @@ export async function prepareImageForUpload(
   const isSvg = extension === "svg" || file.type === "image/svg+xml";
   const isGif = extension === "gif" || file.type === "image/gif";
 
-  if (file.size <= localUploadLimitBytes || isSvg || isGif) {
+  if ((file.size <= localUploadLimitBytes && !options.logo) || isSvg || isGif) {
     return { file, optimized: false };
   }
 
@@ -81,7 +112,7 @@ export async function prepareImageForUpload(
             extension: "png",
             qualities: [undefined],
             sizes: options.logo
-              ? [768, 640, 512, 384, 256, 180, 128]
+              ? [1100, 900, 720, 560, 420, 320]
               : [1400, 1100, 900, 720, 560, 420],
           },
           {
@@ -89,7 +120,7 @@ export async function prepareImageForUpload(
             extension: "webp",
             qualities: [0.86, 0.76, 0.66, 0.56],
             sizes: options.logo
-              ? [768, 640, 512, 384, 256, 180, 128]
+              ? [1100, 900, 720, 560, 420, 320]
               : [1400, 1100, 900, 720, 560, 420],
           },
         ]
@@ -114,7 +145,10 @@ export async function prepareImageForUpload(
   for (const candidate of candidates) {
     for (const size of candidate.sizes) {
       for (const quality of candidate.qualities) {
-        const blob = await resizeImage(file, size, candidate.type, quality);
+        const blob = await resizeImage(file, size, candidate.type, {
+          logo: options.logo,
+          quality,
+        });
 
         if (!best || blob.size < best.blob.size) {
           best = {
