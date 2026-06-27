@@ -46,7 +46,6 @@ function getContactPhones(content: EditableSiteContent) {
 
 export default function Footer({ content }: FooterProps) {
   const logoSrc = content.siteLogoUrl || "/assets/logo.png";
-  const hasUploadedLogo = Boolean(content.siteLogoUrl);
   const contactPhones = getContactPhones(content);
 
   return (
@@ -54,28 +53,14 @@ export default function Footer({ content }: FooterProps) {
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 border-t border-white/10 pt-10 lg:grid-cols-[1.25fr_1.75fr] lg:gap-14">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/10">
-            <div className="flex flex-col items-start gap-5">
-              {hasUploadedLogo ? (
+            <div className="flex flex-col items-start gap-6">
+              <span className="inline-flex rounded-[1.6rem] bg-[#f7f0dc] p-3.5 shadow-2xl shadow-black/20 ring-1 ring-white/20">
                 <img
                   alt={`Logo van ${content.siteName}`}
-                  className="site-logo-cutout h-32 max-w-[320px] object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.28)] sm:h-36"
-                  src={content.siteLogoUrl}
+                  className="site-logo-cutout h-28 max-w-[300px] object-contain drop-shadow-[0_12px_20px_rgba(16,48,1,0.2)] sm:h-32"
+                  src={logoSrc}
                 />
-              ) : (
-                <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/35">
-                  {logoSrc ? (
-                    <img
-                      alt={`Logo van ${content.siteName}`}
-                      className="h-full w-full rounded-full object-cover"
-                      src={logoSrc}
-                    />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
-                      SJ
-                    </span>
-                  )}
-                </span>
-              )}
+              </span>
               <div>
                 <h2 className="text-2xl font-black">{content.siteName}</h2>
                 <p className="mt-4 max-w-md text-sm leading-7 text-green-100">
