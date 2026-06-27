@@ -99,9 +99,11 @@ export default function Navbar({
   const [logoFailed, setLogoFailed] = useState(false);
   const pathname = usePathname();
   const activeSlug = pathname.replace(/^\//, "").split("/")[0];
-  const preferredLogo = content?.siteLogoDarkBackgroundUrl || logoUrl;
+  const contrastLogo = content?.siteLogoDarkBackgroundUrl || "";
+  const preferredLogo = contrastLogo || logoUrl;
   const logoSrc = !logoFailed ? preferredLogo || "/assets/logo.png" : "";
   const hasUploadedLogo = Boolean(preferredLogo && !logoFailed);
+  const shouldCutOutLogo = hasUploadedLogo && !contrastLogo;
   const navigationGroups = getNavigationGroups(content);
 
   function isActive(slugs: string[]) {
@@ -127,7 +129,7 @@ export default function Navbar({
               <img
                 alt={`Logo van ${siteName}`}
                 className={`h-full w-auto max-w-full object-contain drop-shadow-[0_12px_24px_rgba(7,26,2,0.28)] ${
-                  hasUploadedLogo ? "site-logo-cutout" : "rounded-full"
+                  shouldCutOutLogo ? "site-logo-cutout" : "rounded-full"
                 }`}
                 onError={() => setLogoFailed(true)}
                 src={logoSrc}
