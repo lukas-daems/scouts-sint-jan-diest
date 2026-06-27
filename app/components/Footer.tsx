@@ -50,130 +50,96 @@ export default function Footer({ content }: FooterProps) {
   const contactPhones = getContactPhones(content);
 
   return (
-    <footer className="bg-[#071a02] px-5 py-16 text-white sm:px-8 lg:px-10">
+    <footer className="bg-[#071a02] px-5 py-14 text-white sm:px-8 sm:py-18 lg:px-10">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 border-t border-white/10 pt-12 md:grid-cols-2 lg:grid-cols-[1.2fr_0.75fr_0.8fr_0.85fr_0.9fr]">
-          <div>
-            <div className="flex items-center gap-3">
+        <div className="grid gap-10 border-t border-white/10 pt-10 lg:grid-cols-[1.25fr_1.75fr] lg:gap-14">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/10">
+            <div className="flex flex-col items-start gap-5">
               {hasUploadedLogo ? (
                 <img
                   alt={`Logo van ${content.siteName}`}
-                  className="site-logo-cutout h-28 max-w-[260px] object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.28)] sm:h-32 sm:max-w-[320px]"
+                  className="site-logo-cutout h-32 max-w-[320px] object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.28)] sm:h-36"
                   src={content.siteLogoUrl}
                 />
               ) : (
-                <>
-                  <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/35">
-                    {logoSrc ? (
-                      <img
-                        alt={`Logo van ${content.siteName}`}
-                        className="h-full w-full rounded-full object-cover"
-                        src={logoSrc}
-                      />
-                    ) : (
-                      <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
-                        SJ
-                      </span>
-                    )}
-                  </span>
-                  <h2 className="text-lg font-bold">{content.siteName}</h2>
-                </>
+                <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full shadow-xl shadow-green-950/20 ring-1 ring-white/35">
+                  {logoSrc ? (
+                    <img
+                      alt={`Logo van ${content.siteName}`}
+                      className="h-full w-full rounded-full object-cover"
+                      src={logoSrc}
+                    />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001]">
+                      SJ
+                    </span>
+                  )}
+                </span>
               )}
+              <div>
+                <h2 className="text-2xl font-black">{content.siteName}</h2>
+                <p className="mt-4 max-w-md text-sm leading-7 text-green-100">
+                  {content.footerDescription}
+                </p>
+              </div>
             </div>
-            <p className="mt-5 max-w-sm text-sm leading-7 text-green-100">
-              {content.footerDescription}
-            </p>
           </div>
 
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-white">
-              Navigatie
-            </h3>
-            <ul className="mt-5 space-y-3 text-sm text-green-100">
-              {navLinks.map(([label, href]) => (
-                <li key={label}>
-                  <Link className="transition hover:text-white" href={href}>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-white">
-              Takken
-            </h3>
-            <ul className="mt-5 space-y-3 text-sm text-green-100">
-              {branchProfiles.map((branch) => (
-                <li key={branch.slug}>
-                  <Link
-                    className="transition hover:text-white"
-                    href={`/takken/${branch.slug}`}
-                  >
-                    {branch.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-white">
-              Pagina&apos;s
-            </h3>
-            <ul className="mt-5 space-y-3 text-sm text-green-100">
-              {pageLinks.map((link) => (
-                <li key={link.href}>
-                  <Link className="transition hover:text-white" href={link.href}>
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-white">
-              Contact
-            </h3>
-            <ul className="mt-5 space-y-3 text-sm text-green-100">
-              <li>{content.contactLocation}</li>
-              <li>
-                <a
-                  className="break-all transition hover:text-white"
-                  href={`mailto:${content.contactEmail}`}
-                >
-                  {content.contactEmail}
-                </a>
-              </li>
-              {contactPhones.map((item) => (
-                <li key={`${item.name}-${item.phone}`}>
+          <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+            <FooterColumn title="Navigatie" links={navLinks} />
+            <FooterColumn
+              title="Takken"
+              links={branchProfiles.map((branch) => [
+                branch.name,
+                `/takken/${branch.slug}`,
+              ])}
+            />
+            <FooterColumn
+              title="Pagina's"
+              links={pageLinks.map((link) => [link.label, link.href])}
+            />
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-white">
+                Contact
+              </h3>
+              <ul className="mt-5 space-y-3 text-sm text-green-100">
+                <li>{content.contactLocation}</li>
+                <li>
                   <a
-                    className="transition hover:text-white"
-                    href={`tel:${item.phone.replace(/\s/g, "")}`}
+                    className="break-all transition hover:text-white"
+                    href={`mailto:${content.contactEmail}`}
                   >
-                    {item.name}: {item.phone}
+                    {content.contactEmail}
                   </a>
                 </li>
-              ))}
-              <li>
-                <Link
-                  className="transition hover:text-white"
-                  href={content.instagramUrl || "/#contact"}
-                >
-                  {content.instagram}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="transition hover:text-white"
-                  href={content.facebookUrl || "/#contact"}
-                >
-                  {content.facebook}
-                </Link>
-              </li>
-            </ul>
+                {contactPhones.slice(0, 3).map((item) => (
+                  <li key={`${item.name}-${item.phone}`}>
+                    <a
+                      className="transition hover:text-white"
+                      href={`tel:${item.phone.replace(/\s/g, "")}`}
+                    >
+                      {item.name}: {item.phone}
+                    </a>
+                  </li>
+                ))}
+                <li>
+                  <Link
+                    className="transition hover:text-white"
+                    href={content.instagramUrl || "/#contact"}
+                  >
+                    {content.instagram}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="transition hover:text-white"
+                    href={content.facebookUrl || "/#contact"}
+                  >
+                    {content.facebook}
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -191,5 +157,30 @@ export default function Footer({ content }: FooterProps) {
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: string[][];
+}) {
+  return (
+    <div>
+      <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-white">
+        {title}
+      </h3>
+      <ul className="mt-5 space-y-3 text-sm text-green-100">
+        {links.map(([label, href]) => (
+          <li key={`${title}-${label}`}>
+            <Link className="transition hover:text-white" href={href}>
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
