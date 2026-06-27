@@ -1,29 +1,6 @@
 import IconBadge from "./IconBadge";
 import type { EditableSiteContent } from "../lib/site-content-defaults";
 
-const features = [
-  {
-    title: "Veilige omgeving",
-    text: "We zorgen voor duidelijke afspraken, betrokken leiding en activiteiten op maat van de groep.",
-    icon: "shield" as const,
-  },
-  {
-    title: "Sterke vriendschappen",
-    text: "Leden bouwen banden op door samen te spelen, te ontdekken en uitdagingen aan te gaan.",
-    icon: "heart" as const,
-  },
-  {
-    title: "Groeien in zelfstandigheid",
-    text: "Kinderen en jongeren leren keuzes maken, samenwerken en verantwoordelijkheid nemen.",
-    icon: "compass" as const,
-  },
-  {
-    title: "Lokaal verbonden",
-    text: "We zijn stevig verankerd in Diest en voelen ons verbonden met de lokale scoutsfamilie, waaronder Sint-Lut, de meisjesscouts, en Poolster, de gemengde scouts.",
-    icon: "home" as const,
-  },
-];
-
 type WhyJoinProps = {
   content: EditableSiteContent;
 };
@@ -35,8 +12,42 @@ function getBullets(content: EditableSiteContent) {
     .filter(Boolean);
 }
 
+function getFeatures(content: EditableSiteContent) {
+  return [
+    {
+      title: content.whyJoinFeatureOneTitle || "Veilige omgeving",
+      text:
+        content.whyJoinFeatureOneText ||
+        "We zorgen voor duidelijke afspraken, betrokken leiding en activiteiten op maat van de groep.",
+      icon: "shield" as const,
+    },
+    {
+      title: content.whyJoinFeatureTwoTitle || "Sterke vriendschappen",
+      text:
+        content.whyJoinFeatureTwoText ||
+        "Leden bouwen banden op door samen te spelen, te ontdekken en uitdagingen aan te gaan.",
+      icon: "heart" as const,
+    },
+    {
+      title: content.whyJoinFeatureThreeTitle || "Groeien in zelfstandigheid",
+      text:
+        content.whyJoinFeatureThreeText ||
+        "Kinderen en jongeren leren keuzes maken, samenwerken en verantwoordelijkheid nemen.",
+      icon: "compass" as const,
+    },
+    {
+      title: content.whyJoinFeatureFourTitle || "Lokaal verbonden",
+      text:
+        content.whyJoinFeatureFourText ||
+        "We zijn stevig verankerd in Diest en voelen ons verbonden met de lokale scoutsfamilie.",
+      icon: "home" as const,
+    },
+  ];
+}
+
 export default function WhyJoin({ content }: WhyJoinProps) {
   const bullets = getBullets(content);
+  const features = getFeatures(content);
 
   return (
     <section className="bg-[#fbfdf9] px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
