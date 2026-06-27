@@ -32,7 +32,9 @@ function getContactPhones(content: EditableSiteContent) {
 export default function ContactSection({ content }: ContactSectionProps) {
   const hasExternalLink = Boolean(content.contactExternalUrl);
   const contactPhones = getContactPhones(content);
-  const logoSrc = content.siteLogoUrl || "/assets/logo.png";
+  const contrastLogoSrc = content.siteLogoDarkBackgroundUrl || "";
+  const logoSrc = contrastLogoSrc || content.siteLogoUrl || "/assets/logo.png";
+  const hasLogoForGreenBackground = Boolean(contrastLogoSrc);
 
   return (
     <section className="bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="contact">
@@ -127,12 +129,22 @@ export default function ContactSection({ content }: ContactSectionProps) {
             </div>
           </article>
 
-          <aside className="blue-pattern relative overflow-hidden rounded-[2rem] p-8 text-white shadow-2xl shadow-green-950/20">
+          <aside className="blue-pattern relative overflow-hidden rounded-[2rem] p-6 text-white shadow-2xl shadow-green-950/20 sm:p-8">
             <div className="relative">
-              <span className="inline-flex rounded-[1.4rem] bg-[#f7f0dc] p-3 shadow-2xl shadow-black/20 ring-1 ring-white/35">
+              <span
+                className={
+                  hasLogoForGreenBackground
+                    ? "inline-flex max-w-full"
+                    : "inline-flex max-w-full rounded-[1.4rem] bg-[#f7f0dc] p-3 shadow-2xl shadow-black/20 ring-1 ring-white/35"
+                }
+              >
                 <img
                   alt={`Logo van ${content.siteName}`}
-                  className="site-logo-cutout h-24 max-w-[260px] object-contain drop-shadow-[0_10px_18px_rgba(16,48,1,0.18)] sm:h-28"
+                  className={`site-logo-cutout max-w-full object-contain ${
+                    hasLogoForGreenBackground
+                      ? "h-24 drop-shadow-[0_18px_28px_rgba(0,0,0,0.28)] sm:h-28"
+                      : "h-24 drop-shadow-[0_10px_18px_rgba(16,48,1,0.18)] sm:h-28"
+                  }`}
                   src={logoSrc}
                 />
               </span>
