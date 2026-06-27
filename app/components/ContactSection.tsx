@@ -140,10 +140,10 @@ export default function ContactSection({ content }: ContactSectionProps) {
               >
                 <img
                   alt={`Logo van ${content.siteName}`}
-                  className={`site-logo-cutout max-w-full object-contain ${
+                  className={`max-w-full object-contain ${
                     hasLogoForGreenBackground
                       ? "h-24 drop-shadow-[0_18px_28px_rgba(0,0,0,0.28)] sm:h-28"
-                      : "h-24 drop-shadow-[0_10px_18px_rgba(16,48,1,0.18)] sm:h-28"
+                      : "site-logo-cutout h-24 drop-shadow-[0_10px_18px_rgba(16,48,1,0.18)] sm:h-28"
                   }`}
                   src={logoSrc}
                 />
