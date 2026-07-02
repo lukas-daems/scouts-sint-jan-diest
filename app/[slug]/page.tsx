@@ -44,6 +44,40 @@ function getPageKindVisual(page: EditableSitePage) {
   return pageKindVisuals[page.kind] ?? pageKindVisuals.overview;
 }
 
+const adminPlaceholderPattern =
+  /(document of link toevoegen|link of document volgt|pdf of infolink toevoegen|per tak aanvullen|vervang later|officieel profiel toevoegen|\btoevoegen\b|\baanvullen\b)/i;
+
+function cleanPublicText(value: string, fallback = "Wordt binnenkort gedeeld.") {
+  const trimmed = value.trim();
+
+  if (!trimmed || adminPlaceholderPattern.test(trimmed)) {
+    return fallback;
+  }
+
+  return value;
+}
+
+function hasUsefulPublicLink(href?: string) {
+  const normalized = (href ?? "").trim().toLowerCase();
+
+  return Boolean(
+    normalized && normalized !== "/#contact" && normalized !== "#contact"
+  );
+}
+
+function getExternalCtaEyebrow(page: EditableSitePage) {
+  const labels: Partial<Record<EditableSitePage["kind"], string>> = {
+    event: "Inschrijven",
+    order: "Bestellen",
+    reservation: "Reserveren",
+    shop: "Aanvragen",
+    committee: "Contact",
+    rental: "Contact",
+  };
+
+  return labels[page.kind] ?? "Meer info";
+}
+
 function CardsGrid({ page }: { page: EditableSitePage }) {
   if (page.cards.length === 0) {
     return null;
@@ -106,20 +140,26 @@ function FactsList({ page }: { page: EditableSitePage }) {
 
   return (
     <div className="grid gap-3">
-      {page.facts.map((fact) => (
-        <div
-          className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
-          key={`${fact.label}-${fact.value}`}
-        >
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-            {fact.label}
-          </p>
-          <p className="mt-2 text-xl font-black text-slate-950">{fact.value}</p>
-          {fact.note ? (
-            <p className="mt-2 text-sm leading-6 text-slate-600">{fact.note}</p>
-          ) : null}
-        </div>
-      ))}
+      {page.facts.map((fact) => {
+        const note = fact.note ? cleanPublicText(fact.note) : "";
+
+        return (
+          <div
+            className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+            key={`${fact.label}-${fact.value}`}
+          >
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+              {fact.label}
+            </p>
+            <p className="mt-2 text-xl font-black text-slate-950">
+              {fact.value}
+            </p>
+            {note ? (
+              <p className="mt-2 text-sm leading-6 text-slate-600">{note}</p>
+            ) : null}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -195,23 +235,53 @@ function DocumentsBlock({ page }: { page: EditableSitePage }) {
         </div>
       </div>
       <div className="mt-7 grid gap-4 md:grid-cols-3">
-        {page.documents.map((document) => (
-          <Link
-            className="lift-card rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5 transition hover:bg-[#edf6e8]"
-            href={document.href}
-            key={document.label}
-          >
-            <h3 className="text-lg font-black text-slate-950">
-              {document.label}
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {document.description}
-            </p>
-            <p className="mt-4 text-sm font-black text-[#2f6b18]">
-              Open document →
-            </p>
-          </Link>
-        ))}
+        {page.documents.map((document) => {
+          const hasLink = hasUsefulPublicLink(document.href);
+          const description = cleanPublicText(
+            document.description,
+            hasLink
+              ? "Open het document via de knop hieronder."
+              : "Wordt binnenkort gedeeld."
+          );
+          const content = (
+            <>
+              <h3 className="text-lg font-black text-slate-950">
+                {document.label}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {description}
+              </p>
+              {hasLink ? (
+                <p className="mt-4 text-sm font-black text-[#2f6b18]">
+                  Open document →
+                </p>
+              ) : (
+                <span className="mt-4 inline-flex rounded-full bg-[#edf6e8] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#103001] ring-1 ring-[#d7e8cf]">
+                  Nog niet beschikbaar
+                </span>
+              )}
+            </>
+          );
+
+          return hasLink ? (
+            <Link
+              className="lift-card rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5 transition hover:bg-[#edf6e8]"
+              href={document.href}
+              key={document.label}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {content}
+            </Link>
+          ) : (
+            <article
+              className="rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5"
+              key={document.label}
+            >
+              {content}
+            </article>
+          );
+        })}
       </div>
       {page.updates ? (
         <div className="mt-7 rounded-3xl bg-[#edf6e8] p-5 text-sm font-semibold leading-7 text-[#103001] ring-1 ring-[#d7e8cf]">
@@ -356,7 +426,7 @@ function ExternalCtaBlock({ page }: { page: EditableSitePage }) {
           </div>
           <div>
             <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-              Externe link
+              {getExternalCtaEyebrow(page)}
             </p>
             <h2 className="mt-2 text-3xl font-black text-slate-950">
               {page.externalCta.title}
@@ -415,18 +485,45 @@ function LinksBlock({ page }: { page: EditableSitePage }) {
           >
             <h3 className="text-xl font-black text-slate-950">{category}</h3>
             <div className="mt-4 grid gap-3">
-              {links.map((item) => (
-                <Link
-                  className="rounded-2xl bg-white p-4 ring-1 ring-slate-200 transition hover:bg-[#edf6e8]"
-                  href={item.href}
-                  key={`${category}-${item.label}`}
-                >
-                  <span className="font-black text-[#103001]">{item.label}</span>
-                  <span className="mt-1 block text-sm leading-6 text-slate-600">
-                    {item.description}
-                  </span>
-                </Link>
-              ))}
+              {links.map((item) => {
+                const hasLink = hasUsefulPublicLink(item.href);
+                const description = cleanPublicText(
+                  item.description,
+                  "Link wordt binnenkort aangevuld."
+                );
+                const content = (
+                  <>
+                    <span className="font-black text-[#103001]">
+                      {item.label}
+                    </span>
+                    <span className="mt-1 block text-sm leading-6 text-slate-600">
+                      {description}
+                    </span>
+                    {!hasLink ? (
+                      <span className="mt-3 inline-flex rounded-full bg-[#edf6e8] px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] text-[#103001] ring-1 ring-[#d7e8cf]">
+                        Link volgt binnenkort
+                      </span>
+                    ) : null}
+                  </>
+                );
+
+                return hasLink ? (
+                  <Link
+                    className="rounded-2xl bg-white p-4 ring-1 ring-slate-200 transition hover:bg-[#edf6e8]"
+                    href={item.href}
+                    key={`${category}-${item.label}`}
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <div
+                    className="rounded-2xl bg-white p-4 ring-1 ring-slate-200"
+                    key={`${category}-${item.label}`}
+                  >
+                    {content}
+                  </div>
+                );
+              })}
             </div>
           </article>
         ))}
@@ -480,24 +577,28 @@ function ActionFeatureBlocks({ page }: { page: EditableSitePage }) {
           </div>
 
           <div className="grid gap-4 p-6 sm:p-8 md:grid-cols-2 lg:p-10">
-            {page.facts.map((fact) => (
-              <article
-                className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
-                key={`${fact.label}-${fact.value}`}
-              >
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-                  {fact.label}
-                </p>
-                <p className="mt-2 text-xl font-black text-slate-950">
-                  {fact.value}
-                </p>
-                {fact.note ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {fact.note}
+            {page.facts.map((fact) => {
+              const note = fact.note ? cleanPublicText(fact.note) : "";
+
+              return (
+                <article
+                  className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+                  key={`${fact.label}-${fact.value}`}
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                    {fact.label}
                   </p>
-                ) : null}
-              </article>
-            ))}
+                  <p className="mt-2 text-xl font-black text-slate-950">
+                    {fact.value}
+                  </p>
+                  {note ? (
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      {note}
+                    </p>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -653,24 +754,28 @@ function RentalPageContent({
             {content.pageVerhuurPricesTitle}
           </h2>
           <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {page.facts.map((fact) => (
-              <article
-                className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
-                key={`${fact.label}-${fact.value}`}
-              >
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-                  {fact.label}
-                </p>
-                <p className="mt-2 text-xl font-black text-slate-950">
-                  {fact.value}
-                </p>
-                {fact.note ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {fact.note}
+            {page.facts.map((fact) => {
+              const note = fact.note ? cleanPublicText(fact.note) : "";
+
+              return (
+                <article
+                  className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+                  key={`${fact.label}-${fact.value}`}
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                    {fact.label}
                   </p>
-                ) : null}
-              </article>
-            ))}
+                  <p className="mt-2 text-xl font-black text-slate-950">
+                    {fact.value}
+                  </p>
+                  {note ? (
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      {note}
+                    </p>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         </section>
       ) : null}
@@ -750,24 +855,28 @@ function CommitteePageContent({
             {content.pageOudercomiteJoinTitle}
           </h2>
           <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {page.facts.map((fact) => (
-              <article
-                className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
-                key={`${fact.label}-${fact.value}`}
-              >
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-                  {fact.label}
-                </p>
-                <p className="mt-2 text-lg font-black text-slate-950">
-                  {fact.value}
-                </p>
-                {fact.note ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {fact.note}
+            {page.facts.map((fact) => {
+              const note = fact.note ? cleanPublicText(fact.note) : "";
+
+              return (
+                <article
+                  className="rounded-3xl bg-[#fbfdf9] p-5 ring-1 ring-slate-200"
+                  key={`${fact.label}-${fact.value}`}
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                    {fact.label}
                   </p>
-                ) : null}
-              </article>
-            ))}
+                  <p className="mt-2 text-lg font-black text-slate-950">
+                    {fact.value}
+                  </p>
+                  {note ? (
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      {note}
+                    </p>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         </section>
       ) : null}
