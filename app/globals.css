@@ -422,7 +422,7 @@ textarea {
 }
 
 .hero-visual-card .camp-scene {
-  min-height: clamp(320px, 38vw, 560px);
+  min-height: clamp(270px, 34vw, 500px);
   border-radius: 28px;
 }
 
@@ -432,6 +432,10 @@ textarea {
 }
 
 .hero-floating-card {
+  display: flex;
+  min-height: 64px;
+  flex-direction: column;
+  justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.66);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 252, 245, 0.76)),
@@ -441,6 +445,16 @@ textarea {
     0 18px 55px rgba(5, 31, 79, 0.16);
   backdrop-filter: blur(16px) saturate(145%);
   -webkit-backdrop-filter: blur(16px) saturate(145%);
+}
+
+@media (max-width: 640px) {
+  .hero-visual-card .camp-scene {
+    min-height: clamp(240px, 62vw, 320px);
+  }
+
+  .hero-floating-card {
+    min-height: 58px;
+  }
 }
 
 .visual-noise {
