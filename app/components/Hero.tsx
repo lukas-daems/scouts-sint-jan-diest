@@ -22,10 +22,6 @@ export default function Hero({ content }: HeroProps) {
         <div className="section-fade max-w-4xl text-center">
           <div className="hero-eyebrow-badge mb-4 inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-bold uppercase leading-none tracking-[0.14em] text-green-50 sm:text-xs">
             <span>{content.heroEyebrow}</span>
-            <span
-              aria-hidden="true"
-              className="hidden h-1.5 w-1.5 shrink-0 rounded-full bg-white/55 sm:inline-flex"
-            />
             <span>{content.heroOrgLabel}</span>
           </div>
           <h1 className="text-4xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl">
