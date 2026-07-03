@@ -9,6 +9,15 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
 
 const { d1, r2 } = hostingConfig;
 
+function getBuildValue(key: string) {
+  return process.env[key]?.trim();
+}
+
+const d1DatabaseName = getBuildValue("D1_DATABASE_NAME") ?? "scouts-sint-jan-db";
+const d1DatabaseId =
+  getBuildValue("D1_DATABASE_ID") ?? SITE_CREATOR_PLACEHOLDER_DATABASE_ID;
+const r2BucketName = getBuildValue("R2_BUCKET_NAME") ?? "scouts-sint-jan-media";
+
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
@@ -16,8 +25,8 @@ const localBindingConfig = {
     ? [
         {
           binding: d1,
-          database_name: "site-creator-d1",
-          database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+          database_name: d1DatabaseName,
+          database_id: d1DatabaseId,
         },
       ]
     : [],
@@ -25,7 +34,7 @@ const localBindingConfig = {
     ? [
         {
           binding: r2,
-          bucket_name: "site-creator-r2",
+          bucket_name: r2BucketName,
         },
       ]
     : [],
