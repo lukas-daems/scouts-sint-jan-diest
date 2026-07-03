@@ -4,8 +4,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import hostingConfig from "./.openai/hosting.json";
 import { sites } from "./build/sites-vite-plugin";
 
-const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
-  "00000000-0000-4000-8000-000000000000";
+const SCOUTS_D1_DATABASE_ID = "1372b01c-decd-4877-9ddd-b4c2536db4c2";
 
 const { d1, r2 } = hostingConfig;
 
@@ -15,7 +14,7 @@ function getBuildValue(key: string) {
 
 const d1DatabaseName = getBuildValue("D1_DATABASE_NAME") ?? "scouts-sint-jan-db";
 const d1DatabaseId =
-  getBuildValue("D1_DATABASE_ID") ?? SITE_CREATOR_PLACEHOLDER_DATABASE_ID;
+  getBuildValue("D1_DATABASE_ID") ?? SCOUTS_D1_DATABASE_ID;
 const r2BucketName = getBuildValue("R2_BUCKET_NAME") ?? "scouts-sint-jan-media";
 
 const localBindingConfig = {
