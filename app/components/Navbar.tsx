@@ -12,7 +12,7 @@ import type { EditableSiteContent } from "../lib/site-content-defaults";
 const homeSectionLinks = [
   { label: "Takken", href: "/#takken" },
   { label: "Activiteiten", href: "/#activiteiten" },
-  { label: "Kamp", href: "/#kamp" },
+  { label: "Kamp", href: "/zomerkamp" },
   { label: "Contact", href: "/#contact" },
 ];
 
