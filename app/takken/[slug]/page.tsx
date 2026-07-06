@@ -47,12 +47,11 @@ export default async function BranchDetailPage({
     .map((item) => getEditableBranchProfile(item, siteContent));
   const leaderNames = splitLeaderNames(branch.leaderNames);
   const programItems = getVisibleProgramItems(branch.program);
-  const planningSummary =
+  const programStatus =
     programItems.length > 0
-      ? branch.planningInfo.countText.replace(
-          "{aantal}",
-          String(programItems.length)
-        )
+      ? `${programItems.length} ${
+          programItems.length === 1 ? "vergadering" : "vergaderingen"
+        } ingevuld`
       : branch.planningInfo.emptyText;
 
   return (
@@ -222,124 +221,69 @@ export default async function BranchDetailPage({
       </section>
 
       <section className="bg-[#fbfdf9] px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
-        <div className="mx-auto grid max-w-7xl gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:grid-cols-[1.12fr_0.58fr] lg:p-9">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
-              Programma
-            </p>
-            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950">
-              Wat staat er op de planning?
-            </h2>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-              Hier vind je de komende vergaderingen van {branch.name}. Elke
-              kaart is een echte activiteit met datum, uur en uitleg van de
-              leiding.
-            </p>
-
-            <div className="mt-8 grid gap-4">
-              {programItems.length > 0 ? (
-                programItems.map((item, index) => (
-                  <article
-                    className="rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-green-950/8 sm:p-6"
-                    key={`${item.date}-${item.title}-${index}`}
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div>
-                        <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-                          {item.date}
-                        </p>
-                        <h3 className="mt-2 text-2xl font-black text-slate-950">
-                          {item.title}
-                        </h3>
-                      </div>
-                      <span className="inline-flex w-fit rounded-full bg-white px-4 py-2 text-sm font-black text-[#103001] ring-1 ring-[#d7e8cf]">
-                        {item.time}
-                      </span>
-                    </div>
-                    {item.description ? (
-                      <p className="mt-4 whitespace-pre-line text-base leading-7 text-slate-600">
-                        {item.description}
-                      </p>
-                    ) : null}
-                  </article>
-                ))
-              ) : (
-                <div className="rounded-3xl border border-dashed border-slate-300 bg-[#fbfdf9] p-7 text-base leading-8 text-slate-600">
-                  {branch.planningInfo.emptyText}
-                </div>
-              )}
-              {branch.importantDates.trim() ? (
-                <article className="rounded-3xl border border-[#d7e8cf] bg-[#edf6e8] p-5 ring-1 ring-[#d7e8cf] sm:p-6">
-                  <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
-                    Belangrijke data
-                  </p>
-                  <div className="mt-3 whitespace-pre-line text-base font-semibold leading-8 text-[#103001]">
-                    {branch.importantDates}
-                  </div>
-                </article>
-              ) : null}
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:p-10">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f6b18]">
+                Programma
+              </p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950">
+                Wat staat er op de planning?
+              </h2>
+              <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
+                Hier vind je de komende vergaderingen van {branch.name}. Elke
+                kaart is een echte activiteit met datum, uur en uitleg van de
+                leiding.
+              </p>
+            </div>
+            <div className="w-fit rounded-3xl border border-[#d7e8cf] bg-[#edf6e8] px-5 py-3 text-sm font-black text-[#103001]">
+              {programStatus}
             </div>
           </div>
 
-          <aside className="relative h-fit overflow-hidden rounded-[2rem] bg-[#edf6e8] p-6 ring-1 ring-[#d7e8cf]">
-            <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/60" />
-            <div className="relative">
-              <BranchLogo branch={branch} content={siteContent} />
-              <h3 className="mt-6 text-2xl font-black text-[#103001]">
-                Planning {branch.name}
-              </h3>
-              <p className="mt-3 text-sm leading-7 text-slate-700">
-                Het aantal blokken past zich automatisch aan op basis van wat de
-                leiding invult.
-              </p>
-              <dl className="mt-6 grid gap-3 text-sm">
-                {[
-                  {
-                    label: "Vaste dag",
-                    value: branch.planningInfo.day,
-                  },
-                  {
-                    label: "Uur",
-                    value: branch.planningInfo.time,
-                    note: branch.planningInfo.timeNote,
-                  },
-                  {
-                    label: "Locatie",
-                    value: branch.planningInfo.location,
-                  },
-                  {
-                    label: "Meenemen",
-                    value: branch.planningInfo.bring,
-                    note: branch.planningInfo.bringNote,
-                  },
-                  {
-                    label: "Contact",
-                    value: branch.planningInfo.contact,
-                  },
-                ].map((item) => (
-                  <div
-                    className="forest-glass-light rounded-2xl p-4"
-                    key={item.label}
-                  >
-                    <dt className="font-black uppercase tracking-[0.12em] text-[#2f6b18]">
-                      {item.label}
-                    </dt>
-                    <dd className="mt-1 font-semibold leading-6 text-slate-700">
-                      {item.value}
-                    </dd>
-                    {item.note ? (
-                      <dd className="mt-1 text-xs font-semibold leading-5 text-slate-500">
-                        {item.note}
-                      </dd>
-                    ) : null}
+          <div className="mt-8 grid gap-4 xl:grid-cols-2">
+            {programItems.length > 0 ? (
+              programItems.map((item, index) => (
+                <article
+                  className="rounded-3xl border border-slate-200 bg-[#fbfdf9] p-5 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-green-950/8 sm:p-6"
+                  key={`${item.date}-${item.title}-${index}`}
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                        {item.date}
+                      </p>
+                      <h3 className="mt-2 text-2xl font-black text-slate-950">
+                        {item.title}
+                      </h3>
+                    </div>
+                    <span className="inline-flex w-fit rounded-full bg-white px-4 py-2 text-sm font-black text-[#103001] ring-1 ring-[#d7e8cf]">
+                      {item.time}
+                    </span>
                   </div>
-                ))}
-              </dl>
-              <p className="mt-5 rounded-2xl bg-[#103001] px-4 py-3 text-sm font-bold leading-6 text-white">
-                {planningSummary}
-              </p>
-            </div>
-          </aside>
+                  {item.description ? (
+                    <p className="mt-4 whitespace-pre-line text-base leading-7 text-slate-600">
+                      {item.description}
+                    </p>
+                  ) : null}
+                </article>
+              ))
+            ) : (
+              <div className="rounded-3xl border border-dashed border-slate-300 bg-[#fbfdf9] p-7 text-base leading-8 text-slate-600 xl:col-span-2">
+                {branch.planningInfo.emptyText}
+              </div>
+            )}
+            {branch.importantDates.trim() ? (
+              <article className="rounded-3xl border border-[#d7e8cf] bg-[#edf6e8] p-5 ring-1 ring-[#d7e8cf] sm:p-6 xl:col-span-2">
+                <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+                  Belangrijke data
+                </p>
+                <div className="mt-3 whitespace-pre-line text-base font-semibold leading-8 text-[#103001]">
+                  {branch.importantDates}
+                </div>
+              </article>
+            ) : null}
+          </div>
         </div>
       </section>
 
