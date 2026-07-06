@@ -360,15 +360,6 @@ export function canEditContentKey(
     branch.contentKeys.imageUrl,
     branch.contentKeys.leaderNames,
     branch.contentKeys.leaderPhotoUrl,
-    branch.contentKeys.planning.day,
-    branch.contentKeys.planning.time,
-    branch.contentKeys.planning.timeNote,
-    branch.contentKeys.planning.location,
-    branch.contentKeys.planning.bring,
-    branch.contentKeys.planning.bringNote,
-    branch.contentKeys.planning.contact,
-    branch.contentKeys.planning.countText,
-    branch.contentKeys.planning.emptyText,
     ...branch.contentKeys.blocks.flatMap((block) => [block.title, block.text]),
   ];
 
