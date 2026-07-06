@@ -13,6 +13,8 @@ const removedHomepageBlocks = [
   },
 ];
 
+const removedAdminPanels = ["Planningkader"];
+
 function normalizeText(text: string) {
   return text.replace(/\s+/g, " ").trim();
 }
@@ -37,11 +39,34 @@ function hideRemovedHomepageBlocks() {
   });
 }
 
+function hideRemovedAdminPanels() {
+  document.querySelectorAll("h3").forEach((heading) => {
+    if (!(heading instanceof HTMLHeadingElement)) {
+      return;
+    }
+
+    if (!removedAdminPanels.includes(normalizeText(heading.textContent ?? ""))) {
+      return;
+    }
+
+    const panel = heading.closest("div.rounded-3xl");
+    if (panel instanceof HTMLElement) {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    }
+  });
+}
+
+function cleanupRemovedAdminContent() {
+  hideRemovedHomepageBlocks();
+  hideRemovedAdminPanels();
+}
+
 export default function AdminInterfaceCleanup() {
   useEffect(() => {
-    hideRemovedHomepageBlocks();
+    cleanupRemovedAdminContent();
 
-    const observer = new MutationObserver(hideRemovedHomepageBlocks);
+    const observer = new MutationObserver(cleanupRemovedAdminContent);
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => observer.disconnect();
