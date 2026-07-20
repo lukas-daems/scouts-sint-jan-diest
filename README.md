@@ -60,7 +60,31 @@ Zet echte wachtwoorden nooit in GitHub. Online moeten dezelfde waarden als gehei
 
 Uploads gaan via de `MEDIA` R2-binding. In de admin kun je foto's uploaden, vervangen, uit de site halen en ongebruikte uploads opruimen via de mediabibliotheek.
 
+De mediaopslag is bewust behouden. Ze is nodig omdat leiding zonder code taklogo's, leidingfoto's, sfeerbeelden en collagefoto's moet kunnen aanpassen. Gebruik vaste afbeeldingen in `public` alleen voor echte fallbackbeelden die bijna nooit wijzigen.
+
 De zichtbare content wordt opgeslagen in D1 via de `DB` binding. Zonder juiste D1/R2-bindingen blijven de standaardteksten en placeholders zichtbaar.
+
+## Onderhoudsprincipes
+
+- Hou de publieke site oudervriendelijk: bezoekers mogen geen admin- of invulinstructies zien.
+- Hou de admin leidingvriendelijk: gebruik gewone woorden, duidelijke blokken en zo weinig technische labels mogelijk.
+- Voeg alleen adminvelden toe voor content die de leiding echt moet kunnen wijzigen.
+- Verwijder oude componenten wanneer de bijhorende sectie niet meer zichtbaar is.
+- Pas grote dashboardbestanden voorzichtig aan en controleer daarna altijd de build.
+- Laat mediaopslag staan, maar ruim ongebruikte uploads regelmatig op via de mediabibliotheek.
+
+## Belangrijke codeplekken
+
+- `app/page.tsx`: homepage-opbouw.
+- `app/[slug]/page.tsx`: algemene infopagina's zoals Verhuur, Links en Oudercomite.
+- `app/takken/page.tsx`: overzicht van alle takken.
+- `app/takken/[slug]/page.tsx`: aparte takpagina met leiding, programma en belangrijke data.
+- `app/admin/AdminDashboard.tsx`: beheeromgeving.
+- `app/lib/site-content-defaults.ts`: standaardteksten en fallbackcontent.
+- `app/lib/branches.ts`: takconfiguratie en koppeling met adminvelden.
+- `app/lib/site-pages.ts`: configuratie van aparte pagina's.
+- `app/lib/gallery.ts`: vaste en extra fotocollages.
+- `app/api/admin/*`: login, contentbeheer en uploadbeheer.
 
 ## Build controleren
 
