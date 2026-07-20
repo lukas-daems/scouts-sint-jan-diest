@@ -47,10 +47,11 @@ type ActivitiesProps = {
 
 export default function Activities({ content }: ActivitiesProps) {
   const campTheme = getGalleryThemeBySlug("kamp");
-  const uploadedCampImage = campTheme
-    ? content[campTheme.coverKey] ||
-      parseImageListValue(content[campTheme.collageKey])[0]
-    : "";
+  const uploadedCampImage =
+    campTheme?.coverKey && campTheme.collageKey
+      ? content[campTheme.coverKey] ||
+        parseImageListValue(content[campTheme.collageKey])[0]
+      : "";
   const campImage =
     uploadedCampImage || content.campImageUrl || campTheme?.placeholderImages[0] || images.camp;
 
