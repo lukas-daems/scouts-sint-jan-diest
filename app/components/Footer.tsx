@@ -16,7 +16,10 @@ const navLinks = [
 
 const pageLinks = Array.from(
   new Map(
-    sitePageGroups.flatMap((group) => group.items).map((link) => [link.href, link])
+    sitePageGroups
+      .flatMap((group) => group.items)
+      .filter((link) => link.label && link.href)
+      .map((link) => [link.href, link])
   ).values()
 );
 
@@ -170,13 +173,15 @@ function FooterColumn({
         {title}
       </h3>
       <ul className="mt-5 space-y-3 text-sm text-green-100">
-        {links.map(([label, href]) => (
-          <li key={`${title}-${label}`}>
-            <Link className="transition hover:text-white" href={href}>
-              {label}
-            </Link>
-          </li>
-        ))}
+        {links
+          .filter(([label, href]) => label && href)
+          .map(([label, href]) => (
+            <li key={`${title}-${label}`}>
+              <Link className="transition hover:text-white" href={href}>
+                {label}
+              </Link>
+            </li>
+          ))}
       </ul>
     </div>
   );
