@@ -28,6 +28,10 @@ function getFileExtension(file: File) {
     return fromName;
   }
 
+  if (file.type === "image/jpeg") {
+    return "jpg";
+  }
+
   if (file.type === "image/png") {
     return "png";
   }
@@ -59,7 +63,7 @@ function getFileExtension(file: File) {
     return "docx";
   }
 
-  return "jpg";
+  return "";
 }
 
 function getContentType(file: File, extension: string) {
