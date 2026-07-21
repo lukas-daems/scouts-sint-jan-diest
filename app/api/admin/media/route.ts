@@ -6,6 +6,11 @@ type MediaEnv = {
 };
 
 const allowedImageExtensions = ["jpg", "jpeg", "png", "webp", "gif", "svg"];
+const allowedDocumentExtensions = ["pdf", "doc", "docx"];
+const allowedUploadExtensions = [
+  ...allowedImageExtensions,
+  ...allowedDocumentExtensions,
+];
 
 function getMediaBucket() {
   const runtimeEnv = env as unknown as MediaEnv;
@@ -19,7 +24,7 @@ function getMediaBucket() {
 
 function getFileExtension(file: File) {
   const fromName = file.name.split(".").pop()?.toLowerCase();
-  if (fromName && allowedImageExtensions.includes(fromName)) {
+  if (fromName && allowedUploadExtensions.includes(fromName)) {
     return fromName;
   }
 
@@ -35,6 +40,25 @@ function getFileExtension(file: File) {
     return "gif";
   }
 
+  if (file.type === "image/svg+xml") {
+    return "svg";
+  }
+
+  if (file.type === "application/pdf") {
+    return "pdf";
+  }
+
+  if (file.type === "application/msword") {
+    return "doc";
+  }
+
+  if (
+    file.type ===
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    return "docx";
+  }
+
   return "jpg";
 }
 
@@ -43,16 +67,23 @@ function getContentType(file: File, extension: string) {
     return file.type;
   }
 
+  if (file.type && !file.type.startsWith("application/octet-stream")) {
+    return file.type;
+  }
+
   const types: Record<string, string> = {
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     gif: "image/gif",
     jpeg: "image/jpeg",
     jpg: "image/jpeg",
+    pdf: "application/pdf",
     png: "image/png",
     svg: "image/svg+xml",
     webp: "image/webp",
   };
 
-  return types[extension] ?? "image/jpeg";
+  return types[extension] ?? "application/octet-stream";
 }
 
 function normalizeMediaKey(input: unknown) {
@@ -167,21 +198,26 @@ export async function POST(request: Request) {
 
   if (!canUploadToSlot(session, slot)) {
     return Response.json(
-      { error: "Je hebt geen rechten om hier een foto te uploaden." },
+      { error: "Je hebt geen rechten om hier een bestand te uploaden." },
       { status: 403 }
     );
   }
 
   if (!(file instanceof File)) {
-    return Response.json({ error: "Geen foto ontvangen." }, { status: 400 });
+    return Response.json({ error: "Geen bestand ontvangen." }, { status: 400 });
   }
 
   const extension = getFileExtension(file);
-  const hasAllowedExtension = allowedImageExtensions.includes(extension);
+  const hasAllowedExtension = allowedUploadExtensions.includes(extension);
+  const isImage = file.type.startsWith("image/") || allowedImageExtensions.includes(extension);
+  const isDocument = allowedDocumentExtensions.includes(extension);
 
-  if (!file.type.startsWith("image/") && !hasAllowedExtension) {
+  if (!hasAllowedExtension || (!isImage && !isDocument)) {
     return Response.json(
-      { error: "Upload enkel JPG, PNG, WEBP, GIF of SVG afbeeldingen." },
+      {
+        error:
+          "Upload enkel afbeeldingen of documenten als JPG, PNG, WEBP, GIF, SVG, PDF, DOC of DOCX.",
+      },
       { status: 400 }
     );
   }
