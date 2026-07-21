@@ -14,6 +14,10 @@ function getMediaBucket() {
   }
 }
 
+function safeDownloadName(objectKey: string) {
+  return objectKey.split("/").pop()?.replace(/["\\]/g, "") || "document";
+}
+
 export async function GET(
   _request: Request,
   context: { params: Promise<{ key: string[] }> }
@@ -34,8 +38,10 @@ export async function GET(
   return new Response(object.body, {
     headers: {
       "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Disposition": `inline; filename="${safeDownloadName(objectKey)}"`,
       "Content-Type":
         object.httpMetadata?.contentType ?? "application/octet-stream",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }
