@@ -46,11 +46,20 @@ function getNavigationGroups(content?: EditableSiteContent) {
         })),
       ],
     },
-    ...sitePageGroups.map((group) => ({
-      ...group,
-      id: group.label.toLowerCase().replace(/\s+/g, "-"),
-      label: groupLabels[group.label] || group.label,
-    })),
+    ...sitePageGroups.map((group) => {
+      const items = group.items.filter((item) => item.href);
+      const firstHref = items[0]?.href || "/#home";
+      const slugs = group.pages.map((page) => page.slug);
+
+      return {
+        ...group,
+        id: group.label.toLowerCase().replace(/\s+/g, "-"),
+        label: groupLabels[group.label] || group.label,
+        href: firstHref,
+        slugs,
+        items,
+      };
+    }),
   ];
 }
 
