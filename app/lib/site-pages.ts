@@ -289,22 +289,33 @@ export function getSitePageImageKey(page: SiteInfoPage) {
   return keyFor(page, "ImageUrl");
 }
 
+function toMenuItem(page: SiteInfoPage) {
+  return { label: page.navLabel, href: `/${page.slug}` };
+}
+
+const activitiesAndEventsPages = sitePages.filter((page) =>
+  ["activiteiten", "zomerkamp", "dropping", "ontbijtmanden", "steak-en-burgerday"].includes(page.slug)
+);
+const practicalAndSupportPages = sitePages.filter((page) =>
+  ["shop", "oudercomite", "verhuur", "oud-leiding", "links"].includes(page.slug)
+);
+
 export const sitePageGroups = [
   {
+    label: "Activiteiten en evenementen",
     title: "Activiteiten en evenementen",
     description:
       "Wekelijkse activiteiten, kamp, evenementen en verkoopacties die bezoekers snel moeten vinden.",
-    pages: sitePages.filter((page) =>
-      ["activiteiten", "zomerkamp", "dropping", "ontbijtmanden", "steak-en-burgerday"].includes(page.slug)
-    ),
+    pages: activitiesAndEventsPages,
+    items: activitiesAndEventsPages.map(toMenuItem),
   },
   {
+    label: "Praktisch en steun",
     title: "Praktisch en steun",
     description:
       "Pagina's voor shop, oudercomite, verhuur, oud-leiding en nuttige links.",
-    pages: sitePages.filter((page) =>
-      ["shop", "oudercomite", "verhuur", "oud-leiding", "links"].includes(page.slug)
-    ),
+    pages: practicalAndSupportPages,
+    items: practicalAndSupportPages.map(toMenuItem),
   },
 ];
 
