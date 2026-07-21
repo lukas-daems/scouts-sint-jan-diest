@@ -16,6 +16,12 @@ type MediaItem = {
   contentType: string;
 };
 
+type CampDocument = {
+  label: string;
+  href: string;
+  description: string;
+};
+
 type SessionResponse = {
   authenticated: boolean;
   session?: AdminSession | null;
@@ -26,8 +32,30 @@ type MediaResponse = {
   error?: string;
 };
 
+type ContentResponse = {
+  content?: Record<string, string>;
+  error?: string;
+};
+
 const documentPattern = /\.(pdf|doc|docx)$/i;
 const acceptedDocuments = ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const fallbackCampDocuments: CampDocument[] = [
+  {
+    label: "Medische fiche",
+    href: "/#contact",
+    description: "Verplicht voor kamp",
+  },
+  {
+    label: "Kampboekje",
+    href: "/#contact",
+    description: "Alle praktische info",
+  },
+  {
+    label: "Bagagelijst",
+    href: "/#contact",
+    description: "Wat je moet meenemen",
+  },
+];
 
 function isDocument(item: MediaItem) {
   const contentType = item.contentType.toLowerCase();
@@ -36,6 +64,34 @@ function isDocument(item: MediaItem) {
     contentType.includes("pdf") ||
     contentType.includes("word")
   );
+}
+
+function parseCampDocuments(value: string) {
+  const parsed = value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [label = "", href = "", description = ""] = line.split("|");
+      return {
+        label: label.trim(),
+        href: href.trim(),
+        description: description.trim(),
+      };
+    })
+    .filter((item) => item.label);
+
+  return parsed.length ? parsed : fallbackCampDocuments;
+}
+
+function stringifyCampDocuments(items: CampDocument[]) {
+  return items
+    .filter((item) => item.label.trim())
+    .map(
+      (item) =>
+        `${item.label.trim()}|${item.href.trim() || "/#contact"}|${item.description.trim()}`
+    )
+    .join("\n");
 }
 
 function formatBytes(size: number) {
@@ -75,7 +131,11 @@ export default function DocumentLibrary() {
   const [session, setSession] = useState<AdminSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [media, setMedia] = useState<MediaItem[]>([]);
+  const [content, setContent] = useState<Record<string, string> | null>(null);
+  const [campDocuments, setCampDocuments] =
+    useState<CampDocument[]>(fallbackCampDocuments);
   const [uploading, setUploading] = useState(false);
+  const [savingCamp, setSavingCamp] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -93,6 +153,19 @@ export default function DocumentLibrary() {
     }
 
     setMedia(payload.media || []);
+  }
+
+  async function loadContent() {
+    const response = await fetch("/api/admin/content", { cache: "no-store" });
+    const payload = (await response.json().catch(() => ({}))) as ContentResponse;
+
+    if (!response.ok || !payload.content) {
+      setError(payload.error || "Kampdocumenten konden niet geladen worden.");
+      return;
+    }
+
+    setContent(payload.content);
+    setCampDocuments(parseCampDocuments(payload.content.pageZomerkampDocuments || ""));
   }
 
   useEffect(() => {
@@ -119,7 +192,7 @@ export default function DocumentLibrary() {
       }
 
       setSession(sessionPayload.session);
-      await loadDocuments();
+      await Promise.all([loadDocuments(), loadContent()]);
       if (!cancelled) {
         setLoading(false);
       }
@@ -137,7 +210,19 @@ export default function DocumentLibrary() {
     };
   }, []);
 
-  async function uploadDocument(file: File | undefined) {
+  function updateCampDocument(
+    index: number,
+    key: keyof CampDocument,
+    value: string
+  ) {
+    setCampDocuments((items) =>
+      items.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, [key]: value } : item
+      )
+    );
+  }
+
+  async function uploadDocument(file: File | undefined, campIndex?: number) {
     if (!file) {
       return;
     }
@@ -156,15 +241,26 @@ export default function DocumentLibrary() {
     });
     const payload = (await response.json().catch(() => ({}))) as {
       error?: string;
+      url?: string;
     };
 
-    if (!response.ok) {
+    if (!response.ok || !payload.url) {
       setError(payload.error || "Uploaden is niet gelukt.");
       setUploading(false);
       return;
     }
 
-    setMessage("Document toegevoegd. Je kunt de link nu gebruiken bij kampdocumenten.");
+    if (typeof campIndex === "number") {
+      updateCampDocument(campIndex, "href", payload.url);
+      setMessage(
+        "Document toegevoegd en gekoppeld. Klik nog op 'Kampdocumenten opslaan'."
+      );
+    } else {
+      setMessage(
+        "Document toegevoegd. Je kunt de link nu gebruiken bij kampdocumenten."
+      );
+    }
+
     if (inputRef.current) {
       inputRef.current.value = "";
     }
@@ -172,10 +268,44 @@ export default function DocumentLibrary() {
     setUploading(false);
   }
 
+  async function saveCampDocuments() {
+    if (!content) {
+      setError("De huidige site-inhoud kon niet geladen worden.");
+      return;
+    }
+
+    setSavingCamp(true);
+    setMessage("");
+    setError("");
+
+    const response = await fetch("/api/admin/content", {
+      body: JSON.stringify({
+        content: {
+          ...content,
+          pageZomerkampDocuments: stringifyCampDocuments(campDocuments),
+        },
+      }),
+      headers: { "Content-Type": "application/json" },
+      method: "PUT",
+    });
+    const payload = (await response.json().catch(() => ({}))) as ContentResponse;
+
+    if (!response.ok || !payload.content) {
+      setError(payload.error || "Kampdocumenten opslaan is niet gelukt.");
+      setSavingCamp(false);
+      return;
+    }
+
+    setContent(payload.content);
+    setCampDocuments(parseCampDocuments(payload.content.pageZomerkampDocuments || ""));
+    setMessage("Kampdocumenten opgeslagen.");
+    setSavingCamp(false);
+  }
+
   async function copyUrl(item: MediaItem) {
     const absoluteUrl = `${window.location.origin}${item.url}`;
     await navigator.clipboard.writeText(absoluteUrl);
-    setMessage("Link gekopieerd. Plak die bij het juiste kampdocument.");
+    setMessage("Link gekopieerd.");
   }
 
   async function deleteDocument(item: MediaItem) {
@@ -247,7 +377,7 @@ export default function DocumentLibrary() {
               </p>
               <h1 className="mt-3 text-4xl font-black">Documenten beheren</h1>
               <p className="mt-3 max-w-2xl text-slate-600">
-                Upload hier documenten zoals kampboekje, medische fiche of bagagelijst. Gebruik daarna de link bij de kampdocumenten in de pagina-instellingen.
+                Upload hier documenten zoals kampboekje, medische fiche of bagagelijst. Koppel ze daarna rechtstreeks aan de kampdocumenten die ouders op de site zien.
               </p>
             </div>
             <div className="flex gap-3">
@@ -269,7 +399,7 @@ export default function DocumentLibrary() {
 
         {!canManageDocuments && (
           <div className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-sm font-semibold text-amber-900">
-            Alleen de groepsleiding kan algemene documenten uploaden of verwijderen.
+            Alleen de groepsleiding kan algemene documenten uploaden, koppelen of verwijderen.
           </div>
         )}
 
@@ -284,12 +414,132 @@ export default function DocumentLibrary() {
           </div>
         )}
 
+        <section className="rounded-[2rem] border border-emerald-100 bg-white p-7 shadow-lg shadow-emerald-950/5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
+                Zomerkamp
+              </p>
+              <h2 className="mt-3 text-2xl font-black">Kampdocumenten op de site</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+                Dit zijn de documenten die ouders op de zomerkamppagina zien. Upload of kies een document, pas de tekst aan en sla daarna op.
+              </p>
+            </div>
+            <button
+              className="rounded-full bg-[#103001] px-5 py-3 text-sm font-black text-white shadow-lg shadow-emerald-950/20 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={!canManageDocuments || savingCamp}
+              onClick={saveCampDocuments}
+              type="button"
+            >
+              {savingCamp ? "Opslaan..." : "Kampdocumenten opslaan"}
+            </button>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {campDocuments.map((item, index) => (
+              <div
+                className="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 lg:grid-cols-[0.85fr_1fr]"
+                key={`${item.label}-${index}`}
+              >
+                <div className="space-y-3">
+                  <label className="block text-sm font-black text-slate-900">
+                    Naam op de knop
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                      disabled={!canManageDocuments}
+                      onChange={(event) =>
+                        updateCampDocument(index, "label", event.target.value)
+                      }
+                      value={item.label}
+                    />
+                  </label>
+                  <label className="block text-sm font-black text-slate-900">
+                    Korte uitleg voor ouders
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                      disabled={!canManageDocuments}
+                      onChange={(event) =>
+                        updateCampDocument(
+                          index,
+                          "description",
+                          event.target.value
+                        )
+                      }
+                      value={item.description}
+                    />
+                  </label>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="block text-sm font-black text-slate-900">
+                    Link of geüpload document
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                      disabled={!canManageDocuments}
+                      onChange={(event) =>
+                        updateCampDocument(index, "href", event.target.value)
+                      }
+                      placeholder="/api/media/uploads/... of externe link"
+                      value={item.href}
+                    />
+                  </label>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <select
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                      disabled={!canManageDocuments || documents.length === 0}
+                      onChange={(event) => {
+                        if (event.target.value) {
+                          updateCampDocument(index, "href", event.target.value);
+                        }
+                      }}
+                      value=""
+                    >
+                      <option value="">Kies uit bibliotheek</option>
+                      {documents.map((document) => (
+                        <option key={document.key} value={document.url}>
+                          {shortName(document.key)}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-black text-[#103001]">
+                      {uploading ? "Uploaden..." : "Bestand uploaden"}
+                      <input
+                        accept={acceptedDocuments}
+                        className="sr-only"
+                        disabled={!canManageDocuments || uploading}
+                        onChange={(event) =>
+                          uploadDocument(event.target.files?.[0], index)
+                        }
+                        type="file"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            className="mt-5 rounded-full border border-emerald-100 bg-white px-5 py-3 text-sm font-black text-[#103001]"
+            disabled={!canManageDocuments}
+            onClick={() =>
+              setCampDocuments((items) => [
+                ...items,
+                { label: "Nieuw document", href: "/#contact", description: "" },
+              ])
+            }
+            type="button"
+          >
+            Documentregel toevoegen
+          </button>
+        </section>
+
         <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="rounded-[2rem] border border-emerald-100 bg-white p-7 shadow-lg shadow-emerald-950/5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
               Upload
             </p>
-            <h2 className="mt-3 text-2xl font-black">Nieuw document toevoegen</h2>
+            <h2 className="mt-3 text-2xl font-black">Los document toevoegen</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
               Ondersteund: PDF, DOC en DOCX. Voor ouders opent een PDF meestal meteen in de browser; Word-bestanden worden vaak gedownload.
             </p>
@@ -302,7 +552,7 @@ export default function DocumentLibrary() {
               type="file"
             />
             <p className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
-              Tip: ga daarna naar <strong>Pagina's</strong>, kies <strong>Zomerkamp</strong> en vul de gekopieerde link in bij kampboekje, medische fiche of bagagelijst.
+              Deze bibliotheek gebruikt dezelfde Cloudflare-opslag als de foto's. Later kunnen we hier extra documentplekken aan toevoegen als dat nodig is.
             </p>
           </div>
 
