@@ -1,7 +1,7 @@
-import AdminDashboard from "./AdminDashboard";
+import AdminDashboardHumanized from "./AdminDashboardHumanized";
 
 export const dynamic = "force-dynamic";
 
 export default function AdminPage() {
-  return <AdminDashboard />;
+  return <AdminDashboardHumanized />;
 }
