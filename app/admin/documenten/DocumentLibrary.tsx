@@ -67,7 +67,7 @@ function isDocument(item: MediaItem) {
 }
 
 function parseCampDocuments(value: string) {
-  const parsed = value
+  return value
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean)
@@ -80,8 +80,6 @@ function parseCampDocuments(value: string) {
       };
     })
     .filter((item) => item.label);
-
-  return parsed.length ? parsed : fallbackCampDocuments;
 }
 
 function stringifyCampDocuments(items: CampDocument[]) {
@@ -222,6 +220,11 @@ export default function DocumentLibrary() {
     );
   }
 
+  function removeCampDocument(index: number) {
+    setCampDocuments((items) => items.filter((_, itemIndex) => itemIndex !== index));
+    setMessage("Documentregel verwijderd. Klik nog op 'Kampdocumenten opslaan'.");
+  }
+
   async function uploadDocument(file: File | undefined, campIndex?: number) {
     if (!file) {
       return;
@@ -309,7 +312,7 @@ export default function DocumentLibrary() {
   }
 
   async function deleteDocument(item: MediaItem) {
-    if (!window.confirm("Dit document verwijderen uit de bibliotheek?")) {
+    if (!window.confirm("Dit documentbestand verwijderen uit de opslag? Als dit bestand nog op de site gekoppeld is, werkt die link daarna niet meer.")) {
       return;
     }
 
@@ -330,7 +333,7 @@ export default function DocumentLibrary() {
       return;
     }
 
-    setMessage("Document verwijderd.");
+    setMessage("Documentbestand verwijderd uit de opslag.");
     await loadDocuments();
   }
 
@@ -435,88 +438,118 @@ export default function DocumentLibrary() {
             </button>
           </div>
 
-          <div className="mt-6 space-y-4">
-            {campDocuments.map((item, index) => (
-              <div
-                className="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 lg:grid-cols-[0.85fr_1fr]"
-                key={`${item.label}-${index}`}
-              >
-                <div className="space-y-3">
-                  <label className="block text-sm font-black text-slate-900">
-                    Naam op de knop
-                    <input
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
-                      disabled={!canManageDocuments}
-                      onChange={(event) =>
-                        updateCampDocument(index, "label", event.target.value)
-                      }
-                      value={item.label}
-                    />
-                  </label>
-                  <label className="block text-sm font-black text-slate-900">
-                    Korte uitleg voor ouders
-                    <input
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
-                      disabled={!canManageDocuments}
-                      onChange={(event) =>
-                        updateCampDocument(
-                          index,
-                          "description",
-                          event.target.value
-                        )
-                      }
-                      value={item.description}
-                    />
-                  </label>
-                </div>
+          <div className="mt-5 rounded-3xl border border-emerald-100 bg-emerald-50/80 p-4 text-sm leading-6 text-emerald-950">
+            <strong>Goed om te weten:</strong> een documentregel verwijderen haalt de knop van de website. Een documentbestand verwijderen onderaan haalt het echte PDF/Word-bestand uit de opslag.
+          </div>
 
-                <div className="space-y-3">
-                  <label className="block text-sm font-black text-slate-900">
-                    Link of geüpload document
-                    <input
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
-                      disabled={!canManageDocuments}
-                      onChange={(event) =>
-                        updateCampDocument(index, "href", event.target.value)
-                      }
-                      placeholder="/api/media/uploads/... of externe link"
-                      value={item.href}
-                    />
-                  </label>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <select
-                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
-                      disabled={!canManageDocuments || documents.length === 0}
-                      onChange={(event) => {
-                        if (event.target.value) {
-                          updateCampDocument(index, "href", event.target.value);
-                        }
-                      }}
-                      value=""
-                    >
-                      <option value="">Kies uit bibliotheek</option>
-                      {documents.map((document) => (
-                        <option key={document.key} value={document.url}>
-                          {shortName(document.key)}
-                        </option>
-                      ))}
-                    </select>
-                    <label className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-black text-[#103001]">
-                      {uploading ? "Uploaden..." : "Bestand uploaden"}
+          <div className="mt-6 space-y-4">
+            {campDocuments.length > 0 ? (
+              campDocuments.map((item, index) => (
+                <div
+                  className="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 lg:grid-cols-[0.85fr_1fr]"
+                  key={`${item.label}-${index}`}
+                >
+                  <div className="space-y-3">
+                    <label className="block text-sm font-black text-slate-900">
+                      Naam op de knop
                       <input
-                        accept={acceptedDocuments}
-                        className="sr-only"
-                        disabled={!canManageDocuments || uploading}
+                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                        disabled={!canManageDocuments}
                         onChange={(event) =>
-                          uploadDocument(event.target.files?.[0], index)
+                          updateCampDocument(index, "label", event.target.value)
                         }
-                        type="file"
+                        value={item.label}
+                      />
+                    </label>
+                    <label className="block text-sm font-black text-slate-900">
+                      Korte uitleg voor ouders
+                      <input
+                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                        disabled={!canManageDocuments}
+                        onChange={(event) =>
+                          updateCampDocument(
+                            index,
+                            "description",
+                            event.target.value
+                          )
+                        }
+                        value={item.description}
                       />
                     </label>
                   </div>
+
+                  <div className="space-y-3">
+                    <label className="block text-sm font-black text-slate-900">
+                      Link of geüpload document
+                      <input
+                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                        disabled={!canManageDocuments}
+                        onChange={(event) =>
+                          updateCampDocument(index, "href", event.target.value)
+                        }
+                        placeholder="/api/media/uploads/... of externe link"
+                        value={item.href}
+                      />
+                    </label>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <select
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-emerald-700"
+                        disabled={!canManageDocuments || documents.length === 0}
+                        onChange={(event) => {
+                          if (event.target.value) {
+                            updateCampDocument(index, "href", event.target.value);
+                          }
+                        }}
+                        value=""
+                      >
+                        <option value="">Kies uit bibliotheek</option>
+                        {documents.map((document) => (
+                          <option key={document.key} value={document.url}>
+                            {shortName(document.key)}
+                          </option>
+                        ))}
+                      </select>
+                      <label className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-black text-[#103001]">
+                        {uploading ? "Uploaden..." : "Bestand uploaden"}
+                        <input
+                          accept={acceptedDocuments}
+                          className="sr-only"
+                          disabled={!canManageDocuments || uploading}
+                          onChange={(event) =>
+                            uploadDocument(event.target.files?.[0], index)
+                          }
+                          type="file"
+                        />
+                      </label>
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {item.href ? (
+                        <a
+                          className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-[#103001]"
+                          href={item.href}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          Test link
+                        </a>
+                      ) : null}
+                      <button
+                        className="rounded-full border border-red-100 bg-white px-4 py-2 text-sm font-black text-red-700"
+                        disabled={!canManageDocuments}
+                        onClick={() => removeCampDocument(index)}
+                        type="button"
+                      >
+                        Documentregel verwijderen
+                      </button>
+                    </div>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="rounded-3xl border border-dashed border-emerald-200 bg-emerald-50/60 p-8 text-center text-sm font-semibold text-slate-600">
+                Er staan momenteel geen kampdocumentknoppen op de website.
               </div>
-            ))}
+            )}
           </div>
 
           <button
@@ -611,7 +644,7 @@ export default function DocumentLibrary() {
                             onClick={() => deleteDocument(item)}
                             type="button"
                           >
-                            Verwijderen
+                            Bestand verwijderen
                           </button>
                         )}
                       </div>
