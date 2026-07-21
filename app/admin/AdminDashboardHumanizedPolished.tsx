@@ -1,8 +1,9 @@
+import Link from "next/link";
 import AdminDashboardHumanized from "./AdminDashboardHumanized";
 
 export default function AdminDashboardHumanizedPolished() {
   return (
-    <div className="admin-humanized-polish">
+    <div className="admin-humanized-polish bg-[#eef7ec]">
       <style>{`
         .admin-humanized-polish div[class*="flex"][class*="flex-wrap"][class*="gap-2"] {
           align-items: flex-start;
@@ -45,6 +46,22 @@ export default function AdminDashboardHumanizedPolished() {
           display: none;
         }
       `}</style>
+      <div className="mx-auto max-w-[1400px] px-6 pt-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-emerald-100 bg-white/80 px-5 py-4 text-sm shadow-sm shadow-emerald-950/5 backdrop-blur-xl">
+          <div>
+            <p className="font-black text-slate-950">Documenten nodig voor ouders?</p>
+            <p className="text-slate-500">
+              Upload hier kampboekjes, medische fiches en bagagelijsten als PDF of Word-bestand.
+            </p>
+          </div>
+          <Link
+            className="rounded-full bg-[#103001] px-5 py-3 font-black text-white shadow-lg shadow-emerald-950/20"
+            href="/admin/documenten"
+          >
+            Documentbibliotheek
+          </Link>
+        </div>
+      </div>
       <AdminDashboardHumanized />
     </div>
   );
