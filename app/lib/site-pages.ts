@@ -278,17 +278,40 @@ export function parseLinks(value: string): SitePageLinkItem[] {
     .filter((item) => item.label);
 }
 
-export function parseLines(value: string) {
+export function parseLines(value: string): string[] {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
 }
 
+export function getSitePageImageKey(page: SiteInfoPage) {
+  return keyFor(page, "ImageUrl");
+}
+
+export const sitePageGroups = [
+  {
+    title: "Activiteiten en evenementen",
+    description:
+      "Wekelijkse activiteiten, kamp, evenementen en verkoopacties die bezoekers snel moeten vinden.",
+    pages: sitePages.filter((page) =>
+      ["activiteiten", "zomerkamp", "dropping", "ontbijtmanden", "steak-en-burgerday"].includes(page.slug)
+    ),
+  },
+  {
+    title: "Praktisch en steun",
+    description:
+      "Pagina's voor shop, oudercomite, verhuur, oud-leiding en nuttige links.",
+    pages: sitePages.filter((page) =>
+      ["shop", "oudercomite", "verhuur", "oud-leiding", "links"].includes(page.slug)
+    ),
+  },
+];
+
 export function stringifyCards(items: SitePageCard[]) {
   return items
     .filter((item) => item.title.trim() || item.text.trim())
-    .map((item) => `${item.title.trim()}|${item.text.trim()}`)
+    .map((item) => [item.title.trim(), item.text.trim()].join("|"))
     .join("\n");
 }
 
@@ -296,7 +319,7 @@ export function stringifyFacts(items: SitePageFact[]) {
   return items
     .filter((item) => item.label.trim() || item.value.trim() || item.note?.trim())
     .map((item) =>
-      [item.label.trim(), item.value.trim(), (item.note ?? "").trim()].join("|")
+      [item.label.trim(), item.value.trim(), item.note?.trim() ?? ""].join("|")
     )
     .join("\n");
 }
@@ -478,11 +501,10 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
 
   if (page.kind === "camp") {
     groups.push({
-      title: "Documenten en updates",
+      title: "Kampupdates",
       description:
-        "Voeg links toe naar kampboekje, medische fiche, bagagelijst en korte updates.",
+        "Kampboekje, medische fiche en bagagelijst beheer je via de documentbibliotheek. Hier pas je alleen de korte praktische updates aan.",
       fields: [
-        { key: keyFor(page, "Documents"), label: "Links naar documenten", kind: "textarea" },
         { key: keyFor(page, "Updates"), label: "Praktische updates", kind: "textarea" },
       ],
     });
@@ -558,51 +580,3 @@ export function getSitePageAdminGroups(page: SiteInfoPage): SitePageAdminGroup[]
 
   return groups;
 }
-
-export function getSitePageImageKey(page: SiteInfoPage) {
-  return keyFor(page, "ImageUrl");
-}
-
-export const sitePageGroups = [
-  {
-    label: "Activiteiten",
-    href: "/activiteiten",
-    slugs: ["activiteiten", "zomerkamp", "dropping", "steak-en-burgerday"],
-    items: [
-      { label: "Activiteiten", href: "/activiteiten" },
-      { label: "Zomerkamp", href: "/zomerkamp" },
-      { label: "Dropping", href: "/dropping" },
-      { label: "Steak- en Burgerday", href: "/steak-en-burgerday" },
-    ],
-  },
-  {
-    label: "Steun ons",
-    href: "/ontbijtmanden",
-    slugs: ["ontbijtmanden", "steak-en-burgerday", "dropping", "shop"],
-    items: [
-      { label: "Ontbijtmanden", href: "/ontbijtmanden" },
-      { label: "Steak- en Burgerday", href: "/steak-en-burgerday" },
-      { label: "Dropping", href: "/dropping" },
-      { label: "Shop", href: "/shop" },
-    ],
-  },
-  {
-    label: "Praktisch",
-    href: "/oudercomite",
-    slugs: ["oudercomite", "verhuur", "links"],
-    items: [
-      { label: "Oudercomite", href: "/oudercomite" },
-      { label: "Verhuur", href: "/verhuur" },
-      { label: "Links", href: "/links" },
-    ],
-  },
-  {
-    label: "Meer",
-    href: "/oud-leiding",
-    slugs: ["oud-leiding", "fotos"],
-    items: [
-      { label: "Foto's", href: "/fotos" },
-      { label: "Oud-leiding", href: "/oud-leiding" },
-    ],
-  },
-];
