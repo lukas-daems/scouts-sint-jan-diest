@@ -29,7 +29,29 @@ function getContactPhones(content: EditableSiteContent) {
     : [{ name: "Groepsleiding", phone: content.contactPhone }];
 }
 
+function getContactCopy(content: EditableSiteContent) {
+  const subtitle = /Heb je vragen, wil je je kind inschrijven/i.test(
+    content.contactSubtitle
+  )
+    ? "Wil je je zoon eens laten proberen, heb je een praktische vraag of zoek je de juiste leiding? Stuur ons gerust een bericht. We helpen je verder zonder gedoe."
+    : content.contactSubtitle.replace(/je kind/g, "je zoon");
+  const externalTitle = /Schrijf je in of stel je vraag/i.test(
+    content.contactExternalTitle
+  )
+    ? "Laat iets van je horen"
+    : content.contactExternalTitle;
+  const externalText = /Nieuwe leden zijn welkom/i.test(content.contactExternalText)
+    ? "Nieuwe leden mogen eerst vrijblijvend kennismaken op zaterdag. Na contact laten we weten bij welke tak je zoon kan aansluiten en wat praktisch handig is."
+    : content.contactExternalText.replace(/je kind/g, "je zoon");
+  const trustText = /Nieuwe leden zijn welkom/i.test(content.contactTrustText)
+    ? "Eerst eens proberen mag. Zo voelt je zoon snel of scouts iets voor hem is."
+    : content.contactTrustText.replace(/je kind/g, "je zoon");
+
+  return { subtitle, externalTitle, externalText, trustText };
+}
+
 export default function ContactSection({ content }: ContactSectionProps) {
+  const copy = getContactCopy(content);
   const hasExternalLink = Boolean(content.contactExternalUrl);
   const contactPhones = getContactPhones(content);
   const contrastLogoSrc = content.siteLogoDarkBackgroundUrl || "";
@@ -47,7 +69,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
             {content.contactTitle}
           </h2>
           <p className="mt-6 text-lg leading-8 text-slate-600">
-            {content.contactSubtitle}
+            {copy.subtitle}
           </p>
         </div>
 
@@ -56,10 +78,10 @@ export default function ContactSection({ content }: ContactSectionProps) {
             <div className="rounded-[1.7rem] bg-[#edf6e8] p-6 ring-1 ring-[#d7e8cf] sm:p-8">
               <IconBadge icon="mail" tone="green" />
               <h3 className="mt-6 text-3xl font-black text-slate-950">
-                {content.contactExternalTitle}
+                {copy.externalTitle}
               </h3>
               <p className="mt-4 whitespace-pre-line text-base leading-8 text-slate-700">
-                {content.contactExternalText}
+                {copy.externalText}
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 {hasExternalLink ? (
@@ -201,7 +223,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
                 <div className="flex items-center gap-4">
                   <IconBadge icon="heart" tone="light" />
                   <p className="text-sm leading-7 text-green-50">
-                    {content.contactTrustText}
+                    {copy.trustText}
                   </p>
                 </div>
               </div>
