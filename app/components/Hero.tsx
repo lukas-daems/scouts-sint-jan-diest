@@ -5,8 +5,45 @@ type HeroProps = {
   content: EditableSiteContent;
 };
 
+function cleanHeroText(value: string, siteName: string) {
+  return value
+    .replace(/Scouts Sint-Jan Diest/g, siteName)
+    .replace(/kinderen en jongeren/g, "jongens")
+    .replace(/Een warme scoutsgroep/g, "Een jongensscouts")
+    .replace(/Elke week beleven/g, "Elke zaterdag beleven");
+}
+
+function getHeroCopy(content: EditableSiteContent) {
+  const siteName = content.siteName || "Scouts Sint-Jan Berchmans";
+  const eyebrow = /offici.?le scoutsgroep uit diest/i.test(content.heroEyebrow)
+    ? "JONGENSSCOUTS UIT DIEST"
+    : cleanHeroText(content.heroEyebrow, siteName);
+  const titleLineOne =
+    content.heroTitleLineOne.trim().toLowerCase() === "avontuur begint bij"
+      ? "Elke zaterdag op avontuur bij"
+      : cleanHeroText(content.heroTitleLineOne, siteName);
+  const titleLineTwo = cleanHeroText(content.heroTitleLineTwo, siteName);
+  const defaultSubtitle =
+    "Elke zaterdag van 14u tot 17u trekken jongens van 6 tot 18 jaar in Diest naar buiten voor spel, tocht, techniek en kampvoorbereiding. Nieuwe leden mogen eerst vrijblijvend komen proberen.";
+  const subtitle = /avontuur, vriendschap en groei/i.test(content.heroSubtitle)
+    ? defaultSubtitle
+    : cleanHeroText(content.heroSubtitle, siteName);
+  const stats = [
+    [content.heroStatOneTitle, content.heroStatOneLabel],
+    [content.heroStatTwoTitle, content.heroStatTwoLabel],
+    [content.heroStatThreeTitle, content.heroStatThreeLabel],
+    [content.heroStatFourTitle, content.heroStatFourLabel],
+  ].map(([title, label]) => [
+    cleanHeroText(title, siteName),
+    label === "voor 6-18 jaar" ? "jongens 6-18 jaar" : cleanHeroText(label, siteName),
+  ]);
+
+  return { eyebrow, titleLineOne, titleLineTwo, subtitle, stats };
+}
+
 export default function Hero({ content }: HeroProps) {
   const heroImage = content.heroImageUrl || images.hero;
+  const copy = getHeroCopy(content);
   const imageStyle = {
     backgroundImage: `linear-gradient(180deg, rgba(7, 82, 199, 0.08), rgba(4, 18, 50, 0.58)), url("${heroImage}")`,
   };
@@ -21,15 +58,15 @@ export default function Hero({ content }: HeroProps) {
       <div className="relative mx-auto flex max-w-7xl flex-col items-center">
         <div className="section-fade max-w-4xl text-center">
           <div className="hero-eyebrow-badge mb-4 inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-bold uppercase leading-none tracking-[0.14em] text-green-50 sm:text-xs">
-            <span>{content.heroEyebrow}</span>
+            <span>{copy.eyebrow}</span>
             <span>{content.heroOrgLabel}</span>
           </div>
           <h1 className="text-4xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl">
-            {content.heroTitleLineOne}
-            <span className="mt-1 block sm:mt-2">{content.heroTitleLineTwo}</span>
+            {copy.titleLineOne}
+            <span className="mt-1 block sm:mt-2">{copy.titleLineTwo}</span>
           </h1>
           <p className="mx-auto mt-5 max-w-[820px] text-base leading-7 text-green-50 sm:text-xl sm:leading-8">
-            {content.heroSubtitle}
+            {copy.subtitle}
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
@@ -62,12 +99,7 @@ export default function Hero({ content }: HeroProps) {
             <span className="camp-fire" />
           </div>
           <div className="relative z-20 -mt-8 grid grid-cols-2 gap-2 px-2 sm:absolute sm:inset-x-5 sm:bottom-5 sm:mt-0 sm:grid-cols-4 sm:px-0">
-            {[
-              [content.heroStatOneTitle, content.heroStatOneLabel],
-              [content.heroStatTwoTitle, content.heroStatTwoLabel],
-              [content.heroStatThreeTitle, content.heroStatThreeLabel],
-              [content.heroStatFourTitle, content.heroStatFourLabel],
-            ].map(([title, label]) => (
+            {copy.stats.map(([title, label]) => (
               <div
                 className="hero-floating-card rounded-2xl px-3 py-2.5 text-slate-950 sm:px-4 sm:py-3"
                 key={title}
