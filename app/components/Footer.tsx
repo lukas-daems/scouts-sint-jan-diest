@@ -47,11 +47,25 @@ function getContactPhones(content: EditableSiteContent) {
     : [{ name: "Groepsleiding", phone: content.contactPhone }];
 }
 
+function getFooterDescription(content: EditableSiteContent) {
+  const fallback =
+    "Een jongensscouts uit Diest. Elke zaterdag maken leden van 6 tot 18 jaar samen tijd voor spel, kamp, vriendschap en engagement.";
+
+  if (/groeien door avontuur, vriendschap en engagement/i.test(content.footerDescription)) {
+    return fallback;
+  }
+
+  return content.footerDescription
+    .replace(/Scouts Sint-Jan Diest/g, content.siteName)
+    .replace(/kinderen en jongeren/g, "jongens");
+}
+
 export default function Footer({ content }: FooterProps) {
   const contrastLogoSrc = content.siteLogoDarkBackgroundUrl || "";
   const logoSrc = contrastLogoSrc || content.siteLogoUrl || "/assets/logo.png";
   const hasLogoForGreenBackground = Boolean(contrastLogoSrc);
   const contactPhones = getContactPhones(content);
+  const footerDescription = getFooterDescription(content);
 
   return (
     <footer className="bg-[#071a02] px-5 py-14 text-white sm:px-8 sm:py-18 lg:px-10">
@@ -79,7 +93,7 @@ export default function Footer({ content }: FooterProps) {
               <div>
                 <h2 className="text-2xl font-black">{content.siteName}</h2>
                 <p className="mt-4 max-w-md text-sm leading-7 text-green-100">
-                  {content.footerDescription}
+                  {footerDescription}
                 </p>
               </div>
             </div>
