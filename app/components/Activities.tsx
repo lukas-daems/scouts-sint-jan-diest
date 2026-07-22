@@ -11,32 +11,32 @@ import { images } from "../lib/image-placeholders";
 const smallActivities = [
   {
     title: "Bosspelen",
-    text: "Grote spelen in het bos, vol actie, fantasie en samenwerking.",
+    text: "Plein- en bosspelen op zaterdag: vuil worden mag, samenwerken helpt en verliezen hoort erbij.",
     icon: "tree" as const,
   },
   {
     title: "Weekends",
-    text: "Een weekend weg met de tak om de groep sterker te maken.",
+    text: "Twee keer per jaar trekt een tak er een weekend op uit. Dat maakt de groep snel hechter.",
     icon: "home" as const,
   },
   {
     title: "Tochten & technieken",
-    text: "Leren sjorren, kaartlezen, koken op vuur en zelfstandig op pad gaan.",
+    text: "Sjorren, kaartlezen, koken op vuur en stap voor stap zelfstandiger op pad gaan.",
     icon: "map" as const,
   },
   {
     title: "Kampvuur & sfeer",
-    text: "Samen zingen, verhalen delen en genieten van echte scoutssfeer.",
+    text: "Op weekend en kamp maken kleine rituelen, verhalen en liedjes het echte scoutsgevoel.",
     icon: "campfire" as const,
   },
   {
     title: "Dropping",
-    text: "Een avontuurlijk evenement waarbij deelnemers samen op pad gaan en de werking steunen.",
+    text: "Een avond op pad voor ouders, oud-leiding en sympathisanten, met opbrengst voor de werking.",
     icon: "flag" as const,
   },
   {
-    title: "Groepsactiviteiten",
-    text: "Momenten waarop heel Scouts Sint-Jan Berchmans samenkomt.",
+    title: "Groepsmomenten",
+    text: "Startdag, groepsactiviteiten en momenten waarop heel Sint-Jan samenkomt.",
     icon: "users" as const,
   },
 ];
@@ -45,7 +45,33 @@ type ActivitiesProps = {
   content: EditableSiteContent;
 };
 
+function getActivitiesCopy(content: EditableSiteContent) {
+  const subtitle = /spel, natuur, creativiteit, samenwerking en avontuur/i.test(
+    content.activitiesSubtitle
+  )
+    ? "Van een gewoon zaterdagspel tot weekend, dropping of kamp: onze werking leeft vooral buiten, samen met de tak en de leiding."
+    : content.activitiesSubtitle;
+  const featuredText = /vriendschappen verdiepen/i.test(
+    content.activitiesFeaturedText
+  )
+    ? "Voor veel leden is zomerkamp het moment waar ze maanden naar uitkijken: slapen met de tak, zelf mee zorgen voor de dag en thuiskomen met verhalen die blijven hangen."
+    : content.activitiesFeaturedText;
+  const featuredMiniText = /Tenten, takmomenten/i.test(
+    content.activitiesFeaturedMiniText
+  )
+    ? "Tenten, corvee, grote spelen, kampvuur en kleine momenten die later groot worden."
+    : content.activitiesFeaturedMiniText;
+  const moreText = /wekelijkse werking, Dropping, steunacties/i.test(
+    content.activitiesMoreText
+  )
+    ? "Op de activiteitenpagina staat het verschil tussen gewone zaterdagwerking, evenementen zoals Dropping en steunacties zoals ontbijtmanden duidelijk uitgelegd."
+    : content.activitiesMoreText;
+
+  return { subtitle, featuredText, featuredMiniText, moreText };
+}
+
 export default function Activities({ content }: ActivitiesProps) {
+  const copy = getActivitiesCopy(content);
   const campTheme = getGalleryThemeBySlug("kamp");
   const uploadedCampImage =
     campTheme?.coverKey && campTheme.collageKey
@@ -59,7 +85,7 @@ export default function Activities({ content }: ActivitiesProps) {
     <section className="bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="activiteiten">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
-          subtitle={content.activitiesSubtitle}
+          subtitle={copy.subtitle}
           title={content.activitiesTitle}
         />
 
@@ -74,21 +100,21 @@ export default function Activities({ content }: ActivitiesProps) {
                   backgroundImage: `linear-gradient(180deg, rgba(7, 26, 2, 0.05), rgba(7, 26, 2, 0.78)), url("${campImage}")`,
                 }}
               />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.22),transparent_22%),linear-gradient(180deg,rgba(16,48,1,0.04),rgba(7,26,2,0.72))]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.18),transparent_22%),linear-gradient(180deg,rgba(16,48,1,0.03),rgba(7,26,2,0.68))]" />
               <div className="absolute left-5 top-5 flex flex-wrap items-center gap-3 sm:left-7 sm:top-7">
                 <IconBadge icon="tent" tone="light" />
                 <p className="inline-flex rounded-full bg-white/90 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#103001] shadow-lg backdrop-blur">
                   {content.activitiesFeaturedBadge}
                 </p>
               </div>
-              <div className="absolute inset-x-5 bottom-5 rounded-[1.5rem] border border-white/18 bg-white/14 p-5 text-white shadow-2xl shadow-green-950/25 backdrop-blur sm:inset-x-7 sm:bottom-7 sm:p-6">
+              <div className="absolute inset-x-5 bottom-5 rounded-[1.5rem] border border-white/18 bg-white/12 p-5 text-white shadow-2xl shadow-green-950/20 backdrop-blur sm:inset-x-7 sm:bottom-7 sm:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-black uppercase tracking-[0.14em] text-green-100">
                       {content.activitiesFeaturedMiniTitle}
                     </p>
                     <p className="mt-2 max-w-sm text-sm leading-6 text-white/86">
-                      {content.activitiesFeaturedMiniText}
+                      {copy.featuredMiniText}
                     </p>
                   </div>
                   <Link
@@ -107,7 +133,7 @@ export default function Activities({ content }: ActivitiesProps) {
                   {content.activitiesFeaturedTitle}
                 </h3>
                 <p className="mt-4 max-w-xl text-base leading-8 text-slate-600">
-                  {content.activitiesFeaturedText}
+                  {copy.featuredText}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-2">
                   <span className="rounded-full bg-[#edf6e8] px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] text-[#103001] ring-1 ring-[#d7e8cf]">
@@ -124,7 +150,9 @@ export default function Activities({ content }: ActivitiesProps) {
           <div className="grid gap-5 sm:grid-cols-2">
             {smallActivities.map((activity, index) => (
               <article
-                className="lift-card premium-card p-6"
+                className={`lift-card premium-card p-6 ${
+                  index === 0 ? "sm:col-span-2 lg:col-span-1" : ""
+                }`}
                 key={activity.title}
               >
                 <IconBadge
@@ -151,7 +179,7 @@ export default function Activities({ content }: ActivitiesProps) {
                   {content.activitiesMoreTitle}
                 </h3>
                 <p className="mt-2 max-w-3xl text-[15px] leading-7 text-slate-600">
-                  {content.activitiesMoreText}
+                  {copy.moreText}
                 </p>
               </div>
             </div>
