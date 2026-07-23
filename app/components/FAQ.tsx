@@ -18,7 +18,7 @@ export default function FAQ({ content }: FAQProps) {
     : content.faqSubtitle;
 
   return (
-    <section className="bg-[#f2f8ee] px-5 py-14 sm:px-8 sm:py-18 lg:px-10">
+    <section className="bg-[#f2f8ee] px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
       <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.76fr_1.24fr] lg:items-start">
         <div>
           <p className="mb-4 inline-flex rounded-full bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#103001] shadow-sm">
