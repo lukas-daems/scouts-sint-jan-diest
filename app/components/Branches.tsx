@@ -11,22 +11,22 @@ type BranchesProps = {
 export default function Branches({ content }: BranchesProps) {
   return (
     <section
-      className="relative z-0 isolate bg-[#eef7e9] px-5 pb-16 pt-20 sm:px-8 sm:pb-24 sm:pt-24 lg:px-10 lg:pt-28"
+      className="relative z-0 isolate bg-[#eef7e9] px-5 pb-14 pt-16 sm:px-8 sm:pb-20 sm:pt-20 lg:px-10 lg:pt-22"
       id="takken"
     >
-      <div className="relative mx-auto max-w-7xl rounded-[2.25rem] border border-slate-200/80 bg-white p-5 shadow-2xl shadow-green-950/10 sm:p-8 lg:p-10">
+      <div className="relative mx-auto max-w-7xl rounded-[2rem] border border-slate-200/80 bg-white p-5 shadow-2xl shadow-green-950/8 sm:p-7 lg:p-8">
         <SectionHeader
           subtitle={content.branchesHomeSubtitle}
           title={content.branchesHomeTitle}
         />
 
-        <div className="mt-10 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {branchProfiles.map((profile) => {
             const branch = getEditableBranchProfile(profile, content);
 
             return (
               <article
-                className="forest-glass-light lift-card relative overflow-hidden rounded-[1.7rem] p-5 text-center shadow-lg shadow-green-950/6"
+                className="forest-glass-light lift-card relative overflow-hidden rounded-[1.45rem] p-4 text-center shadow-md shadow-green-950/5"
                 key={branch.name}
               >
                 <div className="flex justify-center">
@@ -36,16 +36,16 @@ export default function Branches({ content }: BranchesProps) {
                     tone="green"
                   />
                 </div>
-                <h3 className="mt-5 text-lg font-black tracking-tight text-slate-950">
+                <h3 className="mt-4 text-base font-black tracking-tight text-slate-950">
                   {branch.name}
                 </h3>
-                <div className="mt-3 flex justify-center">
-                  <span className="forest-glass-light rounded-full px-3.5 py-1.5 text-xs font-black text-[#103001]">
+                <div className="mt-2 flex justify-center">
+                  <span className="rounded-full bg-[#edf6e8] px-3 py-1 text-xs font-black text-[#103001] ring-1 ring-[#d7e8cf]">
                     {branch.age}
                   </span>
                 </div>
                 <Link
-                  className="forest-glass-light mt-5 inline-flex items-center rounded-full px-4 py-2 text-sm font-black text-[#2f6b18] transition hover:-translate-y-0.5 hover:text-[#103001]"
+                  className="mt-4 inline-flex items-center rounded-full bg-white px-3.5 py-2 text-xs font-black text-[#2f6b18] ring-1 ring-[#d7e8cf] transition hover:-translate-y-0.5 hover:bg-[#f2f8ee] hover:text-[#103001]"
                   href={`/takken/${branch.slug}`}
                 >
                   Meer over deze tak
@@ -58,9 +58,9 @@ export default function Branches({ content }: BranchesProps) {
           })}
         </div>
 
-        <div className="mt-10 text-center">
+        <div className="mt-8 text-center">
           <Link
-            className="inline-flex rounded-full bg-[#103001] px-7 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/15 transition hover:-translate-y-0.5 hover:bg-[#1e4b0d]"
+            className="inline-flex rounded-full bg-[#103001] px-6 py-3 text-sm font-bold text-white shadow-xl shadow-green-950/12 transition hover:-translate-y-0.5 hover:bg-[#1e4b0d]"
             href="/takken"
           >
             {content.branchesHomeCtaLabel}
