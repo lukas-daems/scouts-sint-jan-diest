@@ -61,7 +61,7 @@ export default function PracticalInfo({ content }: PracticalInfoProps) {
   ].filter(Boolean);
 
   return (
-    <section className="bg-[#fbfdf9] px-5 py-14 sm:px-8 sm:py-18 lg:px-10">
+    <section className="bg-[#fbfdf9] px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           subtitle={copy.subtitle}
