@@ -59,7 +59,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
   const hasLogoForGreenBackground = Boolean(contrastLogoSrc);
 
   return (
-    <section className="bg-white px-5 py-16 sm:px-8 sm:py-22 lg:px-10" id="contact">
+    <section className="bg-white px-5 py-16 sm:px-8 sm:py-20 lg:px-10" id="contact">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <p className="mb-4 inline-flex rounded-full bg-[#edf6e8] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#103001]">
