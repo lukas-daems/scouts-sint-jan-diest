@@ -59,34 +59,34 @@ export default function ContactSection({ content }: ContactSectionProps) {
   const hasLogoForGreenBackground = Boolean(contrastLogoSrc);
 
   return (
-    <section className="bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" id="contact">
+    <section className="bg-white px-5 py-16 sm:px-8 sm:py-22 lg:px-10" id="contact">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-5 inline-flex rounded-full bg-[#edf6e8] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#103001]">
+          <p className="mb-4 inline-flex rounded-full bg-[#edf6e8] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#103001]">
             {content.contactBadge}
           </p>
-          <h2 className="text-4xl font-black leading-tight text-slate-950 sm:text-5xl">
+          <h2 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl">
             {content.contactTitle}
           </h2>
-          <p className="mt-6 text-lg leading-8 text-slate-600">
+          <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
             {copy.subtitle}
           </p>
         </div>
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-[1.12fr_0.88fr]">
-          <article className="rounded-[2rem] border border-[#d7e8cf] bg-[#fbfdf9] p-6 shadow-xl shadow-green-950/8 sm:p-8">
-            <div className="rounded-[1.7rem] bg-[#edf6e8] p-6 ring-1 ring-[#d7e8cf] sm:p-8">
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1.12fr_0.88fr]">
+          <article className="rounded-[2rem] border border-[#d7e8cf] bg-[#fbfdf9] p-5 shadow-xl shadow-green-950/8 sm:p-7">
+            <div className="rounded-[1.7rem] bg-[#edf6e8] p-5 ring-1 ring-[#d7e8cf] sm:p-7">
               <IconBadge icon="mail" tone="green" />
-              <h3 className="mt-6 text-3xl font-black text-slate-950">
+              <h3 className="mt-5 text-2xl font-black text-slate-950 sm:text-3xl">
                 {copy.externalTitle}
               </h3>
-              <p className="mt-4 whitespace-pre-line text-base leading-8 text-slate-700">
+              <p className="mt-3 whitespace-pre-line text-base leading-7 text-slate-700">
                 {copy.externalText}
               </p>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 {hasExternalLink ? (
                   <a
-                    className="inline-flex justify-center rounded-full bg-[#103001] px-8 py-4 text-sm font-bold text-white shadow-xl shadow-green-950/20 transition hover:-translate-y-1 hover:bg-[#1e4b0d]"
+                    className="inline-flex justify-center rounded-full bg-[#103001] px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-green-950/16 transition hover:-translate-y-1 hover:bg-[#1e4b0d]"
                     href={content.contactExternalUrl}
                     rel="noreferrer"
                     target="_blank"
@@ -94,12 +94,12 @@ export default function ContactSection({ content }: ContactSectionProps) {
                     {content.contactExternalButton}
                   </a>
                 ) : (
-                  <span className="inline-flex justify-center rounded-full bg-white px-8 py-4 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
+                  <span className="inline-flex justify-center rounded-full bg-white px-7 py-3.5 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
                     Link volgt binnenkort
                   </span>
                 )}
                 <a
-                  className="inline-flex justify-center rounded-full bg-white px-8 py-4 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf] transition hover:bg-green-50"
+                  className="inline-flex justify-center rounded-full bg-white px-7 py-3.5 text-sm font-bold text-[#103001] ring-1 ring-[#d7e8cf] transition hover:bg-green-50"
                   href={`mailto:${content.contactEmail}`}
                 >
                   {content.contactMailCta}
@@ -108,16 +108,16 @@ export default function ContactSection({ content }: ContactSectionProps) {
             </div>
 
             {content.contactNoticeText ? (
-              <p className="mt-6 whitespace-pre-line rounded-3xl bg-white p-5 text-sm font-semibold leading-7 text-slate-600 ring-1 ring-slate-200">
+              <p className="mt-5 whitespace-pre-line rounded-3xl bg-white p-4 text-sm font-semibold leading-7 text-slate-600 ring-1 ring-slate-200">
                 {content.contactNoticeText}
               </p>
             ) : null}
 
-            <div className="mt-6 rounded-[1.7rem] border border-slate-200 bg-white p-5 shadow-lg shadow-green-950/6 sm:p-6">
-              <p className="text-sm font-black uppercase tracking-[0.16em] text-[#2f6b18]">
+            <div className="mt-5 rounded-[1.7rem] border border-slate-200 bg-white p-5 shadow-lg shadow-green-950/6">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f6b18]">
                 {content.contactStepsTitle || "Wat gebeurt er daarna?"}
               </p>
-              <div className="mt-5 grid gap-3">
+              <div className="mt-4 grid gap-2.5">
                 {[
                   [
                     "1",
@@ -136,10 +136,10 @@ export default function ContactSection({ content }: ContactSectionProps) {
                   ],
                 ].map(([step, text]) => (
                   <div
-                    className="flex items-center gap-4 rounded-2xl bg-[#fbfdf9] px-4 py-3 ring-1 ring-slate-200"
+                    className="flex items-center gap-3 rounded-2xl bg-[#fbfdf9] px-4 py-2.5 ring-1 ring-slate-200"
                     key={step}
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#103001] text-sm font-black text-white">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#103001] text-xs font-black text-white">
                       {step}
                     </span>
                     <p className="text-sm font-semibold leading-6 text-slate-700">
@@ -151,7 +151,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
             </div>
           </article>
 
-          <aside className="blue-pattern relative overflow-hidden rounded-[2rem] p-6 text-white shadow-2xl shadow-green-950/20 sm:p-8">
+          <aside className="blue-pattern relative overflow-hidden rounded-[2rem] p-6 text-white shadow-2xl shadow-green-950/18 sm:p-7">
             <div className="relative">
               <span
                 className={
@@ -164,16 +164,16 @@ export default function ContactSection({ content }: ContactSectionProps) {
                   alt={`Logo van ${content.siteName}`}
                   className={`max-w-full object-contain ${
                     hasLogoForGreenBackground
-                      ? "h-24 drop-shadow-[0_18px_28px_rgba(0,0,0,0.28)] sm:h-28"
-                      : "site-logo-cutout h-24 drop-shadow-[0_10px_18px_rgba(16,48,1,0.18)] sm:h-28"
+                      ? "h-20 drop-shadow-[0_18px_28px_rgba(0,0,0,0.28)] sm:h-24"
+                      : "site-logo-cutout h-20 drop-shadow-[0_10px_18px_rgba(16,48,1,0.18)] sm:h-24"
                   }`}
                   src={logoSrc}
                 />
               </span>
-              <h3 className="mt-8 text-3xl font-black">{content.siteName}</h3>
-              <p className="mt-3 text-green-100">{content.contactLocation}</p>
+              <h3 className="mt-6 text-2xl font-black sm:text-3xl">{content.siteName}</h3>
+              <p className="mt-2 text-green-100">{content.contactLocation}</p>
 
-              <div className="mt-8 space-y-5 text-green-50">
+              <div className="mt-6 space-y-4 text-green-50">
                 <p>
                   <span className="font-bold text-white">E-mail:</span>{" "}
                   <a
@@ -213,13 +213,13 @@ export default function ContactSection({ content }: ContactSectionProps) {
               </div>
 
               <a
-                className="mt-9 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-4 text-sm font-bold text-slate-950 transition hover:bg-green-50"
+                className="mt-7 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-bold text-slate-950 transition hover:bg-green-50"
                 href={`mailto:${content.contactEmail}`}
               >
                 {content.contactMailCta}
               </a>
 
-              <div className="mt-8 rounded-3xl bg-white/10 p-5 ring-1 ring-white/15">
+              <div className="mt-6 rounded-3xl bg-white/10 p-4 ring-1 ring-white/15">
                 <div className="flex items-center gap-4">
                   <IconBadge icon="heart" tone="light" />
                   <p className="text-sm leading-7 text-green-50">
