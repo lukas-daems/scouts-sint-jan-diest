@@ -18,12 +18,12 @@ export default function BranchLogo({
   tone = "blue",
 }: BranchLogoProps) {
   const logoUrl = content[branch.logoKey];
-  const sizeClass = size === "hero" ? "h-24 w-24" : "h-16 w-16";
+  const sizeClass = size === "hero" ? "h-24 w-24" : "h-14 w-14";
 
   if (logoUrl) {
     return (
       <span
-        className={`forest-glass-light ${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-3xl p-2 shadow-xl shadow-green-950/10 ring-1 ring-white/70`}
+        className={`forest-glass-light ${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl p-2 shadow-lg shadow-green-950/8 ring-1 ring-white/70`}
       >
         <img
           alt={`Logo van de ${branch.name}`}
