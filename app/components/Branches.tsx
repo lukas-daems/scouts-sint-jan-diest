@@ -11,7 +11,7 @@ type BranchesProps = {
 export default function Branches({ content }: BranchesProps) {
   return (
     <section
-      className="relative z-0 isolate bg-[#eef7e9] px-5 pb-14 pt-16 sm:px-8 sm:pb-20 sm:pt-20 lg:px-10 lg:pt-22"
+      className="relative z-0 isolate bg-[#eef7e9] px-5 pb-14 pt-16 sm:px-8 sm:pb-20 sm:pt-20 lg:px-10 lg:pt-24"
       id="takken"
     >
       <div className="relative mx-auto max-w-7xl rounded-[2rem] border border-slate-200/80 bg-white p-5 shadow-2xl shadow-green-950/8 sm:p-7 lg:p-8">
