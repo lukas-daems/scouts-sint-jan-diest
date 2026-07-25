@@ -9,20 +9,69 @@ import { branchProfiles } from "../lib/branches";
 import { sitePageGroups } from "../lib/site-pages";
 import type { EditableSiteContent } from "../lib/site-content-defaults";
 
-const homeSectionLinks = [
+type NavigationChild = {
+  label: string;
+  href: string;
+};
+
+type NavigationItem = {
+  label: string;
+  href: string;
+  meta?: string;
+  children?: NavigationChild[];
+};
+
+type NavigationGroup = {
+  id: string;
+  label: string;
+  href: string;
+  slugs: string[];
+  items: NavigationItem[];
+};
+
+const homeSectionLinks: NavigationItem[] = [
   { label: "Takken", href: "/#takken" },
   { label: "Activiteiten", href: "/#activiteiten" },
-  { label: "Kamp", href: "/zomerkamp" },
   { label: "Contact", href: "/#contact" },
 ];
 
-function getNavigationGroups(content?: EditableSiteContent) {
+function getBranchItems(): NavigationItem[] {
+  return [
+    { label: "Alle takken", href: "/takken" },
+    ...branchProfiles.map((branch) => ({
+      label: branch.name,
+      href: `/takken/${branch.slug}#info`,
+      meta: branch.age,
+      children: [
+        { label: "Info", href: `/takken/${branch.slug}#info` },
+        { label: "Leiding", href: `/takken/${branch.slug}#leiding` },
+        { label: "Programma", href: `/takken/${branch.slug}#programma` },
+      ],
+    })),
+  ];
+}
+
+function getNavigationGroups(content?: EditableSiteContent): NavigationGroup[] {
   const groupLabels: Record<string, string> = {
+    "Activiteiten en evenementen": content?.navActivitiesLabel || "Activiteiten",
+    "Praktisch en steun": content?.navPracticalLabel || "Praktisch",
     Activiteiten: content?.navActivitiesLabel || "Activiteiten",
-    "Steun ons": content?.navSupportLabel || "Steun ons",
     Praktisch: content?.navPracticalLabel || "Praktisch",
-    Meer: content?.navMoreLabel || "Meer",
   };
+
+  const pageGroups = sitePageGroups.map((group) => {
+    const items = group.items.filter((item) => item.href);
+    const firstHref = items[0]?.href || "/#home";
+    const slugs = group.pages.map((page) => page.slug);
+
+    return {
+      id: group.label.toLowerCase().replace(/\s+/g, "-"),
+      label: groupLabels[group.label] || group.label,
+      href: firstHref,
+      slugs,
+      items,
+    };
+  });
 
   return [
     {
@@ -37,33 +86,23 @@ function getNavigationGroups(content?: EditableSiteContent) {
       label: content?.navBranchesLabel || "Takken",
       href: "/takken",
       slugs: ["takken"],
+      items: getBranchItems(),
+    },
+    ...pageGroups,
+    {
+      id: "contact",
+      label: "Contact",
+      href: "/#contact",
+      slugs: [],
       items: [
-        { label: "Alle takken", href: "/takken" },
-        ...branchProfiles.map((branch) => ({
-          label: branch.name,
-          href: `/takken/${branch.slug}`,
-          meta: branch.age,
-        })),
+        { label: "Contactgegevens", href: "/#contact" },
+        { label: content?.navCtaLabel || "Word lid", href: "/#contact" },
       ],
     },
-    ...sitePageGroups.map((group) => {
-      const items = group.items.filter((item) => item.href);
-      const firstHref = items[0]?.href || "/#home";
-      const slugs = group.pages.map((page) => page.slug);
-
-      return {
-        ...group,
-        id: group.label.toLowerCase().replace(/\s+/g, "-"),
-        label: groupLabels[group.label] || group.label,
-        href: firstHref,
-        slugs,
-        items,
-      };
-    }),
   ];
 }
 
-const fallbackNavigationGroups = [
+const fallbackNavigationGroups: NavigationGroup[] = [
   {
     id: "home",
     label: "Home",
@@ -105,6 +144,8 @@ export default function Navbar({
   const [openMobileGroup, setOpenMobileGroup] = useState(
     fallbackNavigationGroups[0].id
   );
+  const [openDesktopBranch, setOpenDesktopBranch] = useState("");
+  const [openMobileBranch, setOpenMobileBranch] = useState("");
   const [logoFailed, setLogoFailed] = useState(false);
   const pathname = usePathname();
   const activeSlug = pathname.replace(/^\//, "").split("/")[0];
@@ -174,7 +215,11 @@ export default function Navbar({
                 <Chevron />
               </Link>
 
-              <div className="pointer-events-none absolute left-1/2 top-full w-72 -translate-x-1/2 translate-y-3 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+              <div
+                className={`pointer-events-none absolute left-1/2 top-full -translate-x-1/2 translate-y-3 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100 ${
+                  group.id === "takken" ? "w-80" : "w-72"
+                }`}
+              >
                 <div className="forest-glass-menu rounded-3xl p-3 text-slate-950">
                   <Link
                     className="mb-2 block rounded-2xl bg-[#edf6e8] px-4 py-3 text-sm font-black text-[#103001] transition hover:bg-[#d7e8cf]"
@@ -182,20 +227,70 @@ export default function Navbar({
                   >
                     {group.id === "home" ? "Naar de homepage" : group.label}
                   </Link>
-                  {group.items.map((item) => (
-                    <Link
-                      className="flex items-center justify-between gap-4 rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
-                      href={item.href}
-                      key={item.href}
-                    >
-                      <span>{item.label}</span>
-                      {"meta" in item && typeof item.meta === "string" && item.meta ? (
-                        <span className="text-xs font-semibold text-slate-400">
-                          {item.meta}
-                        </span>
-                      ) : null}
-                    </Link>
-                  ))}
+                  {group.items.map((item) =>
+                    item.children?.length ? (
+                      <div className="rounded-2xl" key={item.href}>
+                        <button
+                          aria-expanded={openDesktopBranch === item.href}
+                          className="flex w-full items-center justify-between gap-4 rounded-2xl px-4 py-3 text-left text-sm font-bold text-slate-700 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                          onClick={() =>
+                            setOpenDesktopBranch((current) =>
+                              current === item.href ? "" : item.href
+                            )
+                          }
+                          type="button"
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate">{item.label}</span>
+                            {item.meta ? (
+                              <span className="block text-xs font-semibold text-slate-400">
+                                {item.meta}
+                              </span>
+                            ) : null}
+                          </span>
+                          <span
+                            className={`shrink-0 transition ${
+                              openDesktopBranch === item.href ? "rotate-180" : ""
+                            }`}
+                          >
+                            <Chevron />
+                          </span>
+                        </button>
+                        <div
+                          className={`overflow-hidden transition-all duration-200 ${
+                            openDesktopBranch === item.href
+                              ? "max-h-40 opacity-100"
+                              : "max-h-0 opacity-0"
+                          }`}
+                        >
+                          <div className="mx-3 mb-2 grid gap-1 border-l border-[#d7e8cf] pl-3">
+                            {item.children.map((child) => (
+                              <Link
+                                className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-[#103001]"
+                                href={child.href}
+                                key={child.href}
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <Link
+                        className="flex items-center justify-between gap-4 rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                        href={item.href}
+                        key={item.href}
+                      >
+                        <span>{item.label}</span>
+                        {item.meta ? (
+                          <span className="text-xs font-semibold text-slate-400">
+                            {item.meta}
+                          </span>
+                        ) : null}
+                      </Link>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -264,7 +359,7 @@ export default function Navbar({
               <div
                 className={`overflow-hidden transition-all duration-300 ${
                   openMobileGroup === group.id
-                    ? "max-h-[520px] opacity-100"
+                    ? "max-h-[720px] opacity-100"
                     : "max-h-0 opacity-0"
                 }`}
               >
@@ -276,21 +371,72 @@ export default function Navbar({
                   >
                     {group.id === "home" ? "Naar de homepage" : `Naar ${group.label}`}
                   </Link>
-                  {group.items.map((item) => (
-                    <Link
-                      className="flex items-center justify-between gap-4 rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
-                      href={item.href}
-                      key={item.href}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>{item.label}</span>
-                      {"meta" in item && typeof item.meta === "string" && item.meta ? (
-                        <span className="text-xs font-semibold text-slate-400">
-                          {item.meta}
-                        </span>
-                      ) : null}
-                    </Link>
-                  ))}
+                  {group.items.map((item) =>
+                    item.children?.length ? (
+                      <div className="rounded-2xl" key={item.href}>
+                        <button
+                          aria-expanded={openMobileBranch === item.href}
+                          className="flex w-full items-center justify-between gap-4 rounded-2xl px-4 py-2.5 text-left text-sm font-semibold text-slate-600 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                          onClick={() =>
+                            setOpenMobileBranch((current) =>
+                              current === item.href ? "" : item.href
+                            )
+                          }
+                          type="button"
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate">{item.label}</span>
+                            {item.meta ? (
+                              <span className="block text-xs font-semibold text-slate-400">
+                                {item.meta}
+                              </span>
+                            ) : null}
+                          </span>
+                          <span
+                            className={`shrink-0 transition ${
+                              openMobileBranch === item.href ? "rotate-180" : ""
+                            }`}
+                          >
+                            <Chevron />
+                          </span>
+                        </button>
+                        <div
+                          className={`overflow-hidden transition-all duration-200 ${
+                            openMobileBranch === item.href
+                              ? "max-h-40 opacity-100"
+                              : "max-h-0 opacity-0"
+                          }`}
+                        >
+                          <div className="mx-3 mb-2 grid gap-1 border-l border-[#d7e8cf] pl-3">
+                            {item.children.map((child) => (
+                              <Link
+                                className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-[#103001]"
+                                href={child.href}
+                                key={child.href}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <Link
+                        className="flex items-center justify-between gap-4 rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                        href={item.href}
+                        key={item.href}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <span>{item.label}</span>
+                        {item.meta ? (
+                          <span className="text-xs font-semibold text-slate-400">
+                            {item.meta}
+                          </span>
+                        ) : null}
+                      </Link>
+                    )
+                  )}
                 </div>
               </div>
             </div>
