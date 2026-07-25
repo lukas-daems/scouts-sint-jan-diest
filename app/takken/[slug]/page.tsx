@@ -109,7 +109,10 @@ export default async function BranchDetailPage({
         </div>
       </section>
 
-      <section className="px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
+      <section
+        className="scroll-mt-24 px-5 py-14 sm:px-8 sm:py-20 lg:px-10"
+        id="info"
+      >
         <div className="mx-auto grid max-w-7xl items-stretch gap-7 lg:grid-cols-[0.82fr_1.18fr]">
           <aside className="premium-card flex h-full flex-col p-6 sm:p-7">
             <div>
@@ -165,7 +168,10 @@ export default async function BranchDetailPage({
         </div>
       </section>
 
-      <section className="bg-white px-5 py-16 sm:px-8 sm:py-24 lg:px-10">
+      <section
+        className="scroll-mt-24 bg-white px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+        id="leiding"
+      >
         <div className="mx-auto grid max-w-7xl gap-10 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:grid-cols-[0.95fr_1.05fr] lg:p-10">
           <div className="overflow-hidden rounded-[1.7rem] bg-[#edf6e8]">
             {branch.leaderPhotoUrl ? (
@@ -220,7 +226,10 @@ export default async function BranchDetailPage({
         </div>
       </section>
 
-      <section className="bg-[#fbfdf9] px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
+      <section
+        className="scroll-mt-24 bg-[#fbfdf9] px-5 py-14 sm:px-8 sm:py-20 lg:px-10"
+        id="programma"
+      >
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8 lg:p-10">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
