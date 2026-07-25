@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { branchProfiles } from "../lib/branches";
@@ -91,7 +91,7 @@ function getNavigationGroups(content?: EditableSiteContent): NavigationGroup[] {
     ...pageGroups,
     {
       id: "contact",
-      label: "Contact",
+      label: content?.navContactLabel || "Contact",
       href: "/#contact",
       slugs: [],
       items: [
@@ -155,32 +155,6 @@ export default function Navbar({
   const hasUploadedLogo = Boolean(preferredLogo && !logoFailed);
   const shouldCutOutLogo = hasUploadedLogo && !contrastLogo;
   const navigationGroups = getNavigationGroups(content);
-
-  useEffect(() => {
-    if (!pathname.startsWith("/takken/")) {
-      return;
-    }
-
-    const sections = Array.from(document.querySelectorAll("main > section"));
-    [
-      { id: "info", section: sections[1] },
-      { id: "leiding", section: sections[2] },
-      { id: "programma", section: sections[3] },
-    ].forEach(({ id, section }) => {
-      if (section) {
-        section.id = id;
-        section.classList.add("scroll-mt-24");
-      }
-    });
-
-    if (["#info", "#leiding", "#programma"].includes(window.location.hash)) {
-      window.setTimeout(() => {
-        document.querySelector(window.location.hash)?.scrollIntoView({
-          block: "start",
-        });
-      }, 80);
-    }
-  }, [pathname]);
 
   function isActive(slugs: string[]) {
     if (slugs.includes("")) {
