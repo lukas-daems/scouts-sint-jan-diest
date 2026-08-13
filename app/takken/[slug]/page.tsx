@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BranchLogo from "../../components/BranchLogo";
 import Footer from "../../components/Footer";
-import Navbar from "../../components/Navbar";
 import SiteEditor from "../../components/SiteEditor";
+import SitePageHero from "../../components/SitePageHero";
 import {
   branchProfiles,
   getBranchBySlug,
@@ -55,59 +55,35 @@ export default async function BranchDetailPage({
       : branch.planningInfo.emptyText;
 
   return (
-    <main className="min-h-screen bg-[#f7fbff] text-slate-950">
-      <section className="hero-sky relative isolate overflow-hidden px-5 pb-16 pt-28 text-white sm:px-8 sm:pb-20 sm:pt-32 lg:px-10">
-        <Navbar
-          content={siteContent}
-          logoUrl={siteContent.siteLogoUrl}
-          siteName={siteContent.siteName}
-        />
-        <div aria-hidden="true" className="hero-lines absolute inset-0" />
-        <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="section-fade">
-            <Link
-              className="forest-glass-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50 transition hover:bg-white/20"
-              href="/takken"
+    <main className="min-h-screen bg-[#f6f8f3] text-slate-950">
+      <SitePageHero
+        beforeTitle={
+          <div className="mb-6 flex flex-wrap items-center gap-4">
+            <BranchLogo branch={branch} content={siteContent} size="hero" />
+            <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-[#103001] shadow-sm">
+              {branch.age}
+            </span>
+          </div>
+        }
+        content={siteContent}
+        eyebrow="Terug naar alle takken"
+        imageUrl={branch.imageUrl}
+        intro={branch.intro}
+        primaryCta={{ label: `Vraag info over ${branch.name}`, href: "/#contact" }}
+        secondaryCta={{ label: "Alle takken", href: "/takken" }}
+        title={branch.name}
+      >
+        <div className="mt-7 flex flex-wrap gap-3">
+          {branch.highlights.map((highlight) => (
+            <span
+              className="rounded-full border border-white/40 bg-black/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white"
+              key={highlight}
             >
-              Terug naar alle takken
-            </Link>
-            <div className="mb-6 flex items-center gap-4">
-              <BranchLogo branch={branch} content={siteContent} size="hero" />
-              <span className="forest-glass-light rounded-full px-4 py-2 text-sm font-black text-[#103001]">
-                {branch.age}
-              </span>
-            </div>
-            <h1 className="text-5xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
-              {branch.name}
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-green-50 sm:text-lg">
-              {branch.intro}
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              {branch.highlights.map((highlight) => (
-                <span
-                  className="forest-glass-pill rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-green-50"
-                  key={highlight}
-                >
-                  {highlight}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="hero-visual-card p-2 sm:p-3">
-            <div
-              aria-label={`${branch.name} in de natuur`}
-              className="camp-scene has-photo min-h-[320px] lg:min-h-[360px]"
-              role="img"
-              style={{
-                backgroundImage: `url("${branch.imageUrl}")`,
-              }}
-            />
-          </div>
+              {highlight}
+            </span>
+          ))}
         </div>
-      </section>
+      </SitePageHero>
 
       <section
         className="scroll-mt-24 px-5 py-14 sm:px-8 sm:py-20 lg:px-10"
@@ -318,7 +294,7 @@ export default async function BranchDetailPage({
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {otherBranches.map((item, index) => (
               <Link
-                className="forest-glass-light lift-card rounded-3xl p-6 shadow-sm"
+                className="lift-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
                 href={`/takken/${item.slug}`}
                 key={item.slug}
               >
