@@ -165,49 +165,49 @@ export default function Navbar({
   }
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50">
+    <header className="absolute inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white text-[#103001] shadow-sm">
       <nav
         aria-label="Hoofdnavigatie"
         className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-10"
       >
         <Link
-          className="flex min-w-0 flex-1 items-center gap-3 text-white lg:max-w-[300px] lg:flex-none xl:max-w-[380px]"
+          className="flex min-w-0 flex-1 items-center gap-3 text-[#103001] lg:max-w-[340px] lg:flex-none xl:max-w-[400px]"
           href="/#home"
         >
-          <span className="flex h-11 max-w-[76px] shrink-0 items-center overflow-visible sm:h-14 sm:max-w-[104px] lg:h-16 lg:max-w-[116px]">
+          <span className="flex h-12 max-w-[86px] shrink-0 items-center overflow-visible sm:h-14 sm:max-w-[112px] lg:h-16 lg:max-w-[128px]">
             {logoSrc ? (
               <img
                 alt={`Logo van ${siteName}`}
-                className={`h-full w-auto max-w-full object-contain drop-shadow-[0_12px_24px_rgba(7,26,2,0.28)] ${
+                className={`h-full w-auto max-w-full object-contain ${
                   shouldCutOutLogo ? "site-logo-cutout" : "rounded-full"
                 }`}
                 onError={() => setLogoFailed(true)}
                 src={logoSrc}
               />
             ) : (
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001] shadow-xl shadow-green-950/20 ring-1 ring-white/40">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#edf6e8] text-sm font-black text-[#103001] ring-1 ring-[#d7e8cf]">
                 SJ
               </span>
             )}
           </span>
           <span className="min-w-0">
-            <span className="block max-w-[155px] truncate text-xs font-black leading-tight tracking-tight text-white sm:max-w-[240px] sm:text-base lg:max-w-[260px]">
+            <span className="block max-w-[190px] truncate text-sm font-black leading-tight tracking-tight text-[#103001] sm:max-w-[260px] sm:text-lg lg:max-w-[290px]">
               {siteName}
             </span>
-            <span className="hidden truncate text-xs font-semibold text-green-100/90 xl:block">
+            <span className="hidden truncate text-xs font-semibold text-slate-500 xl:block">
               {content?.heroOrgLabel || "Scouts en Gidsen Vlaanderen"}
             </span>
           </span>
         </Link>
 
-        <div className="hidden items-center gap-1 lg:flex">
+        <div className="hidden h-20 items-stretch lg:flex">
           {navigationGroups.map((group) => (
-            <div className="group relative py-6" key={group.id}>
+            <div className="group relative flex items-center" key={group.id}>
               <Link
-                className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold transition hover:bg-white/10 hover:text-white xl:px-4 ${
+                className={`flex h-20 items-center gap-1.5 border-b-2 px-3 text-sm font-black uppercase tracking-[0.02em] transition xl:px-4 ${
                   isActive(group.slugs)
-                    ? "bg-white/15 text-white ring-1 ring-white/25"
-                    : "text-white/82"
+                    ? "border-[#103001] text-[#103001]"
+                    : "border-transparent text-slate-700 hover:border-[#2f6b18] hover:text-[#103001]"
                 }`}
                 href={group.href}
               >
@@ -220,19 +220,19 @@ export default function Navbar({
                   group.id === "takken" ? "w-80" : "w-72"
                 }`}
               >
-                <div className="forest-glass-menu rounded-3xl p-3 text-slate-950">
+                <div className="forest-glass-menu rounded-2xl p-3 text-slate-950">
                   <Link
-                    className="mb-2 block rounded-2xl bg-[#edf6e8] px-4 py-3 text-sm font-black text-[#103001] transition hover:bg-[#d7e8cf]"
+                    className="mb-2 block rounded-xl bg-[#edf6e8] px-4 py-3 text-sm font-black text-[#103001] transition hover:bg-[#d7e8cf]"
                     href={group.href}
                   >
                     {group.id === "home" ? "Naar de homepage" : group.label}
                   </Link>
                   {group.items.map((item) =>
                     item.children?.length ? (
-                      <div className="rounded-2xl" key={item.href}>
+                      <div className="rounded-xl" key={item.href}>
                         <button
                           aria-expanded={openDesktopBranch === item.href}
-                          className="flex w-full items-center justify-between gap-4 rounded-2xl px-4 py-3 text-left text-sm font-bold text-slate-700 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                          className="flex w-full items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm font-bold text-slate-700 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
                           onClick={() =>
                             setOpenDesktopBranch((current) =>
                               current === item.href ? "" : item.href
@@ -266,7 +266,7 @@ export default function Navbar({
                           <div className="mx-3 mb-2 grid gap-1 border-l border-[#d7e8cf] pl-3">
                             {item.children.map((child) => (
                               <Link
-                                className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-[#103001]"
+                                className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-[#103001]"
                                 href={child.href}
                                 key={child.href}
                               >
@@ -278,7 +278,7 @@ export default function Navbar({
                       </div>
                     ) : (
                       <Link
-                        className="flex items-center justify-between gap-4 rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                        className="flex items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
                         href={item.href}
                         key={item.href}
                       >
@@ -298,7 +298,7 @@ export default function Navbar({
         </div>
 
         <Link
-          className="hidden rounded-full bg-white px-6 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-green-950/20 transition hover:-translate-y-0.5 hover:bg-green-50 lg:inline-flex"
+          className="hidden h-20 items-center bg-[#103001] px-7 text-sm font-black text-white transition hover:bg-[#1e4b0d] lg:flex"
           href="/#contact"
         >
           {content?.navCtaLabel || "Word lid"}
@@ -307,7 +307,7 @@ export default function Navbar({
         <button
           aria-expanded={isOpen}
           aria-label="Menu openen"
-          className="forest-glass-pill inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/20 lg:hidden"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#103001] text-white transition hover:bg-[#1e4b0d] lg:hidden"
           onClick={() => setIsOpen((current) => !current)}
           type="button"
         >
@@ -330,7 +330,7 @@ export default function Navbar({
       </nav>
 
       <div
-        className={`forest-glass-menu mx-5 overflow-hidden rounded-3xl transition-all duration-300 sm:mx-8 lg:hidden ${
+        className={`forest-glass-menu mx-5 overflow-hidden rounded-2xl transition-all duration-300 sm:mx-8 lg:hidden ${
           isOpen ? "max-h-[calc(100vh-6.5rem)] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -365,7 +365,7 @@ export default function Navbar({
               >
                 <div className="mx-3 mb-3 grid gap-1 border-l border-slate-200 pl-3">
                   <Link
-                    className="rounded-2xl bg-white px-4 py-2.5 text-sm font-black text-[#103001] ring-1 ring-slate-100 transition hover:bg-[#edf6e8]"
+                    className="rounded-xl bg-white px-4 py-2.5 text-sm font-black text-[#103001] ring-1 ring-slate-100 transition hover:bg-[#edf6e8]"
                     href={group.href}
                     onClick={() => setIsOpen(false)}
                   >
@@ -373,10 +373,10 @@ export default function Navbar({
                   </Link>
                   {group.items.map((item) =>
                     item.children?.length ? (
-                      <div className="rounded-2xl" key={item.href}>
+                      <div className="rounded-xl" key={item.href}>
                         <button
                           aria-expanded={openMobileBranch === item.href}
-                          className="flex w-full items-center justify-between gap-4 rounded-2xl px-4 py-2.5 text-left text-sm font-semibold text-slate-600 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                          className="flex w-full items-center justify-between gap-4 rounded-xl px-4 py-2.5 text-left text-sm font-semibold text-slate-600 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
                           onClick={() =>
                             setOpenMobileBranch((current) =>
                               current === item.href ? "" : item.href
@@ -410,7 +410,7 @@ export default function Navbar({
                           <div className="mx-3 mb-2 grid gap-1 border-l border-[#d7e8cf] pl-3">
                             {item.children.map((child) => (
                               <Link
-                                className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-[#103001]"
+                                className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-[#103001]"
                                 href={child.href}
                                 key={child.href}
                                 onClick={() => setIsOpen(false)}
@@ -423,7 +423,7 @@ export default function Navbar({
                       </div>
                     ) : (
                       <Link
-                        className="flex items-center justify-between gap-4 rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
+                        className="flex items-center justify-between gap-4 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-[#f2f8ee] hover:text-[#103001]"
                         href={item.href}
                         key={item.href}
                         onClick={() => setIsOpen(false)}
