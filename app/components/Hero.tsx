@@ -43,40 +43,59 @@ function getHeroCopy(content: EditableSiteContent) {
 
 export default function Hero({ content }: HeroProps) {
   const heroImage = content.heroImageUrl || images.hero;
+  const heroLogo = content.siteLogoDarkBackgroundUrl || content.siteLogoUrl || "";
   const copy = getHeroCopy(content);
   const imageStyle = {
-    backgroundImage: `linear-gradient(180deg, rgba(7, 82, 199, 0.08), rgba(4, 18, 50, 0.58)), url("${heroImage}")`,
+    backgroundImage: `url("${heroImage}")`,
   };
 
   return (
     <section
-      className="hero-sky relative z-20 isolate overflow-visible px-5 pb-0 pt-28 text-white sm:px-8 lg:min-h-[760px] lg:px-10 lg:pt-32"
+      className="hero-photo relative z-20 isolate min-h-[720px] overflow-hidden bg-[#103001] px-5 pt-20 text-white sm:px-8 lg:min-h-[780px] lg:px-10"
       id="home"
     >
-      <div aria-hidden="true" className="hero-lines absolute inset-0" />
-      <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-55" />
-      <div className="relative mx-auto flex max-w-7xl flex-col items-center">
-        <div className="section-fade max-w-4xl text-center">
-          <div className="hero-eyebrow-badge mb-4 inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-bold uppercase leading-none tracking-[0.14em] text-green-50 sm:text-xs">
+      <div
+        aria-label="Scoutsactiviteit in de natuur"
+        className="absolute inset-0 bg-cover bg-center"
+        role="img"
+        style={imageStyle}
+      />
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,12,1,0.36)_0%,rgba(6,18,3,0.42)_34%,rgba(6,18,3,0.7)_100%)]" />
+      <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-25" />
+
+      <div className="relative mx-auto flex min-h-[calc(720px-5rem)] max-w-7xl flex-col items-center justify-center py-14 text-center lg:min-h-[calc(780px-5rem)] lg:py-20">
+        {heroLogo ? (
+          <img
+            alt={`Logo van ${content.siteName || "Scouts Sint-Jan Berchmans"}`}
+            className={`site-logo-hero-mark mb-6 h-20 w-auto max-w-[180px] object-contain drop-shadow-[0_18px_38px_rgba(0,0,0,0.34)] sm:h-24 sm:max-w-[240px] ${
+              content.siteLogoDarkBackgroundUrl ? "" : "site-logo-cutout"
+            }`}
+            src={heroLogo}
+          />
+        ) : null}
+
+        <div className="section-fade max-w-5xl">
+          <div className="hero-eyebrow-badge mb-5 inline-flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-full px-4 py-2 text-[0.68rem] font-bold uppercase leading-none tracking-[0.14em] text-green-50 sm:text-xs">
             <span>{copy.eyebrow}</span>
-            <span>{content.heroOrgLabel}</span>
+            {content.heroOrgLabel ? <span>{content.heroOrgLabel}</span> : null}
           </div>
-          <h1 className="text-4xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl">
+
+          <h1 className="mx-auto max-w-5xl text-4xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
             {copy.titleLineOne}
             <span className="mt-1 block sm:mt-2">{copy.titleLineTwo}</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-[820px] text-base leading-7 text-green-50 sm:text-xl sm:leading-8">
+          <p className="mx-auto mt-5 max-w-[780px] text-base font-medium leading-7 text-white/90 sm:text-xl sm:leading-8">
             {copy.subtitle}
           </p>
-          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              className="inline-flex w-full items-center justify-center rounded-full bg-white px-9 py-4 text-sm font-bold text-slate-950 shadow-xl shadow-green-950/20 transition hover:-translate-y-1 hover:bg-green-50 sm:w-auto"
+              className="inline-flex w-full items-center justify-center rounded-full bg-white px-9 py-4 text-sm font-black text-[#103001] shadow-xl shadow-black/20 transition hover:-translate-y-1 hover:bg-green-50 sm:w-auto"
               href="#contact"
             >
               {content.heroPrimaryCtaLabel}
             </a>
             <a
-              className="forest-glass-pill inline-flex w-full items-center justify-center rounded-full px-9 py-4 text-sm font-bold text-white transition hover:-translate-y-1 hover:bg-white/20 sm:w-auto"
+              className="inline-flex w-full items-center justify-center rounded-full border border-white/70 bg-transparent px-9 py-4 text-sm font-black text-white transition hover:-translate-y-1 hover:bg-white/12 sm:w-auto"
               href="#takken"
             >
               {content.heroSecondaryCtaLabel}
@@ -84,33 +103,15 @@ export default function Hero({ content }: HeroProps) {
           </div>
         </div>
 
-        <div className="hero-visual-card relative z-[60] mt-6 w-full max-w-6xl translate-y-5 overflow-visible p-2 sm:mt-7 sm:p-3 lg:mt-8 lg:translate-y-7">
-          {/* TODO: vervang deze CSS-placeholder door een echte hero-foto van Scouts Sint-Jan Berchmans. */}
-          <div
-            aria-label="Tenten op een scoutskamp in de natuur"
-            className="camp-scene has-photo"
-            role="img"
-            style={imageStyle}
-          >
-            <span className="camp-tree" />
-            <span className="camp-tree" />
-            <span className="camp-tree" />
-            <span className="camp-tree" />
-            <span className="camp-fire" />
-          </div>
-          <div className="relative z-20 -mt-8 grid grid-cols-2 gap-2 px-2 sm:absolute sm:inset-x-5 sm:bottom-5 sm:mt-0 sm:grid-cols-4 sm:px-0">
-            {copy.stats.map(([title, label]) => (
-              <div
-                className="hero-floating-card rounded-2xl px-3 py-2.5 text-slate-950 sm:px-4 sm:py-3"
-                key={title}
-              >
-                <p className="text-sm font-black sm:text-lg">{title}</p>
-                <p className="text-[0.62rem] font-semibold uppercase text-slate-500 sm:text-xs">
-                  {label}
-                </p>
-              </div>
-            ))}
-          </div>
+        <div className="mt-12 grid w-full max-w-5xl grid-cols-2 gap-3 sm:grid-cols-4 lg:mt-14">
+          {copy.stats.map(([title, label], index) => (
+            <div className="hero-photo-stat rounded-2xl px-4 py-3 text-left" key={`${title}-${index}`}>
+              <p className="text-sm font-black text-slate-950 sm:text-lg">{title}</p>
+              <p className="mt-1 text-[0.62rem] font-bold uppercase tracking-[0.08em] text-slate-500 sm:text-xs">
+                {label}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
