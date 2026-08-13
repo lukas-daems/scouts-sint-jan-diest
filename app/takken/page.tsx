@@ -1,8 +1,8 @@
 import Link from "next/link";
 import BranchLogo from "../components/BranchLogo";
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
 import SiteEditor from "../components/SiteEditor";
+import SitePageHero from "../components/SitePageHero";
 import { branchProfiles, getEditableBranchProfile } from "../lib/branches";
 import { images } from "../lib/image-placeholders";
 import { getSiteContent } from "@/db/site-content";
@@ -14,54 +14,16 @@ export default async function BranchesPage() {
   const heroImage = siteContent.heroImageUrl || images.hero;
 
   return (
-    <main className="min-h-screen bg-[#f7fbff] text-slate-950">
-      <section className="hero-sky relative isolate overflow-hidden px-5 pb-24 pt-32 text-white sm:px-8 lg:px-10 lg:pt-36">
-        <Navbar
-          content={siteContent}
-          logoUrl={siteContent.siteLogoUrl}
-          siteName={siteContent.siteName}
-        />
-        <div aria-hidden="true" className="hero-lines absolute inset-0" />
-        <div aria-hidden="true" className="visual-noise absolute inset-0 opacity-50" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="section-fade">
-            <p className="forest-glass-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-green-50">
-              Takken van {siteContent.siteName}
-            </p>
-            <h1 className="text-5xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
-              {siteContent.branchesPageTitle}
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-green-50">
-              {siteContent.branchesPageSubtitle}
-            </p>
-            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-              <Link
-                className="inline-flex justify-center rounded-full bg-white px-7 py-4 text-sm font-bold text-slate-950 shadow-xl shadow-green-950/20 transition hover:-translate-y-0.5 hover:bg-green-50"
-                href="/#contact"
-              >
-                Vraag info aan
-              </Link>
-              <Link
-                className="forest-glass-pill inline-flex justify-center rounded-full px-7 py-4 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/20"
-                href="/#takken"
-              >
-                Terug naar homepage
-              </Link>
-            </div>
-          </div>
-
-          <div className="hero-visual-card p-2 sm:p-3">
-            <div
-              aria-label="Scouts in de natuur"
-              className="camp-scene has-photo min-h-[360px]"
-              role="img"
-              style={{
-                backgroundImage: `linear-gradient(180deg, rgba(16, 48, 1, 0.05), rgba(7, 26, 2, 0.64)), url("${heroImage}")`,
-              }}
-            />
-          </div>
-        </div>
-      </section>
+    <main className="min-h-screen bg-[#f6f8f3] text-slate-950">
+      <SitePageHero
+        content={siteContent}
+        eyebrow={`Takken van ${siteContent.siteName}`}
+        imageUrl={heroImage}
+        intro={siteContent.branchesPageSubtitle}
+        primaryCta={{ label: "Vraag info aan", href: "/#contact" }}
+        secondaryCta={{ label: "Terug naar homepage", href: "/#takken" }}
+        title={siteContent.branchesPageTitle}
+      />
 
       <section className="px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
         <div className="mx-auto max-w-7xl">
@@ -84,7 +46,7 @@ export default async function BranchesPage() {
 
               return (
                 <Link
-                  className="forest-glass-light lift-card group relative overflow-hidden rounded-[1.8rem] p-6 shadow-xl shadow-green-950/6 sm:p-7"
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-[#d7e8cf] hover:shadow-xl hover:shadow-green-950/8 sm:p-7"
                   href={`/takken/${branch.slug}`}
                   key={branch.slug}
                 >
@@ -99,7 +61,7 @@ export default async function BranchesPage() {
                         <h3 className="text-2xl font-black text-slate-950">
                           {branch.name}
                         </h3>
-                        <span className="forest-glass-light rounded-full px-3.5 py-1.5 text-xs font-bold text-[#103001]">
+                        <span className="rounded-full bg-[#edf6e8] px-3.5 py-1.5 text-xs font-bold text-[#103001] ring-1 ring-[#d7e8cf]">
                           {branch.age}
                         </span>
                       </div>
@@ -109,7 +71,7 @@ export default async function BranchesPage() {
                       <div className="mt-5 flex flex-wrap gap-2">
                         {branch.highlights.slice(0, 3).map((highlight) => (
                           <span
-                            className="forest-glass-light rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-slate-500"
+                            className="rounded-full bg-[#f6f8f3] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-slate-500 ring-1 ring-slate-200"
                             key={highlight}
                           >
                             {highlight}
