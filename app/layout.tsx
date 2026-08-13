@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./association-redesign.css";
 
 export const metadata: Metadata = {
   title: "Scouts Sint-Jan Berchmans",
