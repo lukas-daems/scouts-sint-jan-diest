@@ -105,7 +105,10 @@ export default function Hero({ content }: HeroProps) {
 
         <div className="mt-12 grid w-full max-w-5xl grid-cols-2 gap-3 sm:grid-cols-4 lg:mt-14">
           {copy.stats.map(([title, label], index) => (
-            <div className="hero-photo-stat rounded-2xl px-4 py-3 text-left" key={`${title}-${index}`}>
+            <div
+              className="rounded-2xl border border-white/70 bg-white/90 px-4 py-3 text-left shadow-xl shadow-black/15 backdrop-blur-md"
+              key={`${title}-${index}`}
+            >
               <p className="text-sm font-black text-slate-950 sm:text-lg">{title}</p>
               <p className="mt-1 text-[0.62rem] font-bold uppercase tracking-[0.08em] text-slate-500 sm:text-xs">
                 {label}
