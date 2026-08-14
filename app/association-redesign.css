@@ -4,6 +4,33 @@ body {
   background: #f6f8f3;
 }
 
+header nav,
+header nav .h-20,
+header nav a.h-20 {
+  height: 4rem !important;
+}
+
+header nav {
+  gap: 1rem;
+}
+
+header nav > a:first-child > span:first-child {
+  height: 3rem !important;
+  max-width: 5.4rem !important;
+}
+
+header nav > a:first-child img {
+  max-height: 3rem;
+}
+
+header nav > a:first-child span span:first-child {
+  font-size: clamp(0.84rem, 1.05vw, 1rem) !important;
+}
+
+header nav > a:last-of-type {
+  padding-inline: 1.4rem !important;
+}
+
 .hero-sky {
   background:
     linear-gradient(90deg, rgba(7, 26, 2, 0.74), rgba(16, 48, 1, 0.78)),
@@ -12,23 +39,26 @@ body {
 }
 
 .hero-sky .hero-lines {
-  opacity: 0.18;
+  opacity: 0.12;
 }
 
 .hero-sky .visual-noise {
-  opacity: 0.16;
+  opacity: 0.14;
 }
 
 .hero-sky > .relative.mx-auto.grid {
   display: block;
-  min-height: 500px;
-  padding-block: clamp(3.5rem, 8vw, 7rem);
+  min-height: 560px;
+  max-width: none;
+  position: static;
+  padding-block: clamp(4rem, 8vw, 7.5rem);
 }
 
 .hero-sky > .relative.mx-auto.grid > .section-fade {
   position: relative;
   z-index: 2;
   max-width: 48rem;
+  margin-inline: auto;
 }
 
 .hero-sky > .relative.mx-auto.grid > .hero-visual-card {
@@ -49,7 +79,9 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(5, 15, 2, 0.82), rgba(8, 27, 3, 0.58) 56%, rgba(8, 27, 3, 0.34));
+  background:
+    linear-gradient(90deg, rgba(5, 15, 2, 0.84), rgba(8, 27, 3, 0.6) 54%, rgba(8, 27, 3, 0.38)),
+    linear-gradient(180deg, rgba(5, 15, 2, 0.2), rgba(5, 15, 2, 0.5));
   pointer-events: none;
 }
 
@@ -94,15 +126,45 @@ body {
   opacity: 0.12;
 }
 
+main section:not(.hero-sky):not(.hero-photo) div[class*="bg-[#103001]"] {
+  border: 1px solid #d7e8cf;
+  background: #f7fbf4 !important;
+  color: #103001 !important;
+}
+
+main section:not(.hero-sky):not(.hero-photo) div[class*="bg-[#103001]"] [class*="text-white"],
+main section:not(.hero-sky):not(.hero-photo) div[class*="bg-[#103001]"] [class*="text-green-50"],
+main section:not(.hero-sky):not(.hero-photo) div[class*="bg-[#103001]"] [class*="text-green-100"] {
+  color: #103001 !important;
+}
+
+main section:not(.hero-sky):not(.hero-photo) div[class*="bg-[#103001]"] a[class*="bg-white"],
+main section:not(.hero-sky):not(.hero-photo) div[class*="bg-[#103001]"] span[class*="bg-white"] {
+  border: 1px solid #d7e8cf;
+  background: #ffffff !important;
+  color: #103001 !important;
+}
+
+main section:not(.hero-sky):not(.hero-photo) section[class*="bg-[#edf6e8]"],
+main section:not(.hero-sky):not(.hero-photo) div[class*="bg-[#edf6e8]"] {
+  background: #f7fbf4 !important;
+}
+
 .lift-card:hover {
   border-color: rgba(16, 48, 1, 0.18);
   box-shadow: 0 18px 44px rgba(16, 48, 1, 0.1);
 }
 
 @media (max-width: 1023px) {
+  header nav,
+  header nav .h-20,
+  header nav a.h-20 {
+    height: 4rem !important;
+  }
+
   .hero-sky > .relative.mx-auto.grid {
-    min-height: 440px;
-    padding-block: 4rem;
+    min-height: 460px;
+    padding-block: 4.5rem;
   }
 
   .hero-sky > .relative.mx-auto.grid > .section-fade {
